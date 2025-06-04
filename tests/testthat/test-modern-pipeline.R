@@ -1,4 +1,4 @@
-source(file.path('..', '..', 'modern_pipeline.R'))
+source(file.path('..', '..', 'R', 'pipeline.R'))
 
 context('Modern pipeline functions')
 

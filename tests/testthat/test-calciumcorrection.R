@@ -1,4 +1,4 @@
-source(file.path('..','..','calciumcorrection.R'))
+source(file.path('..','..','R', 'pipeline.R'))
 
 test_that('calciumcorrection returns expected structure', {
   dummy <- data.frame(
@@ -9,7 +9,7 @@ test_that('calciumcorrection returns expected structure', {
     BG_3   = rep(3,10)
   )
 
-  result <- suppressWarnings(calciumcorrection(dummy))
+  result <- suppressWarnings(calcium_correction(dummy))
 
   expect_true(is.data.frame(result))
   expect_equal(nrow(result), nrow(dummy))

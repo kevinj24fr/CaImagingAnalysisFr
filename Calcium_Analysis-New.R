@@ -32,7 +32,8 @@ colnames(normalizedtraces)=colnames(bgcorrectedtraces)
 # Baseline Drift corrected Traces using a loess regression
 
 
-loessmatrix=data.frame(matrix(NA, nrow = nrow(bgcorrectedtraces), ncol = ncol(bgcorrectedtraces)-1))
+# Ensure the baseline correction matrix matches the number of trace columns
+loessmatrix=data.frame(matrix(NA, nrow = nrow(bgcorrectedtraces), ncol = ncol(bgcorrectedtraces)))
 #loessmatrix=data.frame(matrix(NA, nrow = nrow(normalizedtraces), ncol = ncol(normalizedtraces)-1))
 Time=(1:nrow(bgcorrectedtraces))
 for (i in 1:ncol(bgcorrectedtraces))

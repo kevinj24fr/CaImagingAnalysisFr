@@ -5,8 +5,8 @@
 #       1. Segment your cells in FIJI, and use the multimeasure function in FIJI to obtain   #
 #       raw calcium traces.                                                                  #
 #       2. Make sure to include 3 background spots from spatially nonoverlapping locations   #
-#       3. Write the data into an excel file, with the trace coloumns named Cell_ and        #
-#          background coloumns as BG_                                                        #
+#       3. Write the data into an excel file, with the trace columns named Cell_ and        #
+#          background columns as BG_                                                        #
 ##############################################################################################
 #
 #

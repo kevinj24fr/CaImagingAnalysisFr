@@ -1,0 +1,36 @@
+---
+title: "Calcium Imaging Analysis Report"
+output: html_document
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(fig.width=7, fig.height=4)
+source('R/pipeline.R')
+```
+
+## Synthetic Data
+
+```{r}
+raw <- generate_synthetic_data(n_cells = 5, n_time = 500, spike_prob = 0.05)
+head(raw)
+```
+
+## Run Analysis
+
+```{r}
+res <- run_analysis(raw, span = 0.45, penalty = 1, ar_order = 2)
+```
+
+### Example Cell Trace
+
+```{r}
+res$cell_plot
+```
+
+### Spike Raster
+
+```{r}
+res$raster_plot
+```
+
+

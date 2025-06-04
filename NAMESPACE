@@ -1,0 +1,6 @@
+export(generate_synthetic_data)
+export(calcium_correction)
+export(infer_spikes)
+export(plot_cell_trace)
+export(plot_spike_raster)
+export(run_analysis)

@@ -1,4 +1,4 @@
 library(testthat)
-source('calciumcorrection.R')
+source(file.path('R', 'pipeline.R'))
 
 test_dir('tests/testthat')

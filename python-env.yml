@@ -1,0 +1,8 @@
+name: caimaging-env
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - oasis
+      - caiman
+      - suite2p

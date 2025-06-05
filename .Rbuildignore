@@ -1,0 +1,7 @@
+^\.github$
+^data/
+^tests/
+^python-env.yml
+^Calcium_Analysis-New\.R
+^modern_pipeline\.R
+^calciumcorrection\.R

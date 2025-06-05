@@ -1,5 +1,3 @@
-source(file.path('..', '..', 'modern_pipeline.R'))
-
 context('Modern pipeline functions')
 
 test_that('Synthetic data generation returns expected format', {
@@ -9,7 +7,6 @@ test_that('Synthetic data generation returns expected format', {
   expect_true(all(grepl('BG_', names(df)[4:6])))
   expect_equal(nrow(df), 100)
 })
-
 
 test_that('calcium_correction returns normalized traces with Time', {
   df <- generate_synthetic_data(n_cells = 2, n_time = 50)

@@ -1,5 +1,3 @@
-source(file.path('..','..','calciumcorrection.R'))
-
 test_that('calciumcorrection returns expected structure', {
   dummy <- data.frame(
     Cell_1 = 1:10,

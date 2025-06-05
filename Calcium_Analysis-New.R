@@ -12,44 +12,15 @@
 #
 #
 
-calciumcorrection=function(rawtrace){
 
-#Background corrected Traces
-background=rawtrace[,grepl("BG",names(rawtrace))]
-background$average=(background$BG_1+background$BG_2+background$BG_3)/3
-bgcorrectedtraces=rawtrace[,grepl("Cell",names(rawtrace))]-background$average
+# Load function from package
+source("R/calcium_correction.R")
 
-#Normalized Traces
-normalizationvalues=vector(length = ncol(bgcorrectedtraces))
-for (i in 1:ncol(bgcorrectedtraces)){
-normalizationvalues[i]=mean(bgcorrectedtraces[,i])
-}
-normalizedtraces=data.frame(matrix(ncol = ncol(bgcorrectedtraces), nrow = nrow(bgcorrectedtraces)))
-for (i in 1:ncol(bgcorrectedtraces)){
-  normalizedtraces[,i]=bgcorrectedtraces[,i]/normalizationvalues[i]
-}
-colnames(normalizedtraces)=colnames(bgcorrectedtraces)
-# Baseline Drift corrected Traces using a loess regression
-
-
-loessmatrix=data.frame(matrix(NA, nrow = nrow(bgcorrectedtraces), ncol = ncol(bgcorrectedtraces)-1))
-#loessmatrix=data.frame(matrix(NA, nrow = nrow(normalizedtraces), ncol = ncol(normalizedtraces)-1))
-Time=(1:nrow(bgcorrectedtraces))
-for (i in 1:ncol(bgcorrectedtraces))
-{
-  Testintermediate=as.matrix(bgcorrectedtraces[,i])
-  #plot(x=Time, y=Testintermediate, type="l")
-  loessintermediate=loess(Testintermediate ~ Time, span = 0.45)
-  smoothed=predict(loessintermediate)
-  #points(y=smoothed-2, x=Time, type="l", col="red")
-  loessmatrix[,i]=smoothed-2
-}
-correctedmatrix=bgcorrectedtraces[,1:ncol(bgcorrectedtraces)]-loessmatrix
-correctedmatrix$Time=Time
-return(correctedmatrix)
-}
-
-correctedtraces=calciumcorrection(rawtrace = readxl::read_excel("~/Documents/Documents – Kevin’s MacBook Pro/Microglia Project/Data/Microglia Project/Kevin/233+MG/B3.xlsx"))
+correctedtraces <- calcium_correction(
+  rawtrace = readxl::read_excel(
+    "~/Documents/Documents – Kevin’s MacBook Pro/Microglia Project/Data/Microglia Project/Kevin/233+MG/B3.xlsx"
+  )
+)
 
 #write.csv(correctedtraces,"A2_corrected.csv")
 

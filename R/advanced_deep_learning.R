@@ -1,10 +1,8 @@
-#' Advanced Deep Learning for Calcium Imaging
+#' Advanced Deep Learning Functions
 #'
-#' Provides self-supervised learning, transformer-based models, and transfer learning
-#' utilities for spike inference and denoising.
+#' Advanced deep learning approaches for calcium imaging analysis.
 #'
 #' @name advanced_deep_learning
-#' @docType package
 NULL
 
 #' Self-Supervised Learning for Trace Representations

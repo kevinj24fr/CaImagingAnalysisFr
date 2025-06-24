@@ -1,10 +1,4 @@
-# CaImagingAnalysisFr <img src="https://img.shields.io/badge/R-Professional-blue" align="right" height="30"/>
-
-[![CRAN Status](https://www.r-pkg.org/badges/version/CaImagingAnalysisFr)](https://cran.r-project.org/package=CaImagingAnalysisFr)
-[![Build Status](https://github.com/yourusername/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/yourusername/CaImagingAnalysisFr/actions)
-[![Coverage Status](https://codecov.io/gh/yourusername/CaImagingAnalysisFr/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/CaImagingAnalysisFr)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/CaImagingAnalysisFr)](https://cran.r-project.org/package=CaImagingAnalysisFr)
+# CaImagingAnalysisFr
 
 > **A professional, robust, and state-of-the-art R package for advanced calcium imaging analysis—no Python required.**
 
@@ -47,12 +41,6 @@
 install.packages("CaImagingAnalysisFr")
 ```
 
-**From GitHub (latest):**
-```r
-# install.packages("devtools")
-devtools::install_github("yourusername/CaImagingAnalysisFr")
-```
-
 ---
 
 ## ⚡ Quick Start
@@ -61,107 +49,98 @@ devtools::install_github("yourusername/CaImagingAnalysisFr")
 library(CaImagingAnalysisFr)
 set.seed(123)
 
-# Simulate data and run a basic workflow
-raw_img <- array(rnorm(100*100*100), dim = c(100, 100, 100))
-seg <- segment_cells(raw_img, method = "suite2p")
-trace <- rnorm(500)
-spikes <- infer_spikes(trace, method = "oasis")
+# Generate synthetic calcium imaging data
+synthetic_data <- generate_synthetic_data(
+  n_cells = 10,
+  n_time = 500,
+  spike_prob = 0.1
+)
 
-# Visualize segmentation overlay and save as PNG
-props <- region_properties(seg$rois, apply(raw_img, c(1,2), mean))
-png("docs/segmentation_overlay_example.png", width = 600, height = 600)
-plot_segmentation_overlay(apply(raw_img, c(1,2), mean), seg$rois, property = "area", props = props)
-dev.off()
+# Extract traces
+traces <- synthetic_data[, grep("^Cell_", names(synthetic_data))]
 
-# Spike inference plot
-png("docs/spike_inference_example.png", width = 600, height = 400)
-plot(trace, type = "l", col = "gray", main = "Calcium Trace with Inferred Spikes", ylab = "Fluorescence")
-points(which(spikes$spike > 0), trace[spikes$spike > 0], col = "red", pch = 19)
-dev.off()
+# Basic calcium correction
+corrected_traces <- calcium_correction(traces, method = "modern")
 
-# Batch correction PCA plot
-mat <- matrix(rnorm(1000), nrow = 50)
-batch <- rep(1:2, each = 25)
-corrected <- batch_correction(mat, batch = batch, method = "deep")
-pca <- prcomp(t(cbind(mat, corrected)), scale. = TRUE)
-batch_labels <- c(rep("Raw", ncol(mat)), rep("Corrected", ncol(corrected)))
-png("docs/batch_correction_pca.png", width = 600, height = 400)
-plot(pca$x[,1:2], col = ifelse(batch_labels == "Raw", "orange", "blue"), pch = 19,
-     main = "Batch Correction: PCA Before/After", xlab = "PC1", ylab = "PC2")
-legend("topright", legend = c("Raw", "Corrected"), col = c("orange", "blue"), pch = 19)
-dev.off()
+# Spike inference
+spike_results <- infer_spikes(corrected_traces, method = "oasis")
 
-# Denoising example (NMF)
-nmf_res <- nmf_decompose(abs(mat), n_components = 2)
-png("docs/denoising_example.png", width = 600, height = 400)
-plot(mat[,1], type = "l", col = "gray", main = "Raw vs. NMF Denoised Trace", ylab = "Signal")
-lines(nmf_res$W[,1], col = "blue", lwd = 2)
-legend("topright", legend = c("Raw", "NMF Denoised"), col = c("gray", "blue"), lwd = c(1,2))
-dev.off()
+# Plot results
+plot_cell_trace(
+  corrected_df = data.frame(Time = 1:ncol(traces), Cell_1 = traces[1, ]),
+  cell = "Cell_1"
+)
 
-# Network analysis plot
-fc <- functional_connectivity(mat, method = "correlation", threshold = 0.3)
-png("docs/network_analysis_example.png", width = 600, height = 600)
-net <- network_visualization(fc$connectivity_matrix)
-dev.off()
+# Batch correction example
+batch_labels <- rep(1:2, each = 5)
+corrected_batch <- batch_correction(
+  traces, 
+  batch = batch_labels, 
+  method = "combat"
+)
 
-# Bayesian posterior plot
-bayes <- bayesian_spike_inference(trace)
-png("docs/bayesian_posterior_example.png", width = 600, height = 400)
-hist(bayes$posterior_spikes, breaks = 30, col = "skyblue", main = "Posterior Spike Probability", xlab = "Probability")
-dev.off()
+# Network analysis
+network_result <- functional_connectivity(
+  corrected_traces, 
+  method = "correlation", 
+  threshold = 0.3
+)
 
-# Benchmark segmentation quality
-bench <- benchmark_segmentation_quality(props)
-print(bench)
+# Bayesian modeling
+bayesian_result <- bayesian_spike_inference(
+  traces[1, ], 
+  model_type = "poisson", 
+  n_samples = 100
+)
+
+# Generate quality control report
+qc_report <- generate_qc_report(data = traces)
+
+print("Quick start completed successfully!")
 ```
-
-![Segmentation Overlay Example](docs/segmentation_overlay_example.png)
-*Segmentation overlay: ROIs color-coded by area.*
-
-![Spike Inference Example](docs/spike_inference_example.png)
-*Calcium trace with inferred spikes (red dots).* 
-
-![Batch Correction PCA](docs/batch_correction_pca.png)
-*PCA plot: orange = raw, blue = batch-corrected.*
-
-![Denoising Example](docs/denoising_example.png)
-*Raw trace (gray) vs. NMF denoised (blue).* 
-
-![Network Analysis Example](docs/network_analysis_example.png)
-*Functional connectivity network plot.*
-
-![Bayesian Posterior Example](docs/bayesian_posterior_example.png)
-*Posterior spike probability distribution.*
-
-*You can regenerate all output images above by running the code block in your R session.*
 
 ---
 
 ## 📚 Comprehensive Usage
 
 ```r
-# Batch correction
-mat <- matrix(rnorm(1000), nrow = 50)
-batch <- rep(1:2, each = 25)
-corrected <- batch_correction(mat, batch = batch, method = "deep")
+# Advanced segmentation
+segmentation_result <- segment_cells(
+  image_data = array(rnorm(100*100*50), dim = c(100, 100, 50)),
+  method = "threshold"
+)
 
-# Denoising
-nmf_res <- nmf_decompose(abs(mat), n_components = 2)
+# Deep learning spike inference
+deep_spikes <- deep_spike_inference(
+  traces[1, ], 
+  model_type = "lstm"
+)
 
-# Network analysis
-fc <- functional_connectivity(mat, method = "correlation", threshold = 0.3)
+# Denoising with NMF
+nmf_result <- nmf_decompose(
+  abs(traces), 
+  n_components = 3
+)
 
-# Bayesian modeling
-bayes <- bayesian_spike_inference(trace)
+# Dynamic network analysis
+dynamic_network <- time_varying_connectivity(
+  traces, 
+  window_size = 50, 
+  step_size = 10
+)
+
+# Bayesian model comparison
+model_comparison <- bayesian_model_comparison(
+  list(model1 = bayesian_result, model2 = deep_spikes)
+)
 ```
 
 ---
 
 ## 📖 Vignettes & Tutorials
-- [Getting Started](vignettes/getting-started.Rmd): Basic and intermediate workflow
-- [Power Features](vignettes/power-features.Rmd): Advanced analytics and unique capabilities
-- [Basic Tutorial](vignettes/tutorial-basic-workflow.Rmd): Step-by-step guide for new users
+- Getting Started: Basic and intermediate workflow
+- Power Features: Advanced analytics and unique capabilities
+- Basic Tutorial: Step-by-step guide for new users
 
 ---
 
@@ -177,24 +156,24 @@ Use these metrics to tune segmentation and assess reliability.
 ---
 
 ## 📚 API Reference
-- [Function Reference (R Documentation)](https://yourusername.github.io/CaImagingAnalysisFr/reference/)
+See the package documentation for complete function reference.
 
 ---
 
 ## 🤝 Contributing
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, code style, and how to run tests. All contributors and feedback are appreciated.
+We welcome contributions! Please see the contributing guidelines for code style and how to run tests. All contributors and feedback are appreciated.
 
 ---
 
 ## 📖 Citing
 If you use CaImagingAnalysisFr in your research, please cite:
 
-> Your Name et al. (2024). CaImagingAnalysisFr: Professional Calcium Imaging Analysis in R. _GitHub_. https://github.com/yourusername/CaImagingAnalysisFr
+> Calcium Team (2024). CaImagingAnalysisFr: Professional Calcium Imaging Analysis in R.
 
 ---
 
 ## 📝 License
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License. See LICENSE file for details.
 
 ---
 
@@ -205,4 +184,4 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 ---
 
 ## 📬 Contact
-For questions, issues, or support, please open a [GitHub Issue](https://github.com/yourusername/CaImagingAnalysisFr/issues) or contact [your.email@domain.com](mailto:your.email@domain.com).
+For questions, issues, or support, please contact the maintainer.

@@ -1,10 +1,8 @@
-#' Dynamic Network and Causality Analysis
+#' Dynamic Network Analysis Functions
 #'
-#' Provides tools for dynamic network analysis, community detection, and causal inference
-#' in calcium imaging data.
+#' Dynamic network analysis and time-varying connectivity methods.
 #'
 #' @name dynamic_network_analysis
-#' @docType package
 NULL
 
 #' Time-Varying Functional Connectivity

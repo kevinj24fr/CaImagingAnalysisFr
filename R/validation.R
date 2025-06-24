@@ -215,4 +215,84 @@ check_memory_usage <- function(data_size) {
   }
   
   TRUE
+}
+
+#' Validate Spike Detection Results
+#'
+#' Validate spike detection results for quality and consistency.
+#'
+#' @param spikes Spike detection results (vector or list)
+#' @param trace Original calcium trace
+#' @param method Spike detection method used
+#' @param ... Additional arguments
+#' @return Validation results
+#' @export
+validate_spike_detection <- function(spikes, trace = NULL, method = NULL, ...) {
+  
+  # Handle different input types
+  if (is.vector(spikes)) {
+    # If spikes is a vector, assume it's the spike indicators
+    spike_indicators <- spikes
+    spike_times <- which(spike_indicators > 0)
+  } else if (is.list(spikes)) {
+    # If spikes is a list, extract spike indicators
+    if ("spikes" %in% names(spikes)) {
+      spike_indicators <- spikes$spikes
+    } else if ("spike" %in% names(spikes)) {
+      spike_indicators <- spikes$spike
+    } else {
+      stop("Spike results must contain 'spikes' or 'spike' field")
+    }
+    spike_times <- which(spike_indicators > 0)
+  } else {
+    stop("Spikes must be a vector or list")
+  }
+  
+  # Basic validation
+  validation_results <- list()
+  
+  # Check for valid spike indicators
+  if (!is.numeric(spike_indicators)) {
+    validation_results$valid_indicators <- FALSE
+    validation_results$error <- "Spike indicators must be numeric"
+    return(validation_results)
+  }
+  
+  # Check for reasonable spike count
+  n_spikes <- length(spike_times)
+  if (n_spikes == 0) {
+    validation_results$spike_count <- "No spikes detected"
+  } else if (n_spikes > length(spike_indicators) * 0.5) {
+    validation_results$spike_count <- "Warning: High spike count (>50% of timepoints)"
+  } else {
+    validation_results$spike_count <- paste("Detected", n_spikes, "spikes")
+  }
+  
+  # Check for minimum interval between spikes (if trace length is available)
+  if (length(spike_indicators) > 1 && n_spikes > 1) {
+    intervals <- diff(spike_times)
+    min_interval <- min(intervals, na.rm = TRUE)
+    if (min_interval < 3) {
+      validation_results$min_interval <- "Warning: Spikes too close together (<3 frames)"
+    } else {
+      validation_results$min_interval <- paste("Minimum interval:", min_interval, "frames")
+    }
+  }
+  
+  # Check for reasonable spike amplitudes (if trace is provided)
+  if (!is.null(trace) && length(trace) == length(spike_indicators)) {
+    spike_amplitudes <- trace[spike_times]
+    if (length(spike_amplitudes) > 0) {
+      mean_amplitude <- mean(spike_amplitudes, na.rm = TRUE)
+      validation_results$mean_amplitude <- paste("Mean spike amplitude:", round(mean_amplitude, 3))
+    }
+  }
+  
+  # Method-specific validation
+  if (!is.null(method)) {
+    validation_results$method <- method
+  }
+  
+  validation_results$valid <- TRUE
+  return(validation_results)
 } 

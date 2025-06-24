@@ -1,10 +1,8 @@
-#' Automated Data Curation and Metadata Handling
+#' Data Curation Functions
 #'
-#' Provides tools for data validation, metadata management, and automated preprocessing
-#' of calcium imaging data.
+#' Data curation and validation utilities for calcium imaging data.
 #'
 #' @name data_curation
-#' @docType package
 NULL
 
 #' Data Validation and Quality Check
@@ -101,7 +99,7 @@ validate_calcium_data <- function(data, data_type = "calcium_traces", validation
       
       if (min_val < -10 || max_val > 10) {
         issues$value_ranges <- paste("Values outside typical range: [", min_val, ",", max_val, "]")
-        recommendations$value_ranges <- "Check if data is properly normalized (ΔF/F)"
+        recommendations$value_ranges <- "Check if data is properly normalized (Delta F/F)"
       } else {
         validation_results$value_ranges <- paste("Value range: [", round(min_val, 3), ",", round(max_val, 3), "]")
       }
@@ -120,6 +118,23 @@ validate_calcium_data <- function(data, data_type = "calcium_traces", validation
     }
   }
   
+  # Compute quality_score (simple: 1 if no issues, 0 if any issues)
+  quality_score <- if (length(issues) == 0) 1 else 0
+
+  # Compute basic_stats (mean, sd, min, max for each column if data is matrix/data.frame)
+  basic_stats <- NULL
+  if (is.matrix(data) || is.data.frame(data)) {
+    basic_stats <- data.frame(
+      column = colnames(data),
+      mean = apply(data, 2, function(x) mean(x, na.rm = TRUE)),
+      sd = apply(data, 2, function(x) sd(x, na.rm = TRUE)),
+      min = apply(data, 2, function(x) min(x, na.rm = TRUE)),
+      max = apply(data, 2, function(x) max(x, na.rm = TRUE))
+    )
+  } else {
+    basic_stats <- data.frame()
+  }
+
   # Create summary
   summary <- list(
     data_type = data_type,
@@ -127,7 +142,9 @@ validate_calcium_data <- function(data, data_type = "calcium_traces", validation
     n_issues = length(issues),
     issues = issues,
     recommendations = recommendations,
-    validation_results = validation_results
+    validation_results = validation_results,
+    quality_score = quality_score,
+    basic_stats = basic_stats
   )
   
   # Format output

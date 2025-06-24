@@ -1,10 +1,8 @@
-#' Enhanced Visualization Suite
+#' Enhanced Visualization Functions
 #'
-#' Provides interactive plots, 3D visualizations, and publication-ready figures
-#' for calcium imaging analysis.
+#' Advanced visualization and plotting utilities for calcium imaging data.
 #'
 #' @name enhanced_visualization
-#' @docType package
 NULL
 
 #' Interactive Calcium Trace Plot
@@ -74,7 +72,7 @@ interactive_calcium_plot <- function(traces, cell_ids = NULL, time_points = NULL
     p,
     title = "Interactive Calcium Traces",
     xaxis = list(title = "Time", showgrid = TRUE),
-    yaxis = list(title = "Calcium Signal", showgrid = TRUE),
+    yaxis = list(title = "Calcium Signal (Delta F/F)", showgrid = TRUE),
     hovermode = "closest",
     showlegend = TRUE,
     legend = list(
@@ -225,7 +223,7 @@ publication_calcium_plot <- function(traces, cell_ids = NULL, time_points = NULL
     ggplot2::labs(
       title = "Calcium Imaging Traces",
       x = "Time",
-      y = "Calcium Signal (ΔF/F)",
+      y = "Calcium Signal (Delta F/F)",
       color = "Cell"
     ) +
     ggplot2::theme_minimal() +
@@ -454,18 +452,34 @@ multi_panel_calcium_plot <- function(traces, spike_results = NULL, network_resul
   
   # Panel 3: Spike raster (if available)
   if (!is.null(spike_results)) {
-    # Create spike raster plot
+    spikes <- spike_results$spikes
+    # Ensure spikes is a matrix with correct dimensions (cells x time)
+    if (is.null(dim(spikes))) {
+      # If vector, convert to matrix with one row
+      spikes <- matrix(spikes, nrow = 1)
+    }
+    if (nrow(spikes) != length(cell_ids) && ncol(spikes) == length(cell_ids)) {
+      # Transpose if needed
+      spikes <- t(spikes)
+    }
+    if (nrow(spikes) != length(cell_ids)) {
+      stop("spike_results$spikes must have one row per cell")
+    }
+    if (ncol(spikes) != length(time_points)) {
+      stop("spike_results$spikes must have one column per time point")
+    }
+    # Build spike data frame
     spike_data <- data.frame(
-      Time = rep(time_points, length(cell_ids)),
-      Cell = rep(cell_ids, each = length(time_points)),
-      Spike = as.vector(spike_results$spikes)
+      Time = rep(time_points, each = length(cell_ids)),
+      Cell = rep(cell_ids, times = length(time_points)),
+      Spike = as.vector(spikes)
     )
-    
     plots[[3]] <- ggplot2::ggplot(spike_data[spike_data$Spike == 1, ], 
                                  ggplot2::aes(x = Time, y = Cell)) +
       ggplot2::geom_point(size = 0.5) +
       ggplot2::labs(title = "C) Spike Raster") +
-      ggplot2::theme_minimal()
+      ggplot2::theme_minimal() +
+      ggplot2::scale_y_discrete(limits = rev(cell_ids))
   }
   
   # Panel 4: Network visualization (if available)

@@ -2,11 +2,20 @@
 % Please edit documentation in R/segmentation.R
 \name{region_properties}
 \alias{region_properties}
-\title{Region Properties Extraction (base R, extended)}
+\title{Calculate Region Properties}
 \usage{
-region_properties(labels, image)
+region_properties(rois, image_data = NULL, ...)
+}
+\arguments{
+\item{rois}{List of ROI coordinates or masks}
+
+\item{image_data}{Image data for intensity calculations}
+
+\item{...}{Additional arguments}
+}
+\value{
+Data frame with region properties
 }
 \description{
-Region Properties Extraction (base R, extended)
+Calculate properties of segmented regions/ROIs.
 }
-\keyword{internal}

@@ -3,7 +3,6 @@
 #' Infer spikes using deep learning approaches implemented in base R.
 #'
 #' @name deep_spike_inference
-#' @docType package
 NULL
 
 #' Deep Spike Inference using Cascade-like Approach

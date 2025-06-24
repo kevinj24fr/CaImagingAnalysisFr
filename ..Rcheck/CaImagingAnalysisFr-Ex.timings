@@ -1,0 +1,5 @@
+name	user	system	elapsed
+calcium_correction	0.013	0.001	0.014	
+calcium_pipeline	0.180	0.015	0.196	
+generate_synthetic_data	0.003	0.000	0.003	
+infer_spikes	0.003	0.000	0.003	

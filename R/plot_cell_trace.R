@@ -32,9 +32,18 @@ plot_cell_trace <- function(corrected_df,
                            colors = NULL,
                            verbose = FALSE) {
   
-  # Validate inputs
+  # Handle vector input (trace + spikes)
+  if (is.numeric(corrected_df) && is.numeric(cell)) {
+    return(plot_cell_trace_vector(corrected_df, cell, colors, verbose))
+  }
+  
+  # Handle data frame input
   if (!is.data.frame(corrected_df)) {
-    stop("corrected_df must be a data frame")
+    stop("corrected_df must be a data frame or numeric vector")
+  }
+  
+  if (!is.character(cell) || length(cell) != 1) {
+    stop("cell must be a single character string when corrected_df is a data frame")
   }
   
   if (!cell %in% names(corrected_df)) {
@@ -125,6 +134,75 @@ plot_cell_trace <- function(corrected_df,
   # Add legend
   if (show_deconvolved || show_spikes) {
     p <- p + ggplot2::theme(legend.position = "bottom")
+  }
+  
+  return(p)
+}
+
+#' Plot Cell Trace from Vector Input
+#' 
+#' Internal function to handle vector inputs for plot_cell_trace
+#' 
+#' @param trace Numeric vector of calcium trace
+#' @param spikes Numeric vector of spike indicators
+#' @param colors Color scheme
+#' @param verbose Whether to show progress messages
+#' @return ggplot object
+#' @keywords internal
+plot_cell_trace_vector <- function(trace, spikes, colors = NULL, verbose = FALSE) {
+  
+  if (!is.numeric(trace) || !is.numeric(spikes)) {
+    stop("Both trace and spikes must be numeric vectors")
+  }
+  
+  if (length(trace) != length(spikes)) {
+    stop("Trace and spikes must have the same length")
+  }
+  
+  # Set default colors if not provided
+  if (is.null(colors)) {
+    colors <- list(
+      signal = "steelblue",
+      spikes = "red"
+    )
+  }
+  
+  if (verbose) {
+    message("Creating plot from vector input")
+  }
+  
+  # Prepare data
+  dat <- data.frame(
+    Time = 1:length(trace),
+    Signal = trace,
+    Spike = spikes > 0
+  )
+  
+  # Create base plot
+  p <- ggplot2::ggplot(data = dat, ggplot2::aes(x = Time)) +
+    ggplot2::geom_line(ggplot2::aes(y = Signal), color = colors$signal, linewidth = 0.8) +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(
+      title = "Calcium Trace",
+      x = "Time",
+      y = "Fluorescence"
+    ) +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(hjust = 0.5, size = 14),
+      axis.title = ggplot2::element_text(size = 12),
+      axis.text = ggplot2::element_text(size = 10)
+    )
+  
+  # Add detected spikes
+  spike_data <- dat[dat$Spike, ]
+  if (nrow(spike_data) > 0) {
+    p <- p + ggplot2::geom_point(
+      data = spike_data,
+      ggplot2::aes(y = Signal),
+      color = colors$spikes,
+      size = 1.5,
+      alpha = 0.8
+    )
   }
   
   return(p)

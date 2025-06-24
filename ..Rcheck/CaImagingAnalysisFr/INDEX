@@ -1,0 +1,202 @@
+advanced_deep_learning
+                        Advanced Deep Learning Functions
+anomaly_detection       Anomaly Detection via Statistical Methods
+auto_optimize_parameters
+                        Auto-optimize all parameters
+autoencoder_reduce      Autoencoder Dimensionality Reduction (Python
+                        Keras)
+automated_preprocessing
+                        Automated Data Preprocessing Pipeline
+batch_aware_analysis    Batch-Aware Analysis Pipeline
+batch_correction        Batch Correction Functions
+batch_effect_report     Batch Effect Summary Report
+batch_quality_control   Batch Quality Control for Calcium Imaging Data
+bayesian_hypothesis_testing
+                        Bayesian Hypothesis Testing
+bayesian_model_comparison
+                        Bayesian Model Comparison
+bayesian_modeling       Bayesian Modeling Functions
+bayesian_parameter_estimation
+                        Bayesian Parameter Estimation
+bayesian_predictive_checks
+                        Bayesian Predictive Checks
+bayesian_spike_inference
+                        Bayesian Spike Inference
+benchmark_performance   Performance benchmarking
+benchmark_segmentation_quality
+                        Benchmark Segmentation Quality
+caiman_segmentation     CaImAn Cell Segmentation
+caiman_spike_inference
+                        CaImAn Spike Inference
+calcium_activity_heatmap
+                        Heatmap of Calcium Activity
+calcium_correction      Calcium Trace Correction
+calcium_correction_chunked
+                        Memory-efficient calcium correction
+calcium_pipeline        Calcium Imaging Analysis Pipeline using targets
+calculate_correction_quality
+                        Calculate Quality Metrics for Calcium
+                        Correction
+cellpose_segmentation   Cellpose Cell Segmentation
+combat_correction       ComBat Batch Effect Correction
+community_detection     Community Detection
+compare_deep_models     Model Performance Comparison
+comprehensive_statistical_analysis
+                        Comprehensive statistical analysis
+contrastive_clustering
+                        Contrastive Learning for Trace Clustering
+convergent_cross_mapping
+                        Convergent Cross Mapping (CCM)
+create_dashboard_app    Create Dashboard App Content
+create_dashboard_global
+                        Create Dashboard Global Content
+create_experiment_metadata
+                        Metadata Management System
+create_notebook_rmd     Create Notebook RMarkdown Content
+create_pipeline_script
+                        Create Pipeline Script Content
+create_report_rmd       Create RMarkdown Content for Report
+cross_batch_validation
+                        Cross-Batch Validation
+curate_data             Unified Data Curation Interface
+data_curation           Data Curation Functions
+deep_harmonization      Deep Learning-Based Harmonization
+deep_spike_inference    Deep Learning Spike Inference
+detect_batch_effects    Batch Effect Detection
+dynamic_community_detection
+                        Dynamic Community Detection
+dynamic_network_analysis
+                        Dynamic Network Analysis Functions
+dynamic_network_metrics
+                        Dynamic Network Metrics
+empirical_mode_decomposition
+                        Empirical Mode Decomposition (EMD)
+enhanced_visualization
+                        Enhanced Visualization Functions
+export_analysis_pipeline
+                        Export Analysis Pipeline as R Script
+export_jupyter_notebook
+                        Export Analysis as Jupyter Notebook
+export_processed_data   Data Export and Archiving
+flag_outliers           Flag Outliers in Calcium Imaging Data
+functional_connectivity
+                        Functional Connectivity Analysis
+generate_analysis_report
+                        Generate Comprehensive Analysis Report
+generate_analysis_summary
+                        Generate Analysis Summary
+generate_interactive_dashboard
+                        Generate Interactive Dashboard
+generate_qc_report      Generate QC Report (RMarkdown)
+generate_synthetic_data
+                        Generate Synthetic Calcium Imaging Dataset
+get_config              Package Configuration
+get_python_info         Get Python environment info
+granger_causality       Granger Causality
+graph_metrics           Graph Metrics
+hierarchical_bayesian_modeling
+                        Hierarchical Bayesian Modeling
+hierarchical_clustering
+                        Hierarchical Clustering for Calcium Imaging
+                        Data
+ica_decompose           ICA Decomposition
+independent_component_analysis
+                        Independent Component Analysis (ICA)
+infer_spikes            Spike Inference Functions
+infer_spikes_chunked    Chunked spike inference for large datasets
+install_python_dependencies
+                        Pre-install all required Python packages
+install_specific_python_packages
+                        Install specific Python packages with error
+                        handling
+interactive_calcium_plot
+                        Interactive Calcium Trace Plot
+interactive_network_plot
+                        Interactive Network Visualization
+kmeans_clustering       K-means Clustering for Calcium Imaging Data
+launch_interactive_viewer
+                        Launch Interactive Viewer for Calcium Traces
+launch_qc_shiny         Launch Interactive QC Report (Shiny)
+manage_python_dependencies
+                        Check and Install Python Dependencies
+manual_roi_editor       Manual ROI Editor Hook
+mnn_correction          Mutual Nearest Neighbors (MNN) Batch Correction
+monitor_memory_usage    Monitor memory usage
+multi_cell_causality_analysis
+                        Multi-Cell Causality Analysis
+multi_panel_calcium_plot
+                        Multi-Panel Calcium Analysis Plot
+network_analysis        Network Analysis Functions
+network_stability_analysis
+                        Network Stability Analysis
+network_visualization   Network Visualization
+nmf_decompose           NMF Decomposition
+nonnegative_matrix_factorization
+                        Non-negative Matrix Factorization (NMF)
+oasis_spike_inference   OASIS Spike Inference
+optimize_correction_parameters
+                        Optimize Calcium Correction Parameters
+optimize_data_structure
+                        Optimize data structure for memory efficiency
+optimize_spike_parameters
+                        Optimize Spike Detection Parameters
+pcmci_causal_inference
+                        PCMCI Causal Inference
+plot_bayesian_results   Plot Bayesian Results
+plot_cell_trace         Plot Corrected Trace with Detected Spikes
+plot_multiple_cells     Plot Multiple Cell Traces
+plot_segmentation_overlay
+                        Plot Segmentation Overlay
+posterior_summary       Posterior Summary Statistics
+probabilistic_spike_detection
+                        Probabilistic Spike Detection
+process_in_chunks       Process Large Datasets in Chunks
+publication_calcium_plot
+                        Publication-Ready Calcium Trace Plot
+region_properties       Calculate Region Properties
+reporting               Reporting Functions
+robust_pca              Robust Principal Component Analysis (RPCA)
+roi_quality_control     ROI Quality Control
+save_publication_figure
+                        Save Publication-Ready Figure
+segment_cells           Unified Cell Segmentation Interface
+segmentation            Automated Cell Segmentation and ROI Extraction
+self_supervised_learning
+                        Self-Supervised Learning for Trace
+                        Representations
+signal_decomposition    Signal Decomposition Functions
+singular_spectrum_analysis
+                        Singular Spectrum Analysis (SSA)
+spike_confidence_intervals
+                        Calculate Confidence Intervals for Spike
+                        Detection
+standardize_data_format
+                        Data Format Standardization
+stream_process_data     Stream processing for very large datasets
+suite2p_segmentation    Suite2p Cell Segmentation
+suite2p_spike_inference
+                        Suite2p Spike Inference
+time_varying_connectivity
+                        Time-Varying Functional Connectivity
+transfer_learning_spike_inference
+                        Transfer Learning for Spike Inference
+transformer_denoising   Transformer-Based Denoising
+transformer_spike_inference
+                        Transformer-Based Spike Inference
+tsne_reduce             t-SNE Dimensionality Reduction
+umap_reduce             UMAP Dimensionality Reduction
+uncertainty_quantification
+                        Uncertainty Quantification
+validate_calcium_data   Data Validation and Quality Check
+validate_calcium_trace
+                        Validate Calcium Trace
+validate_calcium_traces_matrix
+                        Validate Calcium Traces Matrix
+validate_spike_detection
+                        Statistical validation of spike detection
+                        results
+visualize_3d_calcium    3D Calcium Imaging Visualization
+visualize_attention     Attention Visualization for Transformer Models
+visualize_causal_network
+                        Causal Network Visualization
+wavelet_denoise         Wavelet Denoising

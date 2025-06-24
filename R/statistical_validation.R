@@ -396,27 +396,37 @@ generate_recommendations <- function(correction_quality, spike_validations) {
   recommendations <- list()
   
   # Correction recommendations
-  if (correction_quality$overall_quality < 0.6) {
+  if (!is.null(correction_quality$overall_quality) && 
+      !is.na(correction_quality$overall_quality) && 
+      correction_quality$overall_quality < 0.6) {
     recommendations$correction <- "Consider adjusting correction parameters or using different method"
   }
   
   # Spike detection recommendations
-  spike_issues <- sapply(spike_validations, function(x) {
-    issues <- c()
-    if (x$interval_analysis$violation_rate > 0.1) {
-      issues <- c(issues, "High interval violations")
+  if (length(spike_validations) > 0) {
+    spike_issues <- sapply(spike_validations, function(x) {
+      issues <- c()
+      if (!is.null(x$interval_analysis$violation_rate) && 
+          !is.na(x$interval_analysis$violation_rate) && 
+          x$interval_analysis$violation_rate > 0.1) {
+        issues <- c(issues, "High interval violations")
+      }
+      if (!is.null(x$amplitude_analysis$weak_spike_rate) && 
+          !is.na(x$amplitude_analysis$weak_spike_rate) && 
+          x$amplitude_analysis$weak_spike_rate > 0.3) {
+        issues <- c(issues, "Many weak spikes")
+      }
+      if (!is.null(x$basic_stats$spike_rate) && 
+          !is.na(x$basic_stats$spike_rate) && 
+          (x$basic_stats$spike_rate < 0.001 || x$basic_stats$spike_rate > 0.1)) {
+        issues <- c(issues, "Unusual spike rate")
+      }
+      issues
+    })
+    
+    if (any(sapply(spike_issues, length) > 0)) {
+      recommendations$spike_detection <- "Consider adjusting spike detection parameters or method"
     }
-    if (x$amplitude_analysis$weak_spike_rate > 0.3) {
-      issues <- c(issues, "Many weak spikes")
-    }
-    if (x$basic_stats$spike_rate < 0.001 || x$basic_stats$spike_rate > 0.1) {
-      issues <- c(issues, "Unusual spike rate")
-    }
-    issues
-  })
-  
-  if (any(sapply(spike_issues, length) > 0)) {
-    recommendations$spike_detection <- "Consider adjusting spike detection parameters or method"
   }
   
   if (length(recommendations) == 0) {

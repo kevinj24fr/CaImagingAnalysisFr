@@ -1,10 +1,8 @@
-#' Batch Effect Correction and Harmonization
+#' Batch Correction Functions
 #'
-#' Provides methods for correcting batch effects across experiments, animals, or imaging sessions
-#' using ComBat, MNN, and deep learning-based harmonization.
+#' Batch effect correction methods for calcium imaging data.
 #'
 #' @name batch_correction
-#' @docType package
 NULL
 
 #' ComBat Batch Effect Correction

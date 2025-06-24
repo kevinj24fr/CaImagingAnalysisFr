@@ -1,0 +1,254 @@
+
+R version 4.5.0 (2025-04-11) -- "How About a Twenty-Six"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "CaImagingAnalysisFr"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> base::assign(".ExTimings", "CaImagingAnalysisFr-Ex.timings", pos = 'CheckExEnv')
+> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
+> base::assign(".format_ptime",
++ function(x) {
++   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
++   if(!is.na(x[5L])) x[2L] <- x[2L] + x[5L]
++   options(OutDec = '.')
++   format(x[1L:3L], digits = 7L)
++ },
++ pos = 'CheckExEnv')
+> 
+> ### * </HEADER>
+> library('CaImagingAnalysisFr')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("calcium_correction")
+> ### * calcium_correction
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: calcium_correction
+> ### Title: Calcium Trace Correction
+> ### Aliases: calcium_correction
+> 
+> ### ** Examples
+> 
+> # Basic usage
+> raw <- generate_synthetic_data(3, 500)
+Generating synthetic data: 3 cells, 500 time points
+  Generating background traces...
+  Generating cell traces...
+    Applying spikes...
+Synthetic data generation completed
+> corrected <- calcium_correction(raw)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_1 has low signal-to-noise ratio: 0.68 (below 2)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_2 has low signal-to-noise ratio: 0.81 (below 2)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_3 has low signal-to-noise ratio: 0.62 (below 2)
+Processing 6 traces using modern method...
+  Performing background correction...
+  Normalizing traces...
+  Performing baseline correction...
+Correction completed successfully
+> 
+> # Custom parameters
+> corrected <- calcium_correction(raw, span = 0.3, normalize = FALSE)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_1 has low signal-to-noise ratio: 0.68 (below 2)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_2 has low signal-to-noise ratio: 0.81 (below 2)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_3 has low signal-to-noise ratio: 0.62 (below 2)
+Processing 6 traces using modern method...
+  Performing background correction...
+  Performing baseline correction...
+Correction completed successfully
+> 
+> # Legacy method
+> corrected <- calcium_correction(raw, method = "legacy")
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_1 has low signal-to-noise ratio: 0.68 (below 2)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_2 has low signal-to-noise ratio: 0.81 (below 2)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_3 has low signal-to-noise ratio: 0.62 (below 2)
+Processing 6 traces using legacy method...
+  Performing legacy background correction...
+  Performing legacy normalization...
+  Performing legacy baseline correction...
+Correction completed successfully
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("calcium_correction", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("calcium_pipeline")
+> ### * calcium_pipeline
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: calcium_pipeline
+> ### Title: Calcium Imaging Analysis Pipeline using targets
+> ### Aliases: calcium_pipeline
+> 
+> ### ** Examples
+> 
+> # Basic pipeline
+> pipeline <- calcium_pipeline()
+> 
+> # Custom parameters
+> pipeline <- calcium_pipeline(
++   raw_data_path = "path_to_custom_data.csv",
++   config = list(
++     correction_method = "legacy",
++     spike_method = "caiman"
++   )
++ )
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("calcium_pipeline", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("generate_synthetic_data")
+> ### * generate_synthetic_data
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: generate_synthetic_data
+> ### Title: Generate Synthetic Calcium Imaging Dataset
+> ### Aliases: generate_synthetic_data
+> 
+> ### ** Examples
+> 
+> # Basic usage
+> df <- generate_synthetic_data(3, 500)
+Generating synthetic data: 3 cells, 500 time points
+  Generating background traces...
+  Generating cell traces...
+    Applying spikes...
+Synthetic data generation completed
+> head(df)
+       Cell_1      Cell_2      Cell_3         BG_1         BG_2        BG_3
+1  0.07863680 -0.03036904 -0.04130588  0.016374416 -0.006323644 -0.04662285
+2 -0.03533913  0.07728425 -0.03123835 -0.018949070 -0.027342619 -0.02296206
+3 -0.07277542  1.17919560  0.09788586  0.016593185  0.042313251 -0.01973918
+4 -0.02672079  1.20562307  0.02396187 -0.018503353  0.020315927  0.01048705
+5 -0.10520674  1.09795978 -0.03186759  0.011425391  0.009805132 -0.02193965
+6  0.02748578  0.88459302  0.08122158 -0.003813607  0.026444450  0.01154244
+> 
+> # Custom parameters
+> df <- generate_synthetic_data(n_cells = 10, n_time = 2000, spike_prob = 0.01)
+Generating synthetic data: 10 cells, 2000 time points
+  Generating background traces...
+  Generating cell traces...
+    Applying spikes...
+Synthetic data generation completed
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("generate_synthetic_data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("infer_spikes")
+> ### * infer_spikes
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: infer_spikes
+> ### Title: Spike Inference Functions
+> ### Aliases: infer_spikes
+> 
+> ### ** Examples
+> 
+> # Basic usage
+> raw <- generate_synthetic_data(1, 500)
+Generating synthetic data: 1 cells, 500 time points
+  Generating background traces...
+  Generating cell traces...
+    Applying spikes...
+Synthetic data generation completed
+> corrected <- calcium_correction(raw)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_1 has low signal-to-noise ratio: 0.65 (below 2)
+Processing 4 traces using modern method...
+  Performing background correction...
+  Normalizing traces...
+  Performing baseline correction...
+Correction completed successfully
+> spikes <- infer_spikes(corrected$Cell_1)
+Performing spike inference using oasis method...
+Running OASIS spike inference
+Spike inference completed successfully
+> 
+> # Try deep learning method (requires model)
+> # spikes <- infer_spikes(corrected$Cell_1, method = "deep", model_path = "cascade_model.h5")
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("infer_spikes", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("launch_interactive_viewer")
+> ### * launch_interactive_viewer
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: launch_interactive_viewer
+> ### Title: Launch Interactive Viewer for Calcium Traces
+> ### Aliases: launch_interactive_viewer
+> 
+> ### ** Examples
+> 
+> # Basic usage
+> raw <- generate_synthetic_data(3, 500)
+Generating synthetic data: 3 cells, 500 time points
+  Generating background traces...
+  Generating cell traces...
+    Applying spikes...
+Synthetic data generation completed
+> launch_interactive_viewer(raw)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_1 has low signal-to-noise ratio: 0.68 (below 2)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_2 has low signal-to-noise ratio: 0.81 (below 2)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_3 has low signal-to-noise ratio: 0.62 (below 2)
+Loading required package: shiny
+
+Listening on http://127.0.0.1:4793
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_1 has low signal-to-noise ratio: 0.68 (below 2)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_2 has low signal-to-noise ratio: 0.81 (below 2)
+Warning in validate_quality_control(raw_df, cell_cols, bg_cols) :
+  Column Cell_3 has low signal-to-noise ratio: 0.62 (below 2)
+Running OASIS spike inference
+Running OASIS spike inference

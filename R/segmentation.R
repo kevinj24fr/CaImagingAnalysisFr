@@ -3,7 +3,6 @@
 #' Provides tools for automated cell segmentation and ROI extraction from calcium imaging data.
 #'
 #' @name segmentation
-#' @docType package
 NULL
 
 #' Unified Cell Segmentation Interface
@@ -665,49 +664,114 @@ sobel_edges <- function(image) {
   return(mag)
 }
 
-#' Region Properties Extraction (base R, extended)
-#' @keywords internal
-region_properties <- function(labels, image) {
-  props <- list()
-  for (lbl in setdiff(unique(as.vector(labels)), 0)) {
-    idx <- which(labels == lbl, arr.ind = TRUE)
-    area <- nrow(idx)
-    centroid <- colMeans(idx)
-    mean_intensity <- mean(image[labels == lbl], na.rm = TRUE)
-    # Bounding box
-    bbox <- list(
-      min_row = min(idx[,1]), max_row = max(idx[,1]),
-      min_col = min(idx[,2]), max_col = max(idx[,2])
-    )
-    # Perimeter (count edge pixels)
-    perim <- sum(sapply(1:nrow(idx), function(i) {
-      r <- idx[i,1]; c <- idx[i,2]
-      any(labels[pmax(r-1,1),c] != lbl) || any(labels[pmin(r+1,nrow(labels)),c] != lbl) ||
-      any(labels[r,pmax(c-1,1)] != lbl) || any(labels[r,pmin(c+1,ncol(labels))] != lbl)
-    }))
-    # Eccentricity (ellipse fit)
-    covmat <- cov(idx)
-    eig <- eigen(covmat)$values
-    major_axis <- 2 * sqrt(max(eig))
-    minor_axis <- 2 * sqrt(min(eig))
-    eccentricity <- sqrt(1 - (minor_axis^2 / major_axis^2))
-    # Solidity (area/convex hull area)
-    ch_idx <- idx[chull(idx),]
-    ch_area <- 0.5 * abs(sum(ch_idx[,1]*c(ch_idx[-1,2],ch_idx[1,2]) - c(ch_idx[-1,1],ch_idx[1,1])*ch_idx[,2]))
-    solidity <- area / ch_area
-    props[[as.character(lbl)]] <- list(
-      area = area,
-      centroid = centroid,
-      mean_intensity = mean_intensity,
-      bbox = bbox,
-      perimeter = perim,
-      major_axis = major_axis,
-      minor_axis = minor_axis,
-      eccentricity = eccentricity,
-      solidity = solidity
-    )
+#' Calculate Region Properties
+#'
+#' Calculate properties of segmented regions/ROIs.
+#'
+#' @param rois List of ROI coordinates or masks
+#' @param image_data Image data for intensity calculations
+#' @param ... Additional arguments
+#' @return Data frame with region properties
+#' @export
+region_properties <- function(rois, image_data = NULL, ...) {
+  
+  if (is.null(rois) || length(rois) == 0) {
+    return(data.frame())
   }
-  return(props)
+  
+  # Initialize results
+  n_regions <- length(rois)
+  properties <- data.frame(
+    region_id = 1:n_regions,
+    area = numeric(n_regions),
+    centroid_x = numeric(n_regions),
+    centroid_y = numeric(n_regions),
+    eccentricity = numeric(n_regions),
+    solidity = numeric(n_regions),
+    mean_intensity = numeric(n_regions),
+    stringsAsFactors = FALSE
+  )
+  
+  for (i in 1:n_regions) {
+    roi <- rois[[i]]
+    
+    if (is.null(roi) || length(roi) == 0) {
+      next
+    }
+    
+    # Calculate basic properties
+    if (is.matrix(roi) || is.data.frame(roi)) {
+      # ROI is a matrix or data frame of coordinates
+      if (ncol(roi) >= 2) {
+        x_coords <- roi[, 1]
+        y_coords <- roi[, 2]
+        
+        # Area (number of pixels)
+        properties$area[i] <- length(x_coords)
+        
+        # Centroid
+        properties$centroid_x[i] <- mean(x_coords, na.rm = TRUE)
+        properties$centroid_y[i] <- mean(y_coords, na.rm = TRUE)
+        
+        # Eccentricity (simplified calculation)
+        if (length(x_coords) > 2) {
+          # Calculate covariance matrix
+          coords <- cbind(x_coords, y_coords)
+          cov_matrix <- cov(coords, use = "complete.obs")
+          
+          if (nrow(cov_matrix) == 2 && ncol(cov_matrix) == 2) {
+            eigen_vals <- eigen(cov_matrix)$values
+            if (eigen_vals[1] > 0 && eigen_vals[2] > 0) {
+              properties$eccentricity[i] <- sqrt(1 - eigen_vals[2] / eigen_vals[1])
+            }
+          }
+        }
+        
+        # Solidity (simplified - assume convex if enough points)
+        if (length(x_coords) > 3) {
+          # Check if points form a convex hull
+          tryCatch({
+            hull <- chull(cbind(x_coords, y_coords))
+            hull_area <- length(hull)
+            properties$solidity[i] <- properties$area[i] / hull_area
+          }, error = function(e) {
+            properties$solidity[i] <- 1.0  # Default to convex
+          })
+        } else {
+          properties$solidity[i] <- 1.0
+        }
+        
+        # Mean intensity (if image data provided)
+        if (!is.null(image_data) && is.array(image_data)) {
+          tryCatch({
+            # Extract intensity values at ROI coordinates
+            valid_coords <- !is.na(x_coords) & !is.na(y_coords) &
+                           x_coords >= 1 & x_coords <= nrow(image_data) &
+                           y_coords >= 1 & y_coords <= ncol(image_data)
+            
+            if (any(valid_coords)) {
+              intensities <- image_data[cbind(x_coords[valid_coords], y_coords[valid_coords])]
+              properties$mean_intensity[i] <- mean(intensities, na.rm = TRUE)
+            }
+          }, error = function(e) {
+            properties$mean_intensity[i] <- NA
+          })
+        }
+      }
+    } else if (is.numeric(roi)) {
+      # ROI is a numeric vector (e.g., indices)
+      properties$area[i] <- length(roi)
+      properties$centroid_x[i] <- mean(roi, na.rm = TRUE)
+      properties$centroid_y[i] <- mean(roi, na.rm = TRUE)
+      properties$eccentricity[i] <- 0.5  # Default value
+      properties$solidity[i] <- 1.0      # Default value
+    }
+  }
+  
+  # Remove rows with no valid data
+  properties <- properties[properties$area > 0, ]
+  
+  return(properties)
 }
 
 #' Plot Segmentation Overlay

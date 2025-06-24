@@ -1,0 +1,191 @@
+* using log directory ‘/Users/kevinjoseph/CaImagingAnalysisFr/..Rcheck’
+* using R version 4.5.0 (2025-04-11)
+* using platform: aarch64-apple-darwin20
+* R was compiled by
+    Apple clang version 14.0.0 (clang-1400.0.29.202)
+    GNU Fortran (GCC) 14.2.0
+* running under: macOS Sequoia 15.5
+* using session charset: UTF-8
+* using option ‘--as-cran’
+* checking for file ‘./DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘CaImagingAnalysisFr’ version ‘0.2.0’
+* package encoding: UTF-8
+* checking CRAN incoming feasibility ... [3s/19s] NOTE
+Maintainer: ‘Calcium Team <team@example.com>’
+
+New submission
+
+License components with restrictions and base license permitting such:
+  MIT + file LICENSE
+File 'LICENSE':
+  MIT License
+  
+  Copyright (c) 2021 Kevin Joseph
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+The build time stamp is missing.
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  ..Rcheck
+  .git
+  .github
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+
+CRAN-pack does not know about
+  ..Rcheck
+  .git
+  .github
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘CaImagingAnalysisFr’ can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... NOTE
+unable to verify current time
+* checking DESCRIPTION meta-information ... NOTE
+License stub is invalid DCF.
+Author field differs from that derived from Authors@R
+  Author:    ‘Calcium Team <team@example.com>’
+  Authors@R: ‘Calcium Team [aut, cre]’
+
+Checking should be performed on sources prepared by ‘R CMD build’.
+* checking top-level files ... NOTE
+Non-standard files/directories found at top level:
+  ‘IMPLEMENTATION_SUMMARY.md’ ‘Rplots.pdf’ ‘_pkgdown.yml’ ‘docs’
+  ‘python-env.yml’
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... WARNING
+Found the following directory with the name of a check directory:
+  ./..Rcheck
+Most likely, these were included erroneously.
+Found the following directory with the name of a version control directory:
+  ./.git
+These should not be in a package tarball.
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking use of S3 registration ... OK
+* checking dependencies in R code ... WARNING
+'::' or ':::' imports not declared from:
+  ‘gridExtra’ ‘sva’
+'loadNamespace' or 'requireNamespace' calls not declared from:
+  ‘gridExtra’ ‘sva’
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+calcium_activity_heatmap: no visible binding for global variable ‘Time’
+calcium_activity_heatmap: no visible binding for global variable ‘Cell’
+calcium_activity_heatmap: no visible binding for global variable
+  ‘Signal’
+calcium_pipeline: no visible binding for global variable ‘raw_data’
+calcium_pipeline: no visible binding for global variable
+  ‘corrected_data’
+calcium_pipeline: no visible binding for global variable
+  ‘spike_results’
+calcium_pipeline: no visible binding for global variable ‘qc_report’
+calcium_pipeline: no visible binding for global variable
+  ‘summary_stats’
+calcium_pipeline: no visible binding for global variable ‘trace_plots’
+calcium_pipeline : <anonymous>: no visible binding for global variable
+  ‘corrected_data’
+calcium_pipeline: no visible binding for global variable
+  ‘multi_cell_plot’
+calcium_pipeline: no visible binding for global variable
+  ‘export_results’
+detect_batch_effects: no visible binding for global variable ‘PC1’
+detect_batch_effects: no visible binding for global variable ‘PC2’
+detect_batch_effects: no visible binding for global variable ‘Batch’
+multi_panel_calcium_plot: no visible binding for global variable ‘Time’
+multi_panel_calcium_plot: no visible binding for global variable ‘Cell’
+plot_cell_trace: no visible binding for global variable ‘Time’
+plot_cell_trace: no visible binding for global variable ‘Signal’
+plot_cell_trace: no visible binding for global variable ‘Deconvolved’
+plot_cell_trace_vector: no visible binding for global variable ‘Time’
+plot_cell_trace_vector: no visible binding for global variable ‘Signal’
+publication_calcium_plot: no visible binding for global variable ‘Time’
+publication_calcium_plot: no visible binding for global variable
+  ‘Signal’
+publication_calcium_plot: no visible binding for global variable ‘Cell’
+publication_calcium_plot: no visible binding for global variable
+  ‘Selected’
+visualize_attention: no visible binding for global variable ‘time_from’
+visualize_attention: no visible binding for global variable ‘time_to’
+visualize_attention: no visible binding for global variable ‘weight’
+visualize_causal_network: no visible binding for global variable ‘from’
+visualize_causal_network: no visible binding for global variable ‘to’
+visualize_causal_network: no visible binding for global variable
+  ‘p_value’
+visualize_causal_network: no visible binding for global variable ‘x’
+visualize_causal_network: no visible binding for global variable ‘y’
+visualize_causal_network: no visible binding for global variable ‘id’
+visualize_causal_network: no visible binding for global variable
+  ‘weight’
+Undefined global functions or variables:
+  Batch Cell Deconvolved PC1 PC2 Selected Signal Time corrected_data
+  export_results from id multi_cell_plot p_value qc_report raw_data
+  spike_results summary_stats time_from time_to to trace_plots weight x
+  y
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... WARNING
+Undocumented code objects:
+  ‘create_synthetic_data’ ‘synthetic_data’
+Undocumented data sets:
+  ‘synthetic_data’
+All user-level objects in a package should have documentation entries.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... WARNING
+Documented arguments not in \usage in Rd file 'validate_spike_detection.Rd':
+  ‘verbose’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking files in ‘vignettes’ ... WARNING
+Files in the 'vignettes' directory but no files in 'inst/doc':
+  ‘power-features.html’ ‘power-features.tex’
+  ‘tutorial-basic-workflow.R’
+Package has no Sweave vignette sources and no VignetteBuilder field.
+* checking examples ...

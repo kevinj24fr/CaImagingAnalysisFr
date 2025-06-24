@@ -1,9 +1,8 @@
-#' Spike Inference from Calcium Imaging Data
+#' Spike Inference Functions
 #'
-#' Infer spike times from calcium imaging traces using various methods.
+#' Spike detection and inference methods for calcium imaging data.
 #'
 #' @name infer_spikes
-#' @docType package
 NULL
 
 #' Spike Inference via OASIS, CaImAn, Suite2p, or Deep Learning

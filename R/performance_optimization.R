@@ -544,9 +544,9 @@ benchmark_performance <- function(raw_df,
     message("Benchmark completed")
     for (op_name in names(results)) {
       result <- results[[op_name]]
-      message(op_name, ": ", round(result$mean_time, 3), " ± ", 
-              round(result$sd_time, 3), " seconds, ",
-              round(result$mean_memory, 1), " ± ", 
+      message(op_name, ": ", round(result$mean_time, 3), " +/- ", 
+              round(result$sd_time, 3), "s, Memory: ", 
+              round(result$mean_memory, 1), " +/- ", 
               round(result$sd_memory, 1), " MB")
     }
   }

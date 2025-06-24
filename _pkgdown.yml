@@ -1,6 +1,6 @@
 site:
   title: "CaImagingAnalysisFr"
-  url: https://yourusername.github.io/CaImagingAnalysisFr/
+  url: https://kevinj24fr.github.io/CaImagingAnalysisFr/
 
 template:
   bootswatch: flatly
@@ -18,7 +18,7 @@ navbar:
       href: articles/index.html
       id: articles
     - text: "GitHub"
-      href: https://github.com/yourusername/CaImagingAnalysisFr
+      href: https://github.com/kevinj24fr/CaImagingAnalysisFr
       id: github
   right:
     - text: "README"

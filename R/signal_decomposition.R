@@ -1,9 +1,8 @@
-#' Signal Decomposition and Component Analysis
+#' Signal Decomposition Functions
 #'
-#' Decompose calcium imaging signals into components using various methods.
+#' Signal decomposition and denoising methods for calcium imaging data.
 #'
 #' @name signal_decomposition
-#' @docType package
 NULL
 
 #' Robust Principal Component Analysis (RPCA)

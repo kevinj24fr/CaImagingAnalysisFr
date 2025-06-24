@@ -2,24 +2,38 @@ Package: CaImagingAnalysisFr
 Type: Package
 Title: Calcium Imaging Analysis Tools
 Version: 0.2.0
+Author: Calcium Team <team@example.com>
+Maintainer: Calcium Team <team@example.com>
 Authors@R: c(person(given = "Calcium", family = "Team", role = c("aut", "cre"), email = "team@example.com"))
 Description: Comprehensive utilities for calcium imaging analysis including background correction, 
     spike inference, interactive visualization, and reproducible workflows. Features robust 
     error handling, multiple analysis methods, and extensive validation.
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5)
 Imports:
     ggplot2,
     reticulate,
-    stats
+    stats,
+    grDevices,
+    graphics,
+    utils,
+    MASS,
+    Rtsne,
+    igraph,
+    jsonlite,
+    knitr,
+    rmarkdown,
+    uwot,
+    viridis
 Suggests:
     shiny,
     plotly,
     targets,
     testthat,
     patchwork,
-    gridExtra
+    R.matlab,
+    waveslim
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

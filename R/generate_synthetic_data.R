@@ -138,3 +138,14 @@ generate_cell_traces <- function(n_cells, n_time, spike_prob, verbose) {
   
   return(cells)
 }
+
+#' Create Synthetic Calcium Imaging Dataset
+#' 
+#' Creates a sample dataset containing synthetic calcium imaging data for demonstration
+#' and testing purposes.
+#' 
+#' @return A data frame with 500 rows and 13 columns
+#' @export
+create_synthetic_data <- function() {
+  generate_synthetic_data(n_cells = 10, n_time = 500, spike_prob = 0.02, seed = 123)
+}

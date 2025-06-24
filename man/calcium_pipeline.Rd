@@ -5,32 +5,23 @@
 \title{Calcium Imaging Analysis Pipeline using targets}
 \usage{
 calcium_pipeline(
-  n_cells = NULL,
-  n_time = NULL,
-  spike_prob = NULL,
-  correction_method = "modern",
-  spike_method = "oasis",
-  span = 0.45,
-  normalize = TRUE
+  raw_data_path = NULL,
+  output_dir = "results",
+  config = NULL,
+  ...
 )
 }
 \arguments{
-\item{n_cells}{Number of cells for synthetic data (default: 5)}
+\item{raw_data_path}{Path to raw data file}
 
-\item{n_time}{Number of time points (default: 1000)}
+\item{output_dir}{Output directory for results}
 
-\item{spike_prob}{Spike probability (default: 0.02)}
+\item{config}{Configuration parameters}
 
-\item{correction_method}{Correction method (default: "modern")}
-
-\item{spike_method}{Spike inference method (default: "oasis")}
-
-\item{span}{Loess span parameter (default: 0.45)}
-
-\item{normalize}{Whether to normalize traces (default: TRUE)}
+\item{...}{Additional arguments}
 }
 \value{
-List of targets for the pipeline
+targets pipeline object
 }
 \description{
 Defines a reproducible workflow for calcium imaging analysis using
@@ -43,10 +34,11 @@ pipeline <- calcium_pipeline()
 
 # Custom parameters
 pipeline <- calcium_pipeline(
-  n_cells = 10,
-  n_time = 2000,
-  correction_method = "legacy",
-  spike_method = "caiman"
+  raw_data_path = "path_to_custom_data.csv",
+  config = list(
+    correction_method = "legacy",
+    spike_method = "caiman"
+  )
 )
 
 }

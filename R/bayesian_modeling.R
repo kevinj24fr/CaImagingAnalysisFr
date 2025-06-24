@@ -1,9 +1,8 @@
-#' Bayesian Modeling for Calcium Imaging Data
+#' Bayesian Modeling Functions
 #'
-#' Perform Bayesian analysis and modeling of calcium imaging data.
+#' Bayesian inference and modeling for calcium imaging data.
 #'
 #' @name bayesian_modeling
-#' @docType package
 NULL
 
 #' Validate Probability
@@ -1122,15 +1121,15 @@ plot_bayesian_results <- function(bayesian_result, plot_type = "spikes",
   } else if (plot_type == "parameters") {
     # Plot parameter distributions
     if ("mu_samples" %in% names(bayesian_result)) {
-      hist(bayesian_result$mu_samples, main = "Posterior Distribution of μ",
-           xlab = "μ", ylab = "Frequency")
+      hist(bayesian_result$mu_samples, main = "Posterior Distribution of mu",
+           xlab = "mu", ylab = "Frequency")
     }
   } else if (plot_type == "trace") {
     # Plot MCMC trace
     if ("lambda_samples" %in% names(bayesian_result)) {
       plot(bayesian_result$lambda_samples, type = "l",
-           xlab = "MCMC Iteration", ylab = "λ",
-           main = "MCMC Trace for λ")
+           xlab = "MCMC Iteration", ylab = "sigma",
+           main = "MCMC Trace for sigma")
     }
   }
   

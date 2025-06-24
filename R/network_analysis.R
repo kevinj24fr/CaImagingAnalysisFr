@@ -1,9 +1,8 @@
-#' Network Analysis for Calcium Imaging Data
+#' Network Analysis Functions
 #'
-#' Analyze functional connectivity networks from calcium imaging data.
+#' Network analysis and connectivity methods for calcium imaging data.
 #'
 #' @name network_analysis
-#' @docType package
 NULL
 
 #' Functional Connectivity Analysis

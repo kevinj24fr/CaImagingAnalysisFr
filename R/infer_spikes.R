@@ -1,12 +1,11 @@
-#' Spike Inference via OASIS
+#' Spike Inference via OASIS, CaImAn, Suite2p, or Deep Learning
 #' 
-#' Performs spike inference on calcium traces using the OASIS algorithm
-#' via Python's `oasis` package. Includes robust error handling and
-#' fallback mechanisms.
+#' Performs spike inference on calcium traces using the OASIS, CaImAn, Suite2p, or deep learning (CASCADE) algorithm.
 #' 
 #' @param trace Numeric vector of fluorescence values
-#' @param method Inference method: "oasis" (default), "caiman", or "suite2p"
+#' @param method Inference method: "oasis" (default), "caiman", "suite2p", or "deep"
 #' @param fallback Whether to use fallback method if primary fails (default: TRUE)
+#' @param model_path Path to pretrained deep learning model (for method = "deep")
 #' @param verbose Whether to show progress messages (default: TRUE)
 #' 
 #' @return Data frame with deconvolved activity and estimated spikes
@@ -17,13 +16,14 @@
 #' corrected <- calcium_correction(raw)
 #' spikes <- infer_spikes(corrected$Cell_1)
 #' 
-#' # Try different methods
-#' spikes <- infer_spikes(corrected$Cell_1, method = "caiman")
+#' # Try deep learning method (requires model)
+#' # spikes <- infer_spikes(corrected$Cell_1, method = "deep", model_path = "cascade_model.h5")
 #' 
 #' @export
 infer_spikes <- function(trace, 
-                        method = c("oasis", "caiman", "suite2p"),
+                        method = c("oasis", "caiman", "suite2p", "deep"),
                         fallback = TRUE,
+                        model_path = NULL,
                         verbose = TRUE) {
   
   # Validate inputs
@@ -36,9 +36,13 @@ infer_spikes <- function(trace,
   
   # Try primary method
   result <- tryCatch({
-    infer_spikes_primary(trace, method, verbose)
+    if (method == "deep") {
+      infer_spikes_deep(trace, model_path = model_path, verbose = verbose)
+    } else {
+      infer_spikes_primary(trace, method, verbose)
+    }
   }, error = function(e) {
-    if (fallback) {
+    if (fallback && method != "deep") {
       if (verbose) {
         warning("Primary method failed, using fallback: ", e$message)
       }

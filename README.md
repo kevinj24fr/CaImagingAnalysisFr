@@ -78,6 +78,136 @@ deps <- manage_python_dependencies(packages = c("oasis", "caiman"))
 python_info <- get_python_info()
 ```
 
+### Deep Learning-Based Spike Inference
+- **CASCADE/DeepSpike integration** for state-of-the-art spike inference
+- Use `method = "deep"` in `infer_spikes()` and provide a pretrained model path
+
+```r
+# Deep learning spike inference (requires Python CASCADE and a model)
+spikes <- infer_spikes(trace, method = "deep", model_path = "cascade_model.h5")
+```
+
+### Advanced Signal Decomposition and Denoising
+- **NMF, ICA, wavelet denoising, and RPCA** for advanced signal processing
+
+```r
+# NMF decomposition
+nmf_res <- nmf_decompose(data_matrix, n_components = 3)
+
+# ICA decomposition
+ica_res <- ica_decompose(data_matrix, n_components = 3)
+
+# Wavelet denoising
+denoised_trace <- wavelet_denoise(trace)
+
+# RPCA decomposition (requires Python 'r_pca')
+rpca_res <- rpca_decompose(data_matrix)
+```
+
+### Graph and Network Analysis
+- **Functional connectivity, Granger causality, transfer entropy, and graph metrics**
+- **Network visualization** with igraph/ggraph
+
+```r
+# Functional connectivity
+fc <- functional_connectivity(data_matrix, method = "pearson", threshold = 0.3)
+
+# Granger causality between two traces
+gc <- granger_causality(trace1, trace2, max_lag = 3)
+
+# Transfer entropy (requires Python pyitlib)
+te <- transfer_entropy(trace1, trace2)
+
+# Graph metrics
+metrics <- graph_metrics(fc)
+
+# Network visualization
+plot_network(fc)
+```
+
+### Unsupervised and Self-Supervised Learning
+- **Clustering (k-means, hierarchical), UMAP, t-SNE, autoencoder, anomaly detection**
+
+```r
+# K-means clustering
+clust <- kmeans_clustering(data_matrix, centers = 3)
+
+# Hierarchical clustering
+hc <- hierarchical_clustering(data_matrix)
+
+# UMAP and t-SNE
+dumap <- umap_reduce(data_matrix)
+dtsne <- tsne_reduce(data_matrix)
+
+# Autoencoder reduction (requires Python keras)
+encoded <- autoencoder_reduce(data_matrix, encoding_dim = 2)
+
+# Anomaly detection (requires Python scikit-learn)
+scores <- anomaly_detection(data_matrix)
+```
+
+### Bayesian and Probabilistic Modeling
+- **Bayesian spike inference** using PyMC with uncertainty quantification
+- **Parameter estimation** with Bayesian inference and credible intervals
+- **Hierarchical modeling** for multi-cell data analysis
+- **Model comparison** using information criteria (WAIC, LOO, DIC)
+- **Predictive checks** for model validation
+- **Probabilistic spike detection** with uncertainty estimates
+
+```r
+# Bayesian spike inference with PyMC (requires Python pymc, numpy, arviz)
+bayesian_result <- bayesian_spike_inference(
+  calcium_trace, 
+  n_samples = 1000, 
+  n_chains = 4,
+  prior_spike_rate = 0.1
+)
+
+# Bayesian parameter estimation
+param_result <- bayesian_parameter_estimation(
+  calcium_trace,
+  model_type = "exponential",
+  n_samples = 2000
+)
+
+# Uncertainty quantification
+uncertainty <- uncertainty_quantification(
+  bayesian_result, 
+  confidence_level = 0.95,
+  method = "credible_interval"
+)
+
+# Probabilistic spike detection
+prob_spikes <- probabilistic_spike_detection(
+  calcium_trace,
+  method = "threshold",
+  uncertainty_estimation = TRUE
+)
+
+# Hierarchical Bayesian modeling for multi-cell data
+hierarchical_result <- hierarchical_bayesian_modeling(
+  calcium_traces_matrix,
+  model_type = "hierarchical",
+  n_samples = 2000
+)
+
+# Model comparison
+model_comparison <- bayesian_model_comparison(
+  list(model1 = result1, model2 = result2),
+  comparison_metrics = c("waic", "loo")
+)
+
+# Predictive checks
+predictive_checks <- bayesian_predictive_checks(
+  bayesian_result,
+  n_predictions = 100,
+  test_statistics = c("mean", "std", "min", "max")
+)
+
+# Plot Bayesian results
+plot_bayesian_results(bayesian_result, plot_type = "all")
+```
+
 ## Installation
 
 ### Prerequisites

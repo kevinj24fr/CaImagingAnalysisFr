@@ -15,13 +15,38 @@ get_config <- function() {
     
     # Python packages with version requirements
     python_packages = list(
+      # Core packages
       oasis = ">=1.0.0",
       caiman = ">=1.9.0", 
       suite2p = ">=0.12.0",
       numpy = ">=1.20.0",
-      scipy = ">=1.7.0"
+      scipy = ">=1.7.0",
+      
+      # Deep learning packages
+      tensorflow = ">=2.8.0",
+      keras = ">=2.8.0",
+      
+      # Signal processing packages
+      scikit_learn = ">=1.0.0",  # Note: using scikit_learn instead of sklearn
+      pywt = ">=1.3.0",  # PyWavelets for wavelet denoising
+      
+      # Network analysis packages
+      networkx = ">=2.6.0",
+      pyitlib = ">=0.2.3",  # For transfer entropy
+      
+      # Bayesian modeling packages
+      pymc = ">=4.0.0",
+      arviz = ">=0.12.0",
+      
+      # Visualization packages
+      matplotlib = ">=3.5.0",
+      seaborn = ">=0.11.0",
+      
+      # Dimensionality reduction packages
+      umap_learn = ">=0.5.0",
+      openTSNE = ">=0.6.0"
     ),
-    supported_methods = c("oasis", "caiman", "suite2p"),
+    supported_methods = c("oasis", "caiman", "suite2p", "deep"),
     
     # Column name patterns
     cell_pattern = "^Cell_",
@@ -70,6 +95,30 @@ get_config <- function() {
       max_missing_fraction = 0.1,
       min_trace_length = 100,
       max_contiguous_missing = 20
+    ),
+    
+    # Advanced analysis parameters
+    advanced_analysis = list(
+      # Signal decomposition
+      nmf_components = 3,
+      ica_components = 3,
+      wavelet_level = 3,
+      
+      # Network analysis
+      connectivity_threshold = 0.3,
+      granger_max_lag = 5,
+      transfer_entropy_bins = 10,
+      
+      # Clustering
+      max_clusters = 10,
+      umap_n_neighbors = 15,
+      tsne_perplexity = 30,
+      
+      # Bayesian modeling
+      mcmc_samples = 1000,
+      mcmc_chains = 4,
+      prior_spike_rate = 0.1,
+      prior_decay_rate = 0.95
     )
   )
 } 

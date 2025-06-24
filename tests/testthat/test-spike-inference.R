@@ -102,4 +102,12 @@ test_that("infer_spikes handles different method parameters", {
     expect_equal(nrow(result), length(trace))
     expect_true(all(c("fit", "spike") %in% names(result)))
   }
+})
+
+test_that("deep learning spike inference interface works (mock)", {
+  skip("Deep learning model not available for test environment")
+  # Example usage (would require a real model file):
+  # trace <- rnorm(100)
+  # result <- infer_spikes(trace, method = "deep", model_path = "cascade_model.h5", verbose = FALSE)
+  # expect_true(is.data.frame(result))
 }) 

@@ -5,7 +5,7 @@
 #' consolidates both modern and legacy approaches.
 #' 
 #' @param raw_df A data frame containing calcium traces with columns named
-#'   `Cell_*` for cell traces and `BG_*` for background traces
+#'   `Cell_*` for cell traces and optionally `BG_*` for background traces
 #' @param method Correction method: "modern" (default) or "legacy"
 #' @param span Smoothing span for baseline estimation (0.01-1.0). Default 0.45
 #' @param normalize Whether to normalize traces by their mean. Default TRUE
@@ -14,9 +14,13 @@
 #' @return A data frame with corrected traces and a Time column
 #' 
 #' @examples
-#' # Basic usage
+#' # Basic usage with both cell and background columns
 #' raw <- generate_synthetic_data(3, 500)
 #' corrected <- calcium_correction(raw)
+#' 
+#' # Usage with only cell columns (no background correction)
+#' cell_traces <- raw[, grep("^Cell_", names(raw))]
+#' corrected <- calcium_correction(cell_traces)
 #' 
 #' # Custom parameters
 #' corrected <- calcium_correction(raw, span = 0.3, normalize = FALSE)
@@ -39,12 +43,21 @@ calcium_correction <- function(raw_df,
     span <- get_config()$default_span
   }
   
-  # Validate inputs
-  validate_data_frame(raw_df)
+  # Check if background columns are present
+  config <- get_config()
+  bg_cols <- names(raw_df)[grepl(config$background_pattern, names(raw_df))]
+  has_background <- length(bg_cols) > 0
+  
+  # Validate inputs - make background optional
+  validate_data_frame(raw_df, require_cells = TRUE, require_background = FALSE)
   validate_numeric_param(span, get_config()$min_span, get_config()$max_span, "span")
   
   if (verbose) {
-    message("Processing ", ncol(raw_df), " traces using ", method, " method...")
+    if (has_background) {
+      message("Processing ", ncol(raw_df), " traces using ", method, " method...")
+    } else {
+      message("Processing ", ncol(raw_df), " cell traces (no background correction)...")
+    }
   }
   
   # Apply appropriate correction method
@@ -76,11 +89,22 @@ calcium_correction_modern <- function(raw_df, span, normalize, verbose) {
   bg_cols <- names(raw_df)[grepl(config$background_pattern, names(raw_df))]
   cell_cols <- names(raw_df)[grepl(config$cell_pattern, names(raw_df))]
   
-  # Background correction
-  if (verbose) message("  Performing background correction...")
-  bg <- raw_df[, bg_cols, drop = FALSE]
-  bg_avg <- rowMeans(bg, na.rm = TRUE)
-  corrected <- raw_df[, cell_cols, drop = FALSE] - bg_avg
+  # If no cell columns found, assume all columns are cell columns
+  if (length(cell_cols) == 0) {
+    cell_cols <- names(raw_df)
+    if (verbose) message("  No cell columns found, treating all columns as cell traces...")
+  }
+  
+  # Background correction (only if background columns exist)
+  if (length(bg_cols) > 0) {
+    if (verbose) message("  Performing background correction...")
+    bg <- raw_df[, bg_cols, drop = FALSE]
+    bg_avg <- rowMeans(bg, na.rm = TRUE)
+    corrected <- raw_df[, cell_cols, drop = FALSE] - bg_avg
+  } else {
+    if (verbose) message("  No background columns found, skipping background correction...")
+    corrected <- raw_df[, cell_cols, drop = FALSE]
+  }
   
   # Normalization (optional)
   if (normalize) {
@@ -132,12 +156,23 @@ calcium_correction_legacy <- function(raw_df, span, verbose) {
   bg_cols <- names(raw_df)[grepl(config$background_pattern, names(raw_df))]
   cell_cols <- names(raw_df)[grepl(config$cell_pattern, names(raw_df))]
   
+  # If no cell columns found, assume all columns are cell columns
+  if (length(cell_cols) == 0) {
+    cell_cols <- names(raw_df)
+    if (verbose) message("  No cell columns found, treating all columns as cell traces...")
+  }
+  
   if (verbose) message("  Performing legacy background correction...")
   
-  # Background correction (legacy method)
-  background <- raw_df[, bg_cols, drop = FALSE]
-  background$average <- rowMeans(background, na.rm = TRUE)
-  bgcorrectedtraces <- raw_df[, cell_cols, drop = FALSE] - background$average
+  # Background correction (legacy method) - only if background columns exist
+  if (length(bg_cols) > 0) {
+    background <- raw_df[, bg_cols, drop = FALSE]
+    background$average <- rowMeans(background, na.rm = TRUE)
+    bgcorrectedtraces <- raw_df[, cell_cols, drop = FALSE] - background$average
+  } else {
+    if (verbose) message("  No background columns found, skipping background correction...")
+    bgcorrectedtraces <- raw_df[, cell_cols, drop = FALSE]
+  }
   
   # Normalization (legacy method)
   if (verbose) message("  Performing legacy normalization...")

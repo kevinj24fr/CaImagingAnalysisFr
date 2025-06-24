@@ -22,13 +22,10 @@ test_that("infer_spikes handles different methods", {
   expect_true(is.data.frame(result))
   expect_equal(nrow(result), length(trace))
   
-  # Test with fallback disabled (may fail if Python packages not available)
-  if (reticulate::py_module_available("oasis")) {
-    result <- infer_spikes(trace, method = "oasis", fallback = FALSE, verbose = FALSE)
-    expect_true(is.data.frame(result))
-  } else {
-    expect_error(infer_spikes(trace, method = "oasis", fallback = FALSE, verbose = FALSE))
-  }
+  # Test with fallback disabled (should work since we use base R implementation)
+  result <- infer_spikes(trace, method = "oasis", fallback = FALSE, verbose = FALSE)
+  expect_true(is.data.frame(result))
+  expect_equal(nrow(result), length(trace))
 })
 
 test_that("infer_spikes fallback method works", {

@@ -1,0 +1,524 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Power Features of CaImagingAnalysisFr: Advanced Calcium Imaging Analytics},
+  pdfauthor={Calcium Team},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Power Features of CaImagingAnalysisFr: Advanced Calcium Imaging
+Analytics}
+\author{Calcium Team}
+\date{2025-06-24}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}\label{introduction}
+
+\texttt{CaImagingAnalysisFr} is not just a basic calcium imaging
+toolkit---it is a \textbf{comprehensive, professional, and
+state-of-the-art platform} for advanced analysis, quality control, and
+discovery in neuroscience. This vignette highlights the most powerful
+features that set it apart from other packages.
+
+\section{1. Automated Cell Segmentation \& ROI
+Extraction}\label{automated-cell-segmentation-roi-extraction}
+
+Extracting cells and ROIs from raw imaging data is a critical first
+step. This package provides robust, automated segmentation using
+multiple algorithms:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Simulate a realistic imaging matrix with bright "cells" on noisy background}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
+\NormalTok{raw\_img }\OtherTok{\textless{}{-}} \FunctionTok{array}\NormalTok{(}\FunctionTok{rnorm}\NormalTok{(}\DecValTok{100}\SpecialCharTok{*}\DecValTok{100}\SpecialCharTok{*}\DecValTok{200}\NormalTok{, }\AttributeTok{sd =} \FloatTok{0.1}\NormalTok{), }\AttributeTok{dim =} \FunctionTok{c}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{100}\NormalTok{, }\DecValTok{200}\NormalTok{))}
+
+\CommentTok{\# Add bright spots (simulated cells) at random locations}
+\NormalTok{n\_cells }\OtherTok{\textless{}{-}} \DecValTok{15}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{n\_cells) \{}
+  \CommentTok{\# Random cell center}
+\NormalTok{  center\_x }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\DecValTok{20}\SpecialCharTok{:}\DecValTok{80}\NormalTok{, }\DecValTok{1}\NormalTok{)}
+\NormalTok{  center\_y }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\DecValTok{20}\SpecialCharTok{:}\DecValTok{80}\NormalTok{, }\DecValTok{1}\NormalTok{)}
+  
+  \CommentTok{\# Add bright spot with Gaussian profile}
+  \ControlFlowTok{for}\NormalTok{ (x }\ControlFlowTok{in} \FunctionTok{max}\NormalTok{(}\DecValTok{1}\NormalTok{, center\_x}\DecValTok{{-}5}\NormalTok{)}\SpecialCharTok{:}\FunctionTok{min}\NormalTok{(}\DecValTok{100}\NormalTok{, center\_x}\SpecialCharTok{+}\DecValTok{5}\NormalTok{)) \{}
+    \ControlFlowTok{for}\NormalTok{ (y }\ControlFlowTok{in} \FunctionTok{max}\NormalTok{(}\DecValTok{1}\NormalTok{, center\_y}\DecValTok{{-}5}\NormalTok{)}\SpecialCharTok{:}\FunctionTok{min}\NormalTok{(}\DecValTok{100}\NormalTok{, center\_y}\SpecialCharTok{+}\DecValTok{5}\NormalTok{)) \{}
+\NormalTok{      distance }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{((x }\SpecialCharTok{{-}}\NormalTok{ center\_x)}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}\NormalTok{ (y }\SpecialCharTok{{-}}\NormalTok{ center\_y)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+      \ControlFlowTok{if}\NormalTok{ (distance }\SpecialCharTok{\textless{}=} \DecValTok{5}\NormalTok{) \{}
+\NormalTok{        intensity }\OtherTok{\textless{}{-}} \DecValTok{2} \SpecialCharTok{*} \FunctionTok{exp}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{distance}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{/} \DecValTok{8}\NormalTok{)  }\CommentTok{\# Gaussian profile}
+\NormalTok{        raw\_img[x, y, ] }\OtherTok{\textless{}{-}}\NormalTok{ raw\_img[x, y, ] }\SpecialCharTok{+}\NormalTok{ intensity}
+\NormalTok{      \}}
+\NormalTok{    \}}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\CommentTok{\# Automated segmentation (Suite2p{-}style, base R)}
+\NormalTok{seg }\OtherTok{\textless{}{-}} \FunctionTok{segment\_cells}\NormalTok{(raw\_img, }\AttributeTok{method =} \StringTok{"suite2p"}\NormalTok{, }\AttributeTok{min\_size =} \DecValTok{20}\NormalTok{, }\AttributeTok{verbose =} \ConstantTok{FALSE}\NormalTok{)}
+\CommentTok{\#\textgreater{} Running Suite2p{-}like cell segmentation}
+\CommentTok{\#\textgreater{} Warning in remove\_small\_objects(binary\_mask, min\_size = cell\_diameter\^{}2): NAs}
+\CommentTok{\#\textgreater{} introduced by coercion}
+\FunctionTok{str}\NormalTok{(seg)}
+\CommentTok{\#\textgreater{} List of 6}
+\CommentTok{\#\textgreater{}  $ rois          : list()}
+\CommentTok{\#\textgreater{}  $ roi\_properties: list()}
+\CommentTok{\#\textgreater{}  $ binary\_mask   : num [1:100, 1:100] 1 1 1 1 1 1 1 1 1 1 ...}
+\CommentTok{\#\textgreater{}  $ threshold     : Named num 0.00979}
+\CommentTok{\#\textgreater{}   ..{-} attr(*, "names")= chr "80\%"}
+\CommentTok{\#\textgreater{}  $ method        : chr "suite2p"}
+\CommentTok{\#\textgreater{}  $ parameters    :List of 2}
+\CommentTok{\#\textgreater{}   ..$ cell\_diameter   : num 10}
+\CommentTok{\#\textgreater{}   ..$ threshold\_method: chr "otsu"}
+
+\CommentTok{\# ROI quality control}
+\NormalTok{qc }\OtherTok{\textless{}{-}} \FunctionTok{roi\_quality\_control}\NormalTok{(seg}\SpecialCharTok{$}\NormalTok{rois, raw\_img)}
+\CommentTok{\#\textgreater{} Running ROI quality control}
+\FunctionTok{print}\NormalTok{(qc)}
+\CommentTok{\#\textgreater{} $size\_metrics}
+\CommentTok{\#\textgreater{} list()}
+\CommentTok{\#\textgreater{} }
+\CommentTok{\#\textgreater{} $shape\_metrics}
+\CommentTok{\#\textgreater{} list()}
+\CommentTok{\#\textgreater{} }
+\CommentTok{\#\textgreater{} $intensity\_metrics}
+\CommentTok{\#\textgreater{} list()}
+\CommentTok{\#\textgreater{} }
+\CommentTok{\#\textgreater{} $overall\_score}
+\CommentTok{\#\textgreater{} [1] 0.5}
+\end{Highlighting}
+\end{Shaded}
+
+\section{2. Deep Learning Spike Inference (Base
+R)}\label{deep-learning-spike-inference-base-r}
+
+Leverage advanced spike inference without Python dependencies:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Simulate a calcium trace}
+\NormalTok{trace }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{500}\NormalTok{)}
+
+\CommentTok{\# Deep learning spike inference (base R implementation)}
+\NormalTok{deep\_spikes }\OtherTok{\textless{}{-}} \FunctionTok{infer\_spikes}\NormalTok{(trace, }\AttributeTok{method =} \StringTok{"deep"}\NormalTok{, }\AttributeTok{verbose =} \ConstantTok{FALSE}\NormalTok{)}
+\CommentTok{\#\textgreater{} Running deep spike inference}
+\CommentTok{\#\textgreater{} Running LSTM{-}like spike inference}
+\FunctionTok{head}\NormalTok{(deep\_spikes)}
+\CommentTok{\#\textgreater{}           fit spike}
+\CommentTok{\#\textgreater{} 1 1.175519105     0}
+\CommentTok{\#\textgreater{} 2 0.432449312     0}
+\CommentTok{\#\textgreater{} 3 0.159089211     0}
+\CommentTok{\#\textgreater{} 4 0.058525650     0}
+\CommentTok{\#\textgreater{} 5 0.021530383     0}
+\CommentTok{\#\textgreater{} 6 0.007920585     0}
+\end{Highlighting}
+\end{Shaded}
+
+\section{3. Batch Effect Correction}\label{batch-effect-correction}
+
+Correct for batch effects across experiments or imaging sessions:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Simulate batch{-}labeled data}
+\NormalTok{mat }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{rnorm}\NormalTok{(}\DecValTok{3000}\NormalTok{), }\AttributeTok{nrow =} \DecValTok{100}\NormalTok{, }\AttributeTok{ncol =} \DecValTok{30}\NormalTok{)}
+\NormalTok{batch }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{, }\AttributeTok{each =} \DecValTok{10}\NormalTok{)}
+\NormalTok{corrected }\OtherTok{\textless{}{-}} \FunctionTok{batch\_correction}\NormalTok{(mat, }\AttributeTok{batch =}\NormalTok{ batch, }\AttributeTok{method =} \StringTok{"deep"}\NormalTok{)}
+\CommentTok{\#\textgreater{} Running deep learning harmonization with autoencoder}
+\FunctionTok{str}\NormalTok{(corrected)}
+\CommentTok{\#\textgreater{}  num [1:100, 1:30] 0.3665 {-}0.1795 0.5775 0.0642 {-}0.3111 ...}
+\end{Highlighting}
+\end{Shaded}
+
+\section{4. Advanced Denoising: NMF, ICA,
+Wavelet}\label{advanced-denoising-nmf-ica-wavelet}
+
+Extract clean signals and components using modern matrix factorization
+and signal processing:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# NMF decomposition}
+\NormalTok{nmf\_res }\OtherTok{\textless{}{-}} \FunctionTok{nmf\_decompose}\NormalTok{(}\FunctionTok{abs}\NormalTok{(mat), }\AttributeTok{n\_components =} \DecValTok{3}\NormalTok{)}
+\CommentTok{\#\textgreater{} Performing NMF decomposition with 3 components}
+\CommentTok{\#\textgreater{} Iteration 10, Error: 977.736352466433}
+\CommentTok{\#\textgreater{} Iteration 20, Error: 947.013873739154}
+\CommentTok{\#\textgreater{} Iteration 30, Error: 934.820802868632}
+\CommentTok{\#\textgreater{} Iteration 40, Error: 927.238050593973}
+\CommentTok{\#\textgreater{} Iteration 50, Error: 922.772041458302}
+\CommentTok{\#\textgreater{} Iteration 60, Error: 920.044248445006}
+\CommentTok{\#\textgreater{} Iteration 70, Error: 918.13732480533}
+\CommentTok{\#\textgreater{} Iteration 80, Error: 916.647172754725}
+\CommentTok{\#\textgreater{} Iteration 90, Error: 915.468264157083}
+\CommentTok{\#\textgreater{} Iteration 100, Error: 914.550383950746}
+\FunctionTok{str}\NormalTok{(nmf\_res)}
+\CommentTok{\#\textgreater{} List of 5}
+\CommentTok{\#\textgreater{}  $ W             : num [1:100, 1:3] 0.522 0.654 0.159 0.192 0.253 ...}
+\CommentTok{\#\textgreater{}  $ H             : num [1:3, 1:30] 0.811 0.131 0.518 0.403 0.563 ...}
+\CommentTok{\#\textgreater{}  $ reconstruction: num [1:100, 1:30] 0.66 0.931 0.644 0.369 0.465 ...}
+\CommentTok{\#\textgreater{}  $ n\_components  : num 3}
+\CommentTok{\#\textgreater{}  $ iterations    : int 100}
+
+\CommentTok{\# ICA decomposition}
+\NormalTok{ica\_res }\OtherTok{\textless{}{-}} \FunctionTok{ica\_decompose}\NormalTok{(mat, }\AttributeTok{n\_components =} \DecValTok{3}\NormalTok{)}
+\CommentTok{\#\textgreater{} Performing ICA decomposition with 3 components}
+\CommentTok{\#\textgreater{} Warning in sqrt(W \%*\% t(W) + 1e{-}08 * diag(n\_components)): NaNs produced}
+\FunctionTok{str}\NormalTok{(ica\_res)}
+\CommentTok{\#\textgreater{} List of 5}
+\CommentTok{\#\textgreater{}  $ S           : num [1:100, 1:3] NaN NaN NaN NaN NaN NaN NaN NaN NaN NaN ...}
+\CommentTok{\#\textgreater{}  $ W           : num [1:3, 1:3] NaN NaN NaN NaN NaN NaN NaN NaN NaN}
+\CommentTok{\#\textgreater{}  $ A           : num [1:3, 1:3] NaN NaN NaN NaN NaN NaN NaN NaN NaN}
+\CommentTok{\#\textgreater{}  $ n\_components: num 3}
+\CommentTok{\#\textgreater{}  $ iterations  : int 100}
+
+\CommentTok{\# Wavelet denoising}
+\NormalTok{denoised }\OtherTok{\textless{}{-}} \FunctionTok{wavelet\_denoise}\NormalTok{(trace)}
+\CommentTok{\#\textgreater{} Performing wavelet denoising}
+\FunctionTok{str}\NormalTok{(denoised)}
+\CommentTok{\#\textgreater{} List of 5}
+\CommentTok{\#\textgreater{}  $ denoised : num [1:500] 1.113 0.652 0.725 0.73 0.377 ...}
+\CommentTok{\#\textgreater{}  $ original : num [1:500] 1.176 0.849 1.313 {-}0.732 1.017 ...}
+\CommentTok{\#\textgreater{}  $ threshold: num 4.59}
+\CommentTok{\#\textgreater{}  $ wavelet  : chr "db4"}
+\CommentTok{\#\textgreater{}  $ level    : num 3}
+\end{Highlighting}
+\end{Shaded}
+
+\section{5. Dynamic Network \& Causality
+Analysis}\label{dynamic-network-causality-analysis}
+
+Go beyond correlation: infer functional networks, causality, and
+community structure:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Functional connectivity}
+\NormalTok{fc }\OtherTok{\textless{}{-}} \FunctionTok{functional\_connectivity}\NormalTok{(mat, }\AttributeTok{method =} \StringTok{"correlation"}\NormalTok{, }\AttributeTok{threshold =} \FloatTok{0.3}\NormalTok{)}
+\CommentTok{\#\textgreater{} Computing functional connectivity}
+\FunctionTok{str}\NormalTok{(fc)}
+\CommentTok{\#\textgreater{} List of 5}
+\CommentTok{\#\textgreater{}  $ connectivity\_matrix: num [1:100, 1:100] 0 {-}0.297 0.166 0.43 0.144 ...}
+\CommentTok{\#\textgreater{}  $ thresholded\_matrix : num [1:100, 1:100] 0 {-}0.297 0.166 0.43 0.144 ...}
+\CommentTok{\#\textgreater{}  $ network\_properties :List of 12}
+\CommentTok{\#\textgreater{}   ..$ n\_nodes               : num 100}
+\CommentTok{\#\textgreater{}   ..$ n\_edges               : num 3500}
+\CommentTok{\#\textgreater{}   ..$ density               : num 0.707}
+\CommentTok{\#\textgreater{}   ..$ average\_degree        : num 70}
+\CommentTok{\#\textgreater{}   ..$ clustering\_coefficient: num 0.707}
+\CommentTok{\#\textgreater{}   ..$ average\_path\_length   : num 0.159}
+\CommentTok{\#\textgreater{}   ..$ diameter              : num 0.247}
+\CommentTok{\#\textgreater{}   ..$ modularity            : num 0.0228}
+\CommentTok{\#\textgreater{}   ..$ degree\_distribution   : num [1:81] 0 0 0 0 0 0 0 0 0 0 ...}
+\CommentTok{\#\textgreater{}   ..$ betweenness\_centrality: num [1:100] 24 20 32 59 31 49 24 19 25 44 ...}
+\CommentTok{\#\textgreater{}   ..$ closeness\_centrality  : num [1:100] 0.0625 0.0608 0.0632 0.0653 0.0631 ...}
+\CommentTok{\#\textgreater{}   ..$ eigenvector\_centrality: num [1:100] 0.945 0.932 0.785 0.929 0.815 ...}
+\CommentTok{\#\textgreater{}  $ method             : chr "correlation"}
+\CommentTok{\#\textgreater{}  $ parameters         :List of 2}
+\CommentTok{\#\textgreater{}   ..$ threshold\_method: chr "percentile"}
+\CommentTok{\#\textgreater{}   ..$ threshold\_value : num 0.3}
+
+\CommentTok{\# Granger causality between two cells}
+\NormalTok{gc }\OtherTok{\textless{}{-}} \FunctionTok{granger\_causality}\NormalTok{(mat[,}\DecValTok{1}\NormalTok{], mat[,}\DecValTok{2}\NormalTok{], }\AttributeTok{max\_lag =} \DecValTok{2}\NormalTok{)}
+\NormalTok{gc}
+\CommentTok{\#\textgreater{} [1] 0}
+
+\CommentTok{\# Community detection}
+\NormalTok{comm }\OtherTok{\textless{}{-}} \FunctionTok{community\_detection}\NormalTok{(fc}\SpecialCharTok{$}\NormalTok{connectivity\_matrix, }\AttributeTok{method =} \StringTok{"louvain"}\NormalTok{)}
+\CommentTok{\#\textgreater{} Detecting communities}
+\FunctionTok{str}\NormalTok{(comm)}
+\CommentTok{\#\textgreater{} List of 4}
+\CommentTok{\#\textgreater{}  $ communities:List of 5}
+\CommentTok{\#\textgreater{}   ..$ membership : int [1:27] 1 4 5 8 13 17 22 23 25 26 ...}
+\CommentTok{\#\textgreater{}   ..$ memberships: int [1:33] 2 6 7 9 12 19 21 24 33 36 ...}
+\CommentTok{\#\textgreater{}   ..$ modularity : int [1:17] 3 18 32 48 53 56 62 67 82 86 ...}
+\CommentTok{\#\textgreater{}   ..$ vcount     : int [1:9] 10 15 30 35 46 68 74 84 89}
+\CommentTok{\#\textgreater{}   ..$ algorithm  : int [1:14] 11 14 16 20 28 38 42 64 77 79 ...}
+\CommentTok{\#\textgreater{}   ..{-} attr(*, "class")= chr "communities"}
+\CommentTok{\#\textgreater{}  $ membership : \textquotesingle{}membership\textquotesingle{} num [1:100] 1 2 3 1 1 2 2 1 2 4 ...}
+\CommentTok{\#\textgreater{}  $ modularity : num {-}0.00769}
+\CommentTok{\#\textgreater{}  $ method     : chr "louvain"}
+\end{Highlighting}
+\end{Shaded}
+
+\section{6. Unsupervised Learning \& Anomaly
+Detection}\label{unsupervised-learning-anomaly-detection}
+
+Discover hidden structure and outliers in your data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# UMAP dimensionality reduction}
+\NormalTok{umap\_res }\OtherTok{\textless{}{-}} \FunctionTok{umap\_reduce}\NormalTok{(mat, }\AttributeTok{n\_components =} \DecValTok{2}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(umap\_res, }\AttributeTok{main =} \StringTok{"UMAP Embedding"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{power-features_files/figure-latex/unsupervised-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{\# K{-}means clustering}
+\NormalTok{clust }\OtherTok{\textless{}{-}} \FunctionTok{kmeans\_clustering}\NormalTok{(mat, }\AttributeTok{centers =} \DecValTok{3}\NormalTok{)}
+\FunctionTok{table}\NormalTok{(clust}\SpecialCharTok{$}\NormalTok{cluster)}
+\CommentTok{\#\textgreater{} }
+\CommentTok{\#\textgreater{}  1  2  3 }
+\CommentTok{\#\textgreater{} 18 35 47}
+
+\CommentTok{\# Anomaly detection (base R)}
+\NormalTok{anom }\OtherTok{\textless{}{-}} \FunctionTok{anomaly\_detection}\NormalTok{(mat)}
+\FunctionTok{summary}\NormalTok{(anom)}
+\CommentTok{\#\textgreater{}    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. }
+\CommentTok{\#\textgreater{}  0.0000  0.3266  0.4435  0.4463  0.5492  1.0000}
+\end{Highlighting}
+\end{Shaded}
+
+\section{7. Bayesian Modeling \& Model
+Comparison}\label{bayesian-modeling-model-comparison}
+
+Perform robust Bayesian inference and compare models:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Bayesian spike inference}
+\NormalTok{bayes\_spikes }\OtherTok{\textless{}{-}} \FunctionTok{bayesian\_spike\_inference}\NormalTok{(trace)}
+\CommentTok{\#\textgreater{} Running Bayesian spike inference}
+\FunctionTok{str}\NormalTok{(bayes\_spikes)}
+\CommentTok{\#\textgreater{} List of 8}
+\CommentTok{\#\textgreater{}  $ lambda\_samples  : num [1:1000] 0.00703 0.00662 0.01286 0.01056 0.01216 ...}
+\CommentTok{\#\textgreater{}  $ spike\_samples   : num [1:1000, 1:500] 0 0 0 0 0 0 0 0 0 0 ...}
+\CommentTok{\#\textgreater{}  $ tau\_samples     : num [1:1000] 1.22 1.13 1.18 1.21 1.2 ...}
+\CommentTok{\#\textgreater{}  $ posterior\_spikes: num [1:500] 0.021 0.016 0.026 0.004 0.024 0.02 0.007 0.034 0.006 0 ...}
+\CommentTok{\#\textgreater{}  $ posterior\_lambda: num 0.0157}
+\CommentTok{\#\textgreater{}  $ posterior\_tau   : num 1.14}
+\CommentTok{\#\textgreater{}  $ model\_type      : chr "poisson"}
+\CommentTok{\#\textgreater{}  $ parameters      :List of 2}
+\CommentTok{\#\textgreater{}   ..$ n\_samples: num 1000}
+\CommentTok{\#\textgreater{}   ..$ burnin   : num 100}
+
+\CommentTok{\# Model comparison {-} create models with correct format}
+\NormalTok{model1 }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+  \AttributeTok{spikes =} \FunctionTok{bayesian\_spike\_inference}\NormalTok{(trace, }\AttributeTok{n\_samples =} \DecValTok{500}\NormalTok{)}\SpecialCharTok{$}\NormalTok{posterior\_spikes,}
+  \AttributeTok{log\_likelihood =} \SpecialCharTok{{-}}\DecValTok{100}\NormalTok{,}
+  \AttributeTok{aic =} \DecValTok{200}\NormalTok{,}
+  \AttributeTok{bic =} \DecValTok{250}\NormalTok{,}
+  \AttributeTok{dic =} \DecValTok{180}
+\NormalTok{)}
+\CommentTok{\#\textgreater{} Running Bayesian spike inference}
+\NormalTok{model2 }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+  \AttributeTok{spikes =} \FunctionTok{bayesian\_spike\_inference}\NormalTok{(trace }\SpecialCharTok{+} \FunctionTok{rnorm}\NormalTok{(}\FunctionTok{length}\NormalTok{(trace), }\DecValTok{0}\NormalTok{, }\FloatTok{0.1}\NormalTok{), }\AttributeTok{n\_samples =} \DecValTok{500}\NormalTok{)}\SpecialCharTok{$}\NormalTok{posterior\_spikes,}
+  \AttributeTok{log\_likelihood =} \SpecialCharTok{{-}}\DecValTok{110}\NormalTok{,}
+  \AttributeTok{aic =} \DecValTok{220}\NormalTok{,}
+  \AttributeTok{bic =} \DecValTok{270}\NormalTok{,}
+  \AttributeTok{dic =} \DecValTok{200}
+\NormalTok{)}
+\CommentTok{\#\textgreater{} Running Bayesian spike inference}
+\NormalTok{comp }\OtherTok{\textless{}{-}} \FunctionTok{bayesian\_model\_comparison}\NormalTok{(}\FunctionTok{list}\NormalTok{(model1, model2))}
+\CommentTok{\#\textgreater{} Comparing Bayesian models}
+\FunctionTok{str}\NormalTok{(comp)}
+\CommentTok{\#\textgreater{} List of 3}
+\CommentTok{\#\textgreater{}  $ models    :List of 2}
+\CommentTok{\#\textgreater{}   ..$ :List of 5}
+\CommentTok{\#\textgreater{}   .. ..$ spikes        : num [1:500] 0.026 0.02 0.038 0.002 0.022 0.022 0 0.02 0.01 0.004 ...}
+\CommentTok{\#\textgreater{}   .. ..$ log\_likelihood: num {-}100}
+\CommentTok{\#\textgreater{}   .. ..$ aic           : num 200}
+\CommentTok{\#\textgreater{}   .. ..$ bic           : num 250}
+\CommentTok{\#\textgreater{}   .. ..$ dic           : num 180}
+\CommentTok{\#\textgreater{}   ..$ :List of 5}
+\CommentTok{\#\textgreater{}   .. ..$ spikes        : num [1:500] 0.018 0.02 0.032 0.008 0.028 0.024 0.004 0.02 0.006 0.008 ...}
+\CommentTok{\#\textgreater{}   .. ..$ log\_likelihood: num {-}110}
+\CommentTok{\#\textgreater{}   .. ..$ aic           : num 220}
+\CommentTok{\#\textgreater{}   .. ..$ bic           : num 270}
+\CommentTok{\#\textgreater{}   .. ..$ dic           : num 200}
+\CommentTok{\#\textgreater{}  $ comparison:\textquotesingle{}data.frame\textquotesingle{}:  2 obs. of  5 variables:}
+\CommentTok{\#\textgreater{}   ..$ model         : chr [1:2] "model1" "model2"}
+\CommentTok{\#\textgreater{}   ..$ log\_likelihood: num [1:2] {-}100 {-}110}
+\CommentTok{\#\textgreater{}   ..$ aic           : num [1:2] 200 220}
+\CommentTok{\#\textgreater{}   ..$ bic           : num [1:2] 250 270}
+\CommentTok{\#\textgreater{}   ..$ dic           : num [1:2] 180 200}
+\CommentTok{\#\textgreater{}  $ best\_model: chr "model1"}
+\end{Highlighting}
+\end{Shaded}
+
+\section{8. Automated Reporting \& Interactive
+QC}\label{automated-reporting-interactive-qc}
+
+Generate interactive reports and launch QC dashboards:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Generate a comprehensive HTML report}
+\FunctionTok{generate\_report}\NormalTok{(}\AttributeTok{raw\_data =}\NormalTok{ mat, }\AttributeTok{corrected\_data =}\NormalTok{ corrected)}
+
+\CommentTok{\# Launch interactive QC dashboard}
+\FunctionTok{launch\_interactive\_viewer}\NormalTok{(mat)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{9. Data Curation \& Metadata
+Handling}\label{data-curation-metadata-handling}
+
+Automate data curation and ensure reproducibility:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Curate and validate metadata}
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{curate\_data}\NormalTok{(mat, }\AttributeTok{metadata =} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{batch =}\NormalTok{ batch))}
+\CommentTok{\#\textgreater{} Curating calcium imaging data}
+\FunctionTok{str}\NormalTok{(data)}
+\CommentTok{\#\textgreater{} List of 4}
+\CommentTok{\#\textgreater{}  $ data              :List of 2}
+\CommentTok{\#\textgreater{}   ..$ data            : num [1:100, 1:30] 0.521 {-}0.695 0.987 0.151 {-}0.24 ...}
+\CommentTok{\#\textgreater{}   .. ..{-} attr(*, "dimnames")=List of 2}
+\CommentTok{\#\textgreater{}   .. .. ..$ : NULL}
+\CommentTok{\#\textgreater{}   .. .. ..$ : chr [1:30] "Cell\_1" "Cell\_2" "Cell\_3" "Cell\_4" ...}
+\CommentTok{\#\textgreater{}   .. ..{-} attr(*, "format\_info")=List of 3}
+\CommentTok{\#\textgreater{}   .. .. ..$ original\_format: chr "matrix"}
+\CommentTok{\#\textgreater{}   .. .. ..$ target\_format  : chr "matrix"}
+\CommentTok{\#\textgreater{}   .. .. ..$ conversion\_date: POSIXct[1:1], format: "2025{-}06{-}24 10:32:22"}
+\CommentTok{\#\textgreater{}   ..$ outliers\_removed: num 44}
+\CommentTok{\#\textgreater{}  $ metadata          :\textquotesingle{}data.frame\textquotesingle{}:  30 obs. of  1 variable:}
+\CommentTok{\#\textgreater{}   ..$ batch: int [1:30] 1 1 1 1 1 1 1 1 1 1 ...}
+\CommentTok{\#\textgreater{}  $ validation\_results:List of 6}
+\CommentTok{\#\textgreater{}   ..$ data\_type         : chr "calcium\_traces"}
+\CommentTok{\#\textgreater{}   ..$ validation\_passed : logi FALSE}
+\CommentTok{\#\textgreater{}   ..$ n\_issues          : int 1}
+\CommentTok{\#\textgreater{}   ..$ issues            :List of 1}
+\CommentTok{\#\textgreater{}   .. ..$ outliers: chr "Found outliers in 21 columns"}
+\CommentTok{\#\textgreater{}   ..$ recommendations   :List of 1}
+\CommentTok{\#\textgreater{}   .. ..$ outliers: chr "Review and handle outliers appropriately"}
+\CommentTok{\#\textgreater{}   ..$ validation\_results:List of 3}
+\CommentTok{\#\textgreater{}   .. ..$ dimensions    : chr "Data dimensions: 100 x 30"}
+\CommentTok{\#\textgreater{}   .. ..$ missing\_values: chr "No missing values found"}
+\CommentTok{\#\textgreater{}   .. ..$ value\_ranges  : chr "Value range: [ {-}3.646 , 3.226 ]"}
+\CommentTok{\#\textgreater{}  $ curation\_timestamp: POSIXct[1:1], format: "2025{-}06{-}24 10:32:22"}
+\end{Highlighting}
+\end{Shaded}
+
+\section{10. End-to-End Professional
+Workflow}\label{end-to-end-professional-workflow}
+
+Combine all features for a seamless, reproducible, and publication-ready
+analysis:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Note: This requires the \textquotesingle{}targets\textquotesingle{} package}
+\CommentTok{\# Install with: install.packages(\textquotesingle{}targets\textquotesingle{})}
+\NormalTok{pipeline }\OtherTok{\textless{}{-}} \FunctionTok{calcium\_pipeline}\NormalTok{(}
+  \AttributeTok{n\_cells =} \DecValTok{10}\NormalTok{,}
+  \AttributeTok{n\_time =} \DecValTok{1000}\NormalTok{,}
+  \AttributeTok{correction\_method =} \StringTok{"modern"}\NormalTok{,}
+  \AttributeTok{spike\_method =} \StringTok{"deep"}\NormalTok{,}
+  \AttributeTok{normalize =} \ConstantTok{TRUE}
+\NormalTok{)}
+\FunctionTok{str}\NormalTok{(pipeline)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Conclusion}\label{conclusion}
+
+\texttt{CaImagingAnalysisFr} empowers neuroscientists with a
+\textbf{professional, robust, and cutting-edge toolkit} for every stage
+of calcium imaging analysis---from raw data to publication. Explore the
+documentation and function references for even more advanced options!
+
+\end{document}

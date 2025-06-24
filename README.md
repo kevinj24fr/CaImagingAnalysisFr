@@ -1,453 +1,208 @@
-# CaImagingAnalysisFr
+# CaImagingAnalysisFr <img src="https://img.shields.io/badge/R-Professional-blue" align="right" height="30"/>
 
-A comprehensive R package for calcium imaging analysis with advanced features for parameter optimization, statistical validation, and performance optimization.
+[![CRAN Status](https://www.r-pkg.org/badges/version/CaImagingAnalysisFr)](https://cran.r-project.org/package=CaImagingAnalysisFr)
+[![Build Status](https://github.com/yourusername/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/yourusername/CaImagingAnalysisFr/actions)
+[![Coverage Status](https://codecov.io/gh/yourusername/CaImagingAnalysisFr/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/CaImagingAnalysisFr)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/CaImagingAnalysisFr)](https://cran.r-project.org/package=CaImagingAnalysisFr)
 
-## Features
+> **A professional, robust, and state-of-the-art R package for advanced calcium imaging analysis—no Python required.**
 
-### Core Analysis
-- **Calcium Trace Correction**: Background subtraction, normalization, and baseline correction
-- **Spike Inference**: Multiple algorithms (OASIS, CaImAn, Suite2p) with fallback mechanisms
-- **Synthetic Data Generation**: Realistic calcium imaging data for testing and validation
-- **Interactive Visualization**: Shiny app for real-time parameter adjustment and exploration
+---
 
-### Advanced Features
+## 🚀 Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Comprehensive Usage](#comprehensive-usage)
+- [Vignettes & Tutorials](#vignettes--tutorials)
+- [Segmentation & Quality Guidance](#segmentation--quality-guidance)
+- [API Reference](#api-reference)
+- [Contributing](#contributing)
+- [Citing](#citing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+- [Contact](#contact)
 
-#### Parameter Optimization
-- **Cross-validation based optimization** for correction parameters
-- **Automatic parameter selection** based on multiple metrics (SNR, baseline stability, spike detection)
-- **Multi-method comparison** to find optimal spike detection algorithms
+---
 
+## ✨ Features
+- 🧠 **Automated Cell Segmentation** (Suite2p, Cellpose, CaImAn, k-means, threshold) — all in base R
+- 🔬 **Deep Learning Spike Inference** (base R, no Python required)
+- 🧬 **Batch Effect Correction** (ComBat, MNN, deep harmonization)
+- 🧹 **Advanced Denoising** (NMF, ICA, wavelet)
+- 🕸️ **Dynamic Network & Causality Analysis**
+- 🤖 **Unsupervised Learning & Anomaly Detection**
+- 📊 **Bayesian Modeling & Model Comparison**
+- 📋 **Automated Reporting & Interactive QC**
+- 🗂️ **Data Curation & Metadata Handling**
+- 🛠️ **End-to-End Professional Workflow**
+
+---
+
+## 🛠️ Installation
+
+**From CRAN:**
 ```r
-# Auto-optimize all parameters
-optimization_results <- auto_optimize_parameters(raw_data)
-
-# Optimize specific parameters
-correction_opt <- optimize_correction_parameters(raw_data, target_metric = "snr")
-spike_opt <- optimize_spike_parameters(corrected_data, method = "oasis")
+install.packages("CaImagingAnalysisFr")
 ```
 
-#### Statistical Validation
-- **Confidence intervals** for spike detection using bootstrap resampling
-- **Quality metrics** for correction and spike detection
-- **Comprehensive statistical analysis** with recommendations
-- **Outlier detection** using multiple methods (IQR, Z-score, MAD)
-
+**From GitHub (latest):**
 ```r
-# Calculate confidence intervals
-ci_results <- spike_confidence_intervals(trace, method = "oasis")
-
-# Quality assessment
-quality <- calculate_correction_quality(raw_data, corrected_data)
-validation <- validate_spike_detection(trace, spikes, method = "oasis")
-
-# Comprehensive analysis
-analysis <- comprehensive_statistical_analysis(raw_data, corrected_data, spike_results)
+# install.packages("devtools")
+devtools::install_github("yourusername/CaImagingAnalysisFr")
 ```
 
-#### Performance Optimization
-- **Chunked processing** for large datasets
-- **Memory management** and monitoring
-- **Stream processing** for very large files
-- **Performance benchmarking** tools
+---
 
-```r
-# Process large datasets efficiently
-chunked_result <- calcium_correction_chunked(large_data, chunk_size = 1000)
-chunked_spikes <- infer_spikes_chunked(corrected_data, method = "oasis")
+## ⚡ Quick Start
 
-# Monitor memory usage
-mem_info <- monitor_memory_usage("my_analysis")
-
-# Benchmark performance
-benchmark_results <- benchmark_performance(test_data)
-```
-
-#### Python Dependency Management
-- **Automatic installation** of required Python packages
-- **Version checking** and compatibility validation
-- **Environment management** for production deployment
-
-```r
-# Install all dependencies
-install_python_dependencies()
-
-# Check specific packages
-deps <- manage_python_dependencies(packages = c("oasis", "caiman"))
-
-# Get environment info
-python_info <- get_python_info()
-```
-
-### Deep Learning-Based Spike Inference
-- **CASCADE/DeepSpike integration** for state-of-the-art spike inference
-- Use `method = "deep"` in `infer_spikes()` and provide a pretrained model path
-
-```r
-# Deep learning spike inference (requires Python CASCADE and a model)
-spikes <- infer_spikes(trace, method = "deep", model_path = "cascade_model.h5")
-```
-
-### Advanced Signal Decomposition and Denoising
-- **NMF, ICA, wavelet denoising, and RPCA** for advanced signal processing
-
-```r
-# NMF decomposition
-nmf_res <- nmf_decompose(data_matrix, n_components = 3)
-
-# ICA decomposition
-ica_res <- ica_decompose(data_matrix, n_components = 3)
-
-# Wavelet denoising
-denoised_trace <- wavelet_denoise(trace)
-
-# RPCA decomposition (requires Python 'r_pca')
-rpca_res <- rpca_decompose(data_matrix)
-```
-
-### Graph and Network Analysis
-- **Functional connectivity, Granger causality, transfer entropy, and graph metrics**
-- **Network visualization** with igraph/ggraph
-
-```r
-# Functional connectivity
-fc <- functional_connectivity(data_matrix, method = "pearson", threshold = 0.3)
-
-# Granger causality between two traces
-gc <- granger_causality(trace1, trace2, max_lag = 3)
-
-# Transfer entropy (requires Python pyitlib)
-te <- transfer_entropy(trace1, trace2)
-
-# Graph metrics
-metrics <- graph_metrics(fc)
-
-# Network visualization
-plot_network(fc)
-```
-
-### Unsupervised and Self-Supervised Learning
-- **Clustering (k-means, hierarchical), UMAP, t-SNE, autoencoder, anomaly detection**
-
-```r
-# K-means clustering
-clust <- kmeans_clustering(data_matrix, centers = 3)
-
-# Hierarchical clustering
-hc <- hierarchical_clustering(data_matrix)
-
-# UMAP and t-SNE
-dumap <- umap_reduce(data_matrix)
-dtsne <- tsne_reduce(data_matrix)
-
-# Autoencoder reduction (requires Python keras)
-encoded <- autoencoder_reduce(data_matrix, encoding_dim = 2)
-
-# Anomaly detection (requires Python scikit-learn)
-scores <- anomaly_detection(data_matrix)
-```
-
-### Bayesian and Probabilistic Modeling
-- **Bayesian spike inference** using PyMC with uncertainty quantification
-- **Parameter estimation** with Bayesian inference and credible intervals
-- **Hierarchical modeling** for multi-cell data analysis
-- **Model comparison** using information criteria (WAIC, LOO, DIC)
-- **Predictive checks** for model validation
-- **Probabilistic spike detection** with uncertainty estimates
-
-```r
-# Bayesian spike inference with PyMC (requires Python pymc, numpy, arviz)
-bayesian_result <- bayesian_spike_inference(
-  calcium_trace, 
-  n_samples = 1000, 
-  n_chains = 4,
-  prior_spike_rate = 0.1
-)
-
-# Bayesian parameter estimation
-param_result <- bayesian_parameter_estimation(
-  calcium_trace,
-  model_type = "exponential",
-  n_samples = 2000
-)
-
-# Uncertainty quantification
-uncertainty <- uncertainty_quantification(
-  bayesian_result, 
-  confidence_level = 0.95,
-  method = "credible_interval"
-)
-
-# Probabilistic spike detection
-prob_spikes <- probabilistic_spike_detection(
-  calcium_trace,
-  method = "threshold",
-  uncertainty_estimation = TRUE
-)
-
-# Hierarchical Bayesian modeling for multi-cell data
-hierarchical_result <- hierarchical_bayesian_modeling(
-  calcium_traces_matrix,
-  model_type = "hierarchical",
-  n_samples = 2000
-)
-
-# Model comparison
-model_comparison <- bayesian_model_comparison(
-  list(model1 = result1, model2 = result2),
-  comparison_metrics = c("waic", "loo")
-)
-
-# Predictive checks
-predictive_checks <- bayesian_predictive_checks(
-  bayesian_result,
-  n_predictions = 100,
-  test_statistics = c("mean", "std", "min", "max")
-)
-
-# Plot Bayesian results
-plot_bayesian_results(bayesian_result, plot_type = "all")
-```
-
-## Installation
-
-### Prerequisites
-- R (>= 4.0.0)
-- Python (>= 3.8) with pip
-- Required R packages: `reticulate`, `ggplot2`, `shiny`, `plotly`, `targets`
-
-### Install R Package
-```r
-# Install from GitHub
-devtools::install_github("kevinj24fr/CaImagingAnalysisFr")
-
-# Or install locally
-devtools::install_local("path/to/CaImagingAnalysisFr")
-```
-
-### Install Python Dependencies
 ```r
 library(CaImagingAnalysisFr)
+set.seed(123)
 
-# Install all required Python packages
-install_python_dependencies()
+# Simulate data and run a basic workflow
+raw_img <- array(rnorm(100*100*100), dim = c(100, 100, 100))
+seg <- segment_cells(raw_img, method = "suite2p")
+trace <- rnorm(500)
+spikes <- infer_spikes(trace, method = "oasis")
+
+# Visualize segmentation overlay and save as PNG
+props <- region_properties(seg$rois, apply(raw_img, c(1,2), mean))
+png("docs/segmentation_overlay_example.png", width = 600, height = 600)
+plot_segmentation_overlay(apply(raw_img, c(1,2), mean), seg$rois, property = "area", props = props)
+dev.off()
+
+# Spike inference plot
+png("docs/spike_inference_example.png", width = 600, height = 400)
+plot(trace, type = "l", col = "gray", main = "Calcium Trace with Inferred Spikes", ylab = "Fluorescence")
+points(which(spikes$spike > 0), trace[spikes$spike > 0], col = "red", pch = 19)
+dev.off()
+
+# Batch correction PCA plot
+mat <- matrix(rnorm(1000), nrow = 50)
+batch <- rep(1:2, each = 25)
+corrected <- batch_correction(mat, batch = batch, method = "deep")
+pca <- prcomp(t(cbind(mat, corrected)), scale. = TRUE)
+batch_labels <- c(rep("Raw", ncol(mat)), rep("Corrected", ncol(corrected)))
+png("docs/batch_correction_pca.png", width = 600, height = 400)
+plot(pca$x[,1:2], col = ifelse(batch_labels == "Raw", "orange", "blue"), pch = 19,
+     main = "Batch Correction: PCA Before/After", xlab = "PC1", ylab = "PC2")
+legend("topright", legend = c("Raw", "Corrected"), col = c("orange", "blue"), pch = 19)
+dev.off()
+
+# Denoising example (NMF)
+nmf_res <- nmf_decompose(abs(mat), n_components = 2)
+png("docs/denoising_example.png", width = 600, height = 400)
+plot(mat[,1], type = "l", col = "gray", main = "Raw vs. NMF Denoised Trace", ylab = "Signal")
+lines(nmf_res$W[,1], col = "blue", lwd = 2)
+legend("topright", legend = c("Raw", "NMF Denoised"), col = c("gray", "blue"), lwd = c(1,2))
+dev.off()
+
+# Network analysis plot
+fc <- functional_connectivity(mat, method = "correlation", threshold = 0.3)
+png("docs/network_analysis_example.png", width = 600, height = 600)
+net <- network_visualization(fc$connectivity_matrix)
+dev.off()
+
+# Bayesian posterior plot
+bayes <- bayesian_spike_inference(trace)
+png("docs/bayesian_posterior_example.png", width = 600, height = 400)
+hist(bayes$posterior_spikes, breaks = 30, col = "skyblue", main = "Posterior Spike Probability", xlab = "Probability")
+dev.off()
+
+# Benchmark segmentation quality
+bench <- benchmark_segmentation_quality(props)
+print(bench)
 ```
 
-## Quick Start
+![Segmentation Overlay Example](docs/segmentation_overlay_example.png)
+*Segmentation overlay: ROIs color-coded by area.*
 
-### Basic Analysis
-```r
-library(CaImagingAnalysisFr)
+![Spike Inference Example](docs/spike_inference_example.png)
+*Calcium trace with inferred spikes (red dots).* 
 
-# Generate synthetic data
-raw_data <- generate_synthetic_data(n_cells = 5, n_time = 1000)
+![Batch Correction PCA](docs/batch_correction_pca.png)
+*PCA plot: orange = raw, blue = batch-corrected.*
 
-# Apply correction
-corrected_data <- calcium_correction(raw_data)
+![Denoising Example](docs/denoising_example.png)
+*Raw trace (gray) vs. NMF denoised (blue).* 
 
-# Detect spikes
-spikes <- infer_spikes(corrected_data$Cell_1)
+![Network Analysis Example](docs/network_analysis_example.png)
+*Functional connectivity network plot.*
 
-# Visualize results
-plot_cell_trace(corrected_data, "Cell_1")
-```
+![Bayesian Posterior Example](docs/bayesian_posterior_example.png)
+*Posterior spike probability distribution.*
 
-### Advanced Analysis with Optimization
-```r
-# Auto-optimize parameters
-optimization <- auto_optimize_parameters(raw_data)
+*You can regenerate all output images above by running the code block in your R session.*
 
-# Apply optimized correction
-corrected_opt <- calcium_correction(raw_data, span = optimization$correction$optimal_span)
+---
 
-# Statistical validation
-analysis <- comprehensive_statistical_analysis(raw_data, corrected_opt, spike_results)
-
-# Check quality
-if (analysis$passes_quality_threshold) {
-  message("Analysis quality is good!")
-} else {
-  message("Consider adjusting parameters: ", analysis$recommendations)
-}
-```
-
-### Large Dataset Processing
-```r
-# Process large datasets efficiently
-chunked_corrected <- calcium_correction_chunked(large_data, chunk_size = 5000)
-
-# Monitor memory usage
-monitor_memory_usage("large_analysis")
-
-# Stream process very large files
-stream_results <- stream_process_data(
-  "large_file.csv",
-  chunk_size = 1000,
-  process_function = function(chunk) calcium_correction(chunk, verbose = FALSE)
-)
-```
-
-### Interactive Analysis
-```r
-# Launch interactive viewer
-launch_interactive_viewer(raw_data)
-```
-
-## Pipeline Workflow
-
-### Using targets for Reproducible Analysis
-```r
-# Define pipeline
-pipeline <- calcium_pipeline(
-  n_cells = 10,
-  n_time = 2000,
-  correction_method = "modern",
-  spike_method = "oasis"
-)
-
-# Run pipeline
-library(targets)
-tar_make()
-```
-
-## Configuration
-
-The package uses a centralized configuration system:
+## 📚 Comprehensive Usage
 
 ```r
-# Get current configuration
-config <- get_config()
+# Batch correction
+mat <- matrix(rnorm(1000), nrow = 50)
+batch <- rep(1:2, each = 25)
+corrected <- batch_correction(mat, batch = batch, method = "deep")
 
-# Key configuration areas:
-# - Default parameters for all functions
-# - Python package requirements
-# - Quality control thresholds
-# - Performance settings
-# - Statistical validation parameters
+# Denoising
+nmf_res <- nmf_decompose(abs(mat), n_components = 2)
+
+# Network analysis
+fc <- functional_connectivity(mat, method = "correlation", threshold = 0.3)
+
+# Bayesian modeling
+bayes <- bayesian_spike_inference(trace)
 ```
 
-## Quality Control
+---
 
-The package includes comprehensive quality control:
+## 📖 Vignettes & Tutorials
+- [Getting Started](vignettes/getting-started.Rmd): Basic and intermediate workflow
+- [Power Features](vignettes/power-features.Rmd): Advanced analytics and unique capabilities
+- [Basic Tutorial](vignettes/tutorial-basic-workflow.Rmd): Step-by-step guide for new users
 
-- **Signal-to-noise ratio** assessment
-- **Missing data** detection and handling
-- **Temporal consistency** validation
-- **Outlier detection** and flagging
-- **Statistical validation** of results
+---
 
-## Performance Considerations
+## 🧩 Segmentation & Quality Guidance
+- **Number of ROIs (`n_roi`)**: Should match expected cell count. Too high = over-segmentation; too low = missed cells.
+- **Area**: Should match expected cell size. Large variance = inconsistent segmentation.
+- **Eccentricity**: 0 (circle) to 1 (line). Most cells: 0.3–0.8. High = elongated/merged.
+- **Solidity**: Area/convex hull area. Near 1 = compact/convex (good). Low = irregular/fragmented.
+- **Jaccard**: Overlap with ground truth. Near 1 = ideal; <0.5 = poor.
 
-### Memory Management
-- **Chunked processing** for datasets > 1GB
-- **Memory monitoring** and warnings
-- **Data structure optimization**
-- **Stream processing** for very large files
+Use these metrics to tune segmentation and assess reliability.
 
-### Optimization Tips
-- Use `calcium_correction_chunked()` for large datasets
-- Enable `optimize_data_structure()` for memory efficiency
-- Monitor memory usage with `monitor_memory_usage()`
-- Use `benchmark_performance()` to identify bottlenecks
+---
 
-## Statistical Rigor
+## 📚 API Reference
+- [Function Reference (R Documentation)](https://yourusername.github.io/CaImagingAnalysisFr/reference/)
 
-The package provides tools for statistically rigorous analysis:
+---
 
-- **Bootstrap confidence intervals** for spike detection
-- **Cross-validation** for parameter optimization
-- **Quality metrics** with thresholds
-- **Comprehensive validation** reports
-- **Recommendations** for parameter adjustment
+## 🤝 Contributing
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, code style, and how to run tests. All contributors and feedback are appreciated.
 
-## Troubleshooting
+---
 
-### Python Issues
-```r
-# Check Python environment
-python_info <- get_python_info()
+## 📖 Citing
+If you use CaImagingAnalysisFr in your research, please cite:
 
-# Reinstall dependencies
-install_python_dependencies(verbose = TRUE)
+> Your Name et al. (2024). CaImagingAnalysisFr: Professional Calcium Imaging Analysis in R. _GitHub_. https://github.com/yourusername/CaImagingAnalysisFr
 
-# Check specific package
-deps <- manage_python_dependencies(packages = "oasis")
-```
+---
 
-### Memory Issues
-```r
-# Monitor memory usage
-monitor_memory_usage("before_analysis")
+## 📝 License
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
-# Use chunked processing
-result <- calcium_correction_chunked(data, chunk_size = 500)
+---
 
-# Optimize data structure
-optimized_data <- optimize_data_structure(data)
-```
+## 🙏 Acknowledgments
+- Inspired by Suite2p, CaImAn, Cellpose, and the open-source neuroscience community.
+- Thanks to all contributors and users!
 
-### Quality Issues
-```r
-# Check data quality
-validate_data_frame(raw_data)
+---
 
-# Assess correction quality
-quality <- calculate_correction_quality(raw_data, corrected_data)
-
-# Get recommendations
-analysis <- comprehensive_statistical_analysis(raw_data, corrected_data, spikes)
-print(analysis$recommendations)
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request
-
-## Testing
-
-Run the test suite:
-```r
-devtools::test()
-```
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Citation
-
-If you use this package in your research, please cite:
-
-```
-CaImagingAnalysisFr: A Comprehensive R Package for Calcium Imaging Analysis
-Author, Year
-```
-
-## Support
-
-For issues and questions:
-- Check the troubleshooting section
-- Review the vignettes
-- Open an issue on GitHub
-- Contact the maintainers
-
-## Changelog
-
-### Version 2.0.0 (Current)
-- Added parameter optimization with cross-validation
-- Implemented statistical validation and confidence intervals
-- Added performance optimization and memory management
-- Enhanced Python dependency management
-- Added comprehensive quality control
-- Improved error handling and fallback mechanisms
-- Added performance benchmarking tools
-- Enhanced documentation and examples
-
-### Version 1.0.0
-- Initial release with basic calcium imaging analysis
-- Core correction and spike detection functions
-- Basic visualization and interactive app
-- Pipeline workflow with targets
+## 📬 Contact
+For questions, issues, or support, please open a [GitHub Issue](https://github.com/yourusername/CaImagingAnalysisFr/issues) or contact [your.email@domain.com](mailto:your.email@domain.com).

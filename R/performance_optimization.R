@@ -122,9 +122,9 @@ calcium_correction_chunked <- function(raw_df,
   return(result)
 }
 
-#' Memory-efficient spike inference
+#' Chunked spike inference for large datasets
 #' 
-#' @param corrected_df Corrected data frame
+#' @param corrected_df Corrected calcium data
 #' @param method Spike inference method
 #' @param chunk_size Chunk size for processing
 #' @param verbose Whether to show progress messages
@@ -156,11 +156,54 @@ infer_spikes_chunked <- function(corrected_df,
       chunk_results <- process_trace_in_chunks(trace, method, chunk_size, verbose = FALSE)
       results[[cell]] <- combine_trace_chunks(chunk_results)
     } else {
-      results[[cell]] <- infer_spikes(trace, method = method, fallback = TRUE, verbose = FALSE)
+      # Convert infer_spikes result to expected data frame format
+      spike_result <- infer_spikes(trace, method = method, fallback = TRUE, verbose = FALSE)
+      results[[cell]] <- convert_spike_result_to_df(spike_result)
     }
   }
   
   return(results)
+}
+
+#' Convert spike inference result to data frame format
+#' 
+#' @param spike_result Result from infer_spikes function
+#' @return Data frame with fit and spike columns
+#' @keywords internal
+convert_spike_result_to_df <- function(spike_result) {
+  # Extract components from spike_result
+  if ("calcium_est" %in% names(spike_result)) {
+    fit <- spike_result$calcium_est
+  } else if ("fit" %in% names(spike_result)) {
+    fit <- spike_result$fit
+  } else {
+    # Fallback: use original trace as fit
+    fit <- spike_result$trace
+  }
+  
+  if ("spikes" %in% names(spike_result)) {
+    spike <- spike_result$spikes
+  } else if ("spike" %in% names(spike_result)) {
+    spike <- spike_result$spike
+  } else {
+    # Fallback: create spike vector from spike_times
+    n <- length(fit)
+    spike <- rep(0, n)
+    if ("spike_times" %in% names(spike_result)) {
+      spike[spike_result$spike_times] <- 1
+    }
+  }
+  
+  # Ensure both vectors have the same length
+  n <- max(length(fit), length(spike))
+  if (length(fit) < n) fit <- c(fit, rep(NA, n - length(fit)))
+  if (length(spike) < n) spike <- c(spike, rep(0, n - length(spike)))
+  
+  data.frame(
+    fit = fit,
+    spike = spike,
+    stringsAsFactors = FALSE
+  )
 }
 
 #' Process a single trace in chunks
@@ -218,20 +261,39 @@ combine_trace_chunks <- function(chunk_results) {
     stop("No valid trace chunk results to combine")
   }
   
-  # Combine all chunks
-  all_fit <- numeric(0)
-  all_spike <- numeric(0)
-  
-  for (chunk in valid_results) {
-    all_fit <- c(all_fit, chunk$result$fit)
-    all_spike <- c(all_spike, chunk$result$spike)
+  # Convert each chunk result to data frame format
+  chunk_dfs <- list()
+  for (i in seq_along(valid_results)) {
+    chunk <- valid_results[[i]]
+    if ("result" %in% names(chunk)) {
+      chunk_dfs[[i]] <- convert_spike_result_to_df(chunk$result)
+    } else {
+      # If result is directly available, convert it
+      chunk_dfs[[i]] <- convert_spike_result_to_df(chunk)
+    }
   }
   
-  data.frame(
-    fit = all_fit,
-    spike = all_spike,
-    stringsAsFactors = FALSE
-  )
+  # Combine all data frames
+  if (length(chunk_dfs) == 1) {
+    return(chunk_dfs[[1]])
+  } else {
+    # Combine by rows, ensuring column alignment
+    all_fit <- numeric(0)
+    all_spike <- numeric(0)
+    
+    for (df in chunk_dfs) {
+      if (is.data.frame(df) && "fit" %in% names(df) && "spike" %in% names(df)) {
+        all_fit <- c(all_fit, df$fit)
+        all_spike <- c(all_spike, df$spike)
+      }
+    }
+    
+    data.frame(
+      fit = all_fit,
+      spike = all_spike,
+      stringsAsFactors = FALSE
+    )
+  }
 }
 
 #' Monitor memory usage

@@ -1,0 +1,26 @@
+site:
+  title: "CaImagingAnalysisFr"
+  url: https://yourusername.github.io/CaImagingAnalysisFr/
+
+template:
+  bootswatch: flatly
+  bootstrap: 5
+
+navbar:
+  structure:
+    left: [reference, articles, github]
+    right: [README]
+  left:
+    - text: "Reference"
+      href: reference/index.html
+      id: reference
+    - text: "Articles"
+      href: articles/index.html
+      id: articles
+    - text: "GitHub"
+      href: https://github.com/yourusername/CaImagingAnalysisFr
+      id: github
+  right:
+    - text: "README"
+      href: ../README.html
+      id: README 

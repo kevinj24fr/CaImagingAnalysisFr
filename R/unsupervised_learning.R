@@ -41,6 +41,13 @@ umap_reduce <- function(data, n_neighbors = 15, min_dist = 0.1, n_components = 2
   if (!requireNamespace("uwot", quietly = TRUE)) {
     stop("Package 'uwot' is required for UMAP. Install with install.packages('uwot')")
   }
+  
+  # Adjust parameters for small datasets
+  n_samples <- nrow(data)
+  if (n_samples < n_neighbors) {
+    n_neighbors <- max(2, n_samples - 1)
+  }
+  
   uwot::umap(as.matrix(data), n_neighbors = n_neighbors, min_dist = min_dist, n_components = n_components, ...)
 }
 
@@ -58,6 +65,13 @@ tsne_reduce <- function(data, dims = 2, perplexity = 30, ...) {
   if (!requireNamespace("Rtsne", quietly = TRUE)) {
     stop("Package 'Rtsne' is required for t-SNE. Install with install.packages('Rtsne')")
   }
+  
+  # Adjust perplexity for small datasets
+  n_samples <- nrow(data)
+  if (n_samples < perplexity * 3) {
+    perplexity <- max(1, floor(n_samples / 3))
+  }
+  
   tsne <- Rtsne::Rtsne(as.matrix(data), dims = dims, perplexity = perplexity, ...)
   tsne$Y
 }
@@ -97,29 +111,88 @@ autoencoder_reduce <- function(data, encoding_dim = 2, epochs = 20, install_miss
   encoded
 }
 
-#' Anomaly Detection via Isolation Forest (Python)
+#' Anomaly Detection via Statistical Methods
 #'
-#' Detect anomalies using isolation forest (requires Python scikit-learn).
+#' Detect anomalies using statistical outlier detection methods.
 #'
 #' @param data Matrix or data frame (cells x features)
-#' @param install_missing Whether to install missing Python dependencies
-#' @param verbose Show progress messages
+#' @param method Detection method ("mahalanobis", "iqr", "zscore")
+#' @param threshold Threshold for anomaly detection (default: 0.05)
+#' @param ... Additional arguments
 #' @return Vector of anomaly scores
 #' @export
-anomaly_detection <- function(data, install_missing = TRUE, verbose = FALSE) {
-  if (!requireNamespace("reticulate", quietly = TRUE)) {
-    stop("Package 'reticulate' is required for anomaly detection.")
-  }
-  # Check Python dependencies
-  deps <- manage_python_dependencies(packages = c("scikit_learn"), install_missing = install_missing, verbose = verbose)
-  if (!deps$scikit_learn$available) {
-    stop("Python package 'scikit-learn' is not available and could not be installed.")
-  }
-  # Note: scikit-learn is installed as scikit-learn but imported as sklearn in Python.
-  sklearn <- reticulate::import("sklearn.ensemble")
+anomaly_detection <- function(data, method = "mahalanobis", threshold = 0.05, ...) {
   x <- as.matrix(data)
-  clf <- sklearn$IsolationForest()
-  clf$fit(x)
-  scores <- clf$decision_function(x)
-  scores
+  n_samples <- nrow(x)
+  
+  if (method == "mahalanobis") {
+    # Mahalanobis distance-based anomaly detection
+    if (n_samples > ncol(x)) {
+      # Calculate Mahalanobis distance
+      mu <- colMeans(x, na.rm = TRUE)
+      sigma <- cov(x, use = "pairwise.complete.obs")
+      
+      # Handle singular covariance matrix
+      if (any(is.na(sigma)) || det(sigma) == 0) {
+        # Fallback to Euclidean distance
+        scores <- apply(x, 1, function(row) {
+          sqrt(sum((row - mu)^2, na.rm = TRUE))
+        })
+      } else {
+        scores <- apply(x, 1, function(row) {
+          mahalanobis(row, mu, sigma)
+        })
+      }
+    } else {
+      # Fallback to Euclidean distance for small sample sizes
+      mu <- colMeans(x, na.rm = TRUE)
+      scores <- apply(x, 1, function(row) {
+        sqrt(sum((row - mu)^2, na.rm = TRUE))
+      })
+    }
+    
+  } else if (method == "iqr") {
+    # IQR-based outlier detection
+    scores <- numeric(n_samples)
+    for (i in 1:n_samples) {
+      sample_scores <- numeric(ncol(x))
+      for (j in 1:ncol(x)) {
+        col_data <- x[, j]
+        q1 <- quantile(col_data, 0.25, na.rm = TRUE)
+        q3 <- quantile(col_data, 0.75, na.rm = TRUE)
+        iqr <- q3 - q1
+        if (iqr > 0) {
+          sample_scores[j] <- abs(x[i, j] - median(col_data, na.rm = TRUE)) / iqr
+        }
+      }
+      scores[i] <- mean(sample_scores, na.rm = TRUE)
+    }
+    
+  } else if (method == "zscore") {
+    # Z-score based anomaly detection
+    scores <- numeric(n_samples)
+    for (i in 1:n_samples) {
+      sample_scores <- numeric(ncol(x))
+      for (j in 1:ncol(x)) {
+        col_data <- x[, j]
+        mean_val <- mean(col_data, na.rm = TRUE)
+        sd_val <- sd(col_data, na.rm = TRUE)
+        if (sd_val > 0) {
+          sample_scores[j] <- abs(x[i, j] - mean_val) / sd_val
+        }
+      }
+      scores[i] <- mean(sample_scores, na.rm = TRUE)
+    }
+    
+  } else {
+    stop("Unknown method. Use 'mahalanobis', 'iqr', or 'zscore'")
+  }
+  
+  # Normalize scores to [0, 1] range
+  if (max(scores, na.rm = TRUE) > min(scores, na.rm = TRUE)) {
+    scores <- (scores - min(scores, na.rm = TRUE)) / 
+              (max(scores, na.rm = TRUE) - min(scores, na.rm = TRUE))
+  }
+  
+  return(scores)
 } 

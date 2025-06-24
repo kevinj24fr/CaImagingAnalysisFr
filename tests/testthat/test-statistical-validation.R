@@ -90,14 +90,16 @@ test_that("ICA decomposition works", {
   mat <- matrix(rnorm(100), nrow = 10)
   res <- ica_decompose(mat, n_components = 2)
   expect_true(is.list(res))
-  expect_true(all(c("S", "M") %in% names(res)))
+  expect_true(all(c("S", "W", "A") %in% names(res)))
 })
 
 test_that("Wavelet denoising works", {
   trace <- rnorm(100)
   denoised <- wavelet_denoise(trace)
-  expect_true(is.numeric(denoised))
-  expect_equal(length(denoised), length(trace))
+  expect_true(is.list(denoised))
+  expect_true("denoised" %in% names(denoised))
+  expect_true(is.numeric(denoised$denoised))
+  expect_equal(length(denoised$denoised), length(trace))
 })
 
 test_that("RPCA decomposition interface works (mock)", {
@@ -110,17 +112,19 @@ test_that("RPCA decomposition interface works (mock)", {
 
 test_that("Functional connectivity works", {
   mat <- matrix(rnorm(100), nrow = 5)
-  fc <- functional_connectivity(mat, method = "pearson", threshold = 0.2)
-  expect_true(is.matrix(fc))
-  expect_equal(nrow(fc), ncol(fc))
+  fc <- functional_connectivity(mat, method = "correlation", threshold = 0.2)
+  expect_true(is.list(fc))
+  expect_true("connectivity_matrix" %in% names(fc))
+  expect_true(is.matrix(fc$connectivity_matrix))
+  expect_equal(nrow(fc$connectivity_matrix), ncol(fc$connectivity_matrix))
 })
 
 test_that("Granger causality works", {
   x <- rnorm(100)
   y <- filter(x, 0.5, method = "recursive") + rnorm(100, sd = 0.1)
   res <- granger_causality(x, y, max_lag = 2)
-  expect_true(is.list(res))
-  expect_true(all(grepl("lag_", names(res))))
+  expect_true(is.numeric(res))
+  expect_true(length(res) == 1)
 })
 
 test_that("Graph metrics work", {

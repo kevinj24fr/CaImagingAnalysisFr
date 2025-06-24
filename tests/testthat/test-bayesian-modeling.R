@@ -240,48 +240,20 @@ test_that("validation helper functions work correctly", {
 })
 
 test_that("Bayesian modeling functions handle Python dependencies correctly", {
-  # Mock Python dependency check
-  mock_check_deps <- function(packages) {
-    if (any(packages %in% c("pymc", "numpy", "arviz"))) {
-      stop("Python package not available")
-    }
-  }
+  valid_trace <- rnorm(100)
   
-  with_mocked_bindings(
-    manage_python_dependencies = mock_check_deps,
-    {
-      valid_trace <- rnorm(100)
-      expect_error(bayesian_spike_inference(valid_trace), "Python package not available")
-      expect_error(bayesian_parameter_estimation(valid_trace), "Python package not available")
-      expect_error(hierarchical_bayesian_modeling(matrix(rnorm(200), nrow = 5, ncol = 40)), "Python package not available")
-    }
-  )
+  # Test that functions work without Python dependencies (since we use base R)
+  # These should now work since we use base R implementations
+  expect_no_error(bayesian_spike_inference(valid_trace))
+  expect_no_error(bayesian_parameter_estimation(valid_trace))
+  expect_no_error(hierarchical_bayesian_modeling(matrix(rnorm(200), nrow = 5, ncol = 40)))
 })
 
 test_that("Bayesian modeling functions handle errors gracefully", {
   valid_trace <- rnorm(100)
   
-  # Create mock bayesian result
-  mock_bayesian_result <- list(
-    spikes = rnorm(100),
-    spike_samples = matrix(rnorm(1000), nrow = 100, ncol = 10)
-  )
-  class(mock_bayesian_result) <- "bayesian_spike_result"
-  
-  # Mock Python call to throw error
-  mock_py_call <- function(...) stop("Python error")
-  
-  with_mocked_bindings(
-    `reticulate::py_call` = mock_py_call,
-    {
-      expect_error(bayesian_spike_inference(valid_trace), "Bayesian spike inference failed: Python error")
-      expect_error(bayesian_parameter_estimation(valid_trace), "Bayesian parameter estimation failed: Python error")
-      expect_error(uncertainty_quantification(mock_bayesian_result), "Uncertainty quantification failed: Python error")
-      expect_error(probabilistic_spike_detection(valid_trace), "Probabilistic spike detection failed: Python error")
-      expect_error(hierarchical_bayesian_modeling(matrix(rnorm(200), nrow = 5, ncol = 40)), "Hierarchical Bayesian modeling failed: Python error")
-      expect_error(plot_bayesian_results(mock_bayesian_result), "Plotting Bayesian results failed: Python error")
-      expect_error(bayesian_model_comparison(list(list(), list())), "Bayesian model comparison failed: Python error")
-      expect_error(bayesian_predictive_checks(mock_bayesian_result), "Bayesian predictive checks failed: Python error")
-    }
-  )
+  # Test error handling with invalid inputs
+  expect_error(bayesian_spike_inference(numeric(0)), "calcium_trace must be a numeric vector with at least 10 elements")
+  expect_error(bayesian_parameter_estimation(numeric(0)), "calcium_trace must be a numeric vector with at least 10 elements")
+  expect_error(hierarchical_bayesian_modeling(matrix(numeric(0))), "calcium_traces must be a matrix with at least 1 row and 10 columns")
 }) 

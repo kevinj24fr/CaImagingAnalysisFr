@@ -46,55 +46,55 @@ install.packages("CaImagingAnalysisFr")
 ## ⚡ Quick Start
 
 ```r
+# Load the package
 library(CaImagingAnalysisFr)
-set.seed(123)
 
-# Generate synthetic calcium imaging data
+# Generate synthetic data
 synthetic_data <- generate_synthetic_data(
-  n_cells = 10,
+  n_cells = 30,
   n_time = 500,
   spike_prob = 0.1
 )
 
-# Extract traces
-traces <- synthetic_data[, grep("^Cell_", names(synthetic_data))]
+# Basic calcium correction (include both cells and background)
+corrected_traces <- calcium_correction(synthetic_data, method = "modern")
 
-# Basic calcium correction
-corrected_traces <- calcium_correction(traces, method = "modern")
+# Extract just the cell traces for further analysis
+cell_traces <- corrected_traces[, grep("^Cell_", names(corrected_traces))]
 
 # Spike inference
 spike_results <- infer_spikes(corrected_traces, method = "oasis")
 
 # Plot results
 plot_cell_trace(
-  corrected_df = data.frame(Time = 1:ncol(traces), Cell_1 = traces[1, ]),
+  corrected_df = data.frame(Time = 1:ncol(cell_traces), Cell_1 = cell_traces[1, ]),
   cell = "Cell_1"
 )
 
 # Batch correction example
 batch_labels <- rep(1:2, each = 5)
 corrected_batch <- batch_correction(
-  traces, 
+  cell_traces, 
   batch = batch_labels, 
   method = "combat"
 )
 
 # Network analysis
 network_result <- functional_connectivity(
-  corrected_traces, 
+  cell_traces, 
   method = "correlation", 
   threshold = 0.3
 )
 
 # Bayesian modeling
 bayesian_result <- bayesian_spike_inference(
-  traces[1, ], 
+  cell_traces[1, ], 
   model_type = "poisson", 
   n_samples = 100
 )
 
 # Generate quality control report
-qc_report <- generate_qc_report(data = traces)
+qc_report <- generate_qc_report(data = cell_traces)
 
 print("Quick start completed successfully!")
 ```
@@ -112,19 +112,19 @@ segmentation_result <- segment_cells(
 
 # Deep learning spike inference
 deep_spikes <- deep_spike_inference(
-  traces[1, ], 
+  cell_traces[1, ], 
   model_type = "lstm"
 )
 
 # Denoising with NMF
 nmf_result <- nmf_decompose(
-  abs(traces), 
+  abs(cell_traces), 
   n_components = 3
 )
 
 # Dynamic network analysis
 dynamic_network <- time_varying_connectivity(
-  traces, 
+  cell_traces, 
   window_size = 50, 
   step_size = 10
 )

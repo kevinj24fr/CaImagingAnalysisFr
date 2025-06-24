@@ -15,7 +15,7 @@ Depends: R (>= 3.5)
 Imports: ggplot2, reticulate, stats, grDevices, graphics, utils, MASS,
         Rtsne, igraph, jsonlite, knitr, rmarkdown, uwot, viridis
 Suggests: shiny, plotly, targets, testthat, patchwork, R.matlab,
-        waveslim
+        waveslim, gridExtra, sva
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Built: R 4.5.0; ; 2025-06-24 16:43:51 UTC; unix
+Built: R 4.5.0; ; 2025-06-24 17:46:54 UTC; unix

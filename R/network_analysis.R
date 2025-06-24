@@ -50,10 +50,14 @@ functional_connectivity <- function(traces, method = "correlation",
   # Compute network properties
   network_properties <- compute_network_properties(thresholded_matrix)
   
+  # Extract connections (edge list)
+  connections <- extract_connections(thresholded_matrix)
+  
   return(list(
     connectivity_matrix = connectivity_matrix,
     thresholded_matrix = thresholded_matrix,
     network_properties = network_properties,
+    connections = connections,
     method = method,
     parameters = list(threshold_method = threshold_method, 
                      threshold_value = threshold_value)
@@ -701,4 +705,36 @@ compute_closeness_centrality <- function(adjacency_matrix) {
   }
   
   return(closeness)
+}
+
+#' Extract Connections from Thresholded Matrix
+#'
+#' Convert thresholded adjacency matrix to edge list.
+#'
+#' @param thresholded_matrix Thresholded adjacency matrix
+#' @return Data frame with columns: from, to, weight
+#' @keywords internal
+extract_connections <- function(thresholded_matrix) {
+  n_nodes <- nrow(thresholded_matrix)
+  
+  # Find non-zero entries (upper triangle only to avoid duplicates)
+  connections <- data.frame(
+    from = integer(0),
+    to = integer(0),
+    weight = numeric(0)
+  )
+  
+  for (i in 1:(n_nodes-1)) {
+    for (j in (i+1):n_nodes) {
+      if (thresholded_matrix[i, j] != 0) {
+        connections <- rbind(connections, data.frame(
+          from = i,
+          to = j,
+          weight = thresholded_matrix[i, j]
+        ))
+      }
+    }
+  }
+  
+  return(connections)
 } 

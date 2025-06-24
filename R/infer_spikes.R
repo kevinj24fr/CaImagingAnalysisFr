@@ -1,24 +1,186 @@
-#' Spike inference via OASIS
-#'
-#' This uses the Python package `oasis` to deconvolve calcium traces. If the
-#' package is missing, it attempts installation and returns zeros on failure.
-#'
+#' Spike Inference via OASIS
+#' 
+#' Performs spike inference on calcium traces using the OASIS algorithm
+#' via Python's `oasis` package. Includes robust error handling and
+#' fallback mechanisms.
+#' 
 #' @param trace Numeric vector of fluorescence values
+#' @param method Inference method: "oasis" (default), "caiman", or "suite2p"
+#' @param fallback Whether to use fallback method if primary fails (default: TRUE)
+#' @param verbose Whether to show progress messages (default: TRUE)
+#' 
 #' @return Data frame with deconvolved activity and estimated spikes
+#' 
+#' @examples
+#' # Basic usage
+#' raw <- generate_synthetic_data(1, 500)
+#' corrected <- calcium_correction(raw)
+#' spikes <- infer_spikes(corrected$Cell_1)
+#' 
+#' # Try different methods
+#' spikes <- infer_spikes(corrected$Cell_1, method = "caiman")
+#' 
 #' @export
-infer_spikes <- function(trace) {
-  if (!reticulate::py_module_available("oasis")) {
-    tryCatch({
-      reticulate::py_install("oasis")
-    }, error = function(e) {
-      warning("oasis package not available; spikes will be zero")
-      return(data.frame(fit = rep(0, length(trace)), spike = rep(0, length(trace))))
-    })
+infer_spikes <- function(trace, 
+                        method = c("oasis", "caiman", "suite2p"),
+                        fallback = TRUE,
+                        verbose = TRUE) {
+  
+  # Validate inputs
+  validate_trace(trace)
+  method <- match.arg(method)
+  
+  if (verbose) {
+    message("Performing spike inference using ", method, " method...")
   }
-  if (!reticulate::py_module_available("oasis")) {
-    return(data.frame(fit = rep(0, length(trace)), spike = rep(0, length(trace))))
+  
+  # Try primary method
+  result <- tryCatch({
+    infer_spikes_primary(trace, method, verbose)
+  }, error = function(e) {
+    if (fallback) {
+      if (verbose) {
+        warning("Primary method failed, using fallback: ", e$message)
+      }
+      infer_spikes_fallback(trace, verbose)
+    } else {
+      stop("Spike inference failed: ", e$message)
+    }
+  })
+  
+  if (verbose) {
+    message("Spike inference completed successfully")
   }
+  
+  return(result)
+}
+
+#' Primary spike inference methods
+#' 
+#' @param trace Input trace
+#' @param method Method to use
+#' @param verbose Progress messages
+#' @return Spike inference results
+#' @keywords internal
+infer_spikes_primary <- function(trace, method, verbose) {
+  
+  if (method == "oasis") {
+    return(infer_spikes_oasis(trace, verbose))
+  } else if (method == "caiman") {
+    return(infer_spikes_caiman(trace, verbose))
+  } else if (method == "suite2p") {
+    return(infer_spikes_suite2p(trace, verbose))
+  }
+}
+
+#' OASIS spike inference
+#' 
+#' @param trace Input trace
+#' @param verbose Progress messages
+#' @return OASIS results
+#' @keywords internal
+infer_spikes_oasis <- function(trace, verbose) {
+  if (verbose) message("  Using OASIS algorithm...")
+  
+  # Check Python dependencies
+  deps <- manage_python_dependencies(packages = "oasis", install_missing = TRUE, verbose = FALSE)
+  
+  if (!deps$oasis$available) {
+    stop("OASIS package is not available and could not be installed")
+  }
+  
+  # Import and run OASIS
   oasis <- reticulate::import("oasis.functions")
   result <- oasis$deconvolve(trace)
-  data.frame(fit = result[[1]], spike = result[[2]])
+  
+  # Format results
+  data.frame(
+    fit = as.numeric(result[[1]]),
+    spike = as.numeric(result[[2]]),
+    stringsAsFactors = FALSE
+  )
+}
+
+#' CaImAn spike inference
+#' 
+#' @param trace Input trace
+#' @param verbose Progress messages
+#' @return CaImAn results
+#' @keywords internal
+infer_spikes_caiman <- function(trace, verbose) {
+  if (verbose) message("  Using CaImAn algorithm...")
+  
+  # Check Python dependencies
+  deps <- manage_python_dependencies(packages = "caiman", install_missing = TRUE, verbose = FALSE)
+  
+  if (!deps$caiman$available) {
+    stop("CaImAn package is not available and could not be installed")
+  }
+  
+  # Import and run CaImAn
+  cm <- reticulate::import("caiman")
+  res <- cm$deconvolution$cd_oasis(trace)
+  
+  # Format results
+  data.frame(
+    fit = as.numeric(res[[1]]),
+    spike = as.numeric(res[[2]]),
+    stringsAsFactors = FALSE
+  )
+}
+
+#' Suite2p spike inference
+#' 
+#' @param trace Input trace
+#' @param verbose Progress messages
+#' @return Suite2p results
+#' @keywords internal
+infer_spikes_suite2p <- function(trace, verbose) {
+  if (verbose) message("  Using Suite2p algorithm...")
+  
+  # Check Python dependencies
+  deps <- manage_python_dependencies(packages = "suite2p", install_missing = TRUE, verbose = FALSE)
+  
+  if (!deps$suite2p$available) {
+    stop("Suite2p package is not available and could not be installed")
+  }
+  
+  # Import and run Suite2p
+  s2p <- reticulate::import("suite2p")
+  res <- s2p$deconv$deconvolve(trace)
+  
+  # Format results
+  data.frame(
+    fit = as.numeric(res[["C_dec"]]),
+    spike = as.numeric(res[["spks"]]),
+    stringsAsFactors = FALSE
+  )
+}
+
+#' Fallback spike inference
+#' 
+#' Simple threshold-based spike detection as fallback
+#' 
+#' @param trace Input trace
+#' @param verbose Progress messages
+#' @return Fallback results
+#' @keywords internal
+infer_spikes_fallback <- function(trace, verbose) {
+  if (verbose) message("  Using fallback threshold method...")
+  
+  config <- get_config()
+  
+  # Simple threshold-based detection
+  threshold <- config$default_threshold_multiplier * sd(trace, na.rm = TRUE)
+  spikes <- trace > threshold
+  
+  # Simple smoothing for fit
+  fit <- stats::filter(trace, rep(1/5, 5), sides = 2)
+  fit[is.na(fit)] <- trace[is.na(fit)]
+  
+  data.frame(
+    fit = as.numeric(fit),
+    spike = as.numeric(spikes),
+    stringsAsFactors = FALSE
+  )
 }

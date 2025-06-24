@@ -1,0 +1,280 @@
+---
+title: "Getting Started with CaImagingAnalysisFr"
+author: "Calcium Team"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with CaImagingAnalysisFr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.height = 6
+)
+```
+
+## Introduction
+
+The `CaImagingAnalysisFr` package provides comprehensive tools for analyzing calcium imaging data. This vignette demonstrates the basic workflow and advanced features.
+
+## Installation and Setup
+
+First, install the package and load it:
+
+```{r install}
+library(CaImagingAnalysisFr)
+```
+
+## Basic Workflow
+
+### 1. Generate Synthetic Data
+
+Let's start by creating some synthetic calcium imaging data:
+
+```{r generate_data}
+# Generate data with 3 cells and 500 time points
+raw_data <- generate_synthetic_data(
+  n_cells = 3, 
+  n_time = 500, 
+  spike_prob = 0.02,
+  verbose = FALSE
+)
+
+# Look at the structure
+str(raw_data)
+head(raw_data)
+```
+
+### 2. Apply Calcium Correction
+
+Now let's correct the data using the modern method:
+
+```{r correction}
+# Apply correction
+corrected_data <- calcium_correction(
+  raw_data,
+  method = "modern",
+  span = 0.45,
+  normalize = TRUE,
+  verbose = FALSE
+)
+
+# Check the results
+str(corrected_data)
+```
+
+### 3. Perform Spike Inference
+
+Detect spikes in the corrected traces:
+
+```{r spike_inference}
+# Infer spikes for the first cell
+spikes <- infer_spikes(
+  corrected_data$Cell_1,
+  method = "oasis",
+  fallback = TRUE,
+  verbose = FALSE
+)
+
+# Look at the results
+head(spikes)
+summary(spikes)
+```
+
+### 4. Visualize Results
+
+Create a comprehensive plot:
+
+```{r plotting}
+# Create a plot with all components
+p <- plot_cell_trace(
+  corrected_data,
+  "Cell_1",
+  method = "oasis",
+  show_spikes = TRUE,
+  show_deconvolved = TRUE,
+  verbose = FALSE
+)
+
+print(p)
+```
+
+## Advanced Features
+
+### Multiple Correction Methods
+
+Compare different correction approaches:
+
+```{r multiple_methods}
+# Modern method
+corrected_modern <- calcium_correction(
+  raw_data, 
+  method = "modern", 
+  verbose = FALSE
+)
+
+# Legacy method
+corrected_legacy <- calcium_correction(
+  raw_data, 
+  method = "legacy", 
+  verbose = FALSE
+)
+
+# Compare results
+par(mfrow = c(2, 1))
+plot(corrected_modern$Cell_1, type = "l", main = "Modern Method")
+plot(corrected_legacy$Cell_1, type = "l", main = "Legacy Method")
+```
+
+### Multiple Spike Inference Methods
+
+Try different spike detection algorithms:
+
+```{r multiple_spike_methods}
+# Test different methods
+methods <- c("oasis", "caiman", "suite2p")
+spike_results <- list()
+
+for (method in methods) {
+  spike_results[[method]] <- tryCatch({
+    infer_spikes(corrected_data$Cell_1, method = method, verbose = FALSE)
+  }, error = function(e) {
+    # Use fallback if method fails
+    infer_spikes(corrected_data$Cell_1, method = method, fallback = TRUE, verbose = FALSE)
+  })
+}
+
+# Compare spike counts
+spike_counts <- sapply(spike_results, function(x) sum(x$spike > 0))
+print(spike_counts)
+```
+
+### Multi-Cell Visualization
+
+Create overview plots for multiple cells:
+
+```{r multi_cell}
+# Plot all cells
+multi_plot <- plot_multiple_cells(
+  corrected_data,
+  ncol = 2,
+  method = "oasis",
+  show_spikes = TRUE,
+  show_deconvolved = TRUE,
+  verbose = FALSE
+)
+
+print(multi_plot)
+```
+
+## Interactive Analysis
+
+Launch the interactive viewer for exploratory analysis:
+
+```{r interactive, eval = FALSE}
+# Launch interactive viewer
+launch_interactive_viewer(raw_data)
+```
+
+## Reproducible Workflows
+
+Create a reproducible analysis pipeline:
+
+```{r pipeline}
+# Create pipeline
+pipeline <- calcium_pipeline(
+  n_cells = 3,
+  n_time = 500,
+  correction_method = "modern",
+  spike_method = "oasis"
+)
+
+# View pipeline structure
+str(pipeline)
+```
+
+## Configuration Management
+
+Access and modify package configuration:
+
+```{r config}
+# Get current configuration
+config <- get_config()
+print(config)
+
+# Use configuration values
+corrected <- calcium_correction(
+  raw_data,
+  span = config$default_span,
+  verbose = FALSE
+)
+```
+
+## Error Handling
+
+The package includes robust error handling:
+
+```{r error_handling}
+# Invalid input
+tryCatch({
+  calcium_correction("invalid input")
+}, error = function(e) {
+  cat("Error caught:", e$message, "\n")
+})
+
+# Missing Python packages (graceful fallback)
+spikes <- infer_spikes(
+  corrected_data$Cell_1,
+  method = "oasis",
+  fallback = TRUE,
+  verbose = FALSE
+)
+```
+
+## Performance Optimization
+
+For large datasets, consider these optimizations:
+
+```{r performance}
+# Use verbose = FALSE for better performance
+system.time({
+  corrected <- calcium_correction(raw_data, verbose = FALSE)
+})
+
+# Process multiple cells efficiently
+cell_cols <- names(corrected_data)[grepl("^Cell_", names(corrected_data))]
+spike_results <- lapply(cell_cols, function(cell) {
+  infer_spikes(corrected_data[[cell]], verbose = FALSE)
+})
+```
+
+## Best Practices
+
+1. **Always validate your data** before processing
+2. **Use appropriate parameters** for your experimental setup
+3. **Enable fallback options** for robust analysis
+4. **Save intermediate results** for reproducibility
+5. **Document your analysis parameters**
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Python packages not available**: The package will automatically fall back to threshold-based detection
+2. **Memory issues with large datasets**: Process cells in batches
+3. **Slow performance**: Disable verbose output and use appropriate parameters
+
+### Getting Help
+
+- Check function documentation: `?function_name`
+- Review test files for examples
+- Check package configuration: `get_config()`
+
+## Conclusion
+
+This vignette demonstrated the basic workflow and advanced features of `CaImagingAnalysisFr`. The package provides a comprehensive, robust, and user-friendly interface for calcium imaging analysis with extensive error handling and validation. 

@@ -88,7 +88,7 @@ python_info <- get_python_info()
 ### Install R Package
 ```r
 # Install from GitHub
-devtools::install_github("your-username/CaImagingAnalysisFr")
+devtools::install_github("kevinj24fr/CaImagingAnalysisFr")
 
 # Or install locally
 devtools::install_local("path/to/CaImagingAnalysisFr")

@@ -1,7 +1,7 @@
 Package: CaImagingAnalysisFr
 Type: Package
 Title: Comprehensive Calcium Imaging Analysis Tools
-Version: 0.4.0
+Version: 0.5.0
 Authors@R: c(
     person("Kevin", "J", email = "kevin@example.com", role = c("aut", "cre")),
     person("Calcium Team", role = "ctb")
@@ -12,8 +12,10 @@ Description: A comprehensive toolkit for calcium imaging analysis including
     analysis. Provides modern R-native features: S7 classes for type safety,
     data.table integration for large trace operations, Rcpp-accelerated hot paths,
     future/furrr parallelization, formula-based analysis interface, custom ggplot2
-    geoms for calcium imaging visualization, and Arrow/DuckDB backend for
-    out-of-core processing of large datasets.
+    geoms for calcium imaging visualization, Arrow/DuckDB backend for out-of-core
+    processing, and classical machine learning methods (random forests, gradient
+    boosting, SVMs, regularized regression) for cell classification, neural
+    decoding, and event detection.
 License: MIT + file LICENSE
 URL: https://github.com/kevinj24fr/CaImagingAnalysisFr
 BugReports: https://github.com/kevinj24fr/CaImagingAnalysisFr/issues
@@ -61,7 +63,11 @@ Suggests:
     DBI,
     dplyr,
     tidyr,
-    lme4
+    lme4,
+    ranger,
+    xgboost,
+    e1071,
+    glmnet
 LinkingTo:
     Rcpp,
     RcppArmadillo

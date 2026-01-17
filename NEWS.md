@@ -1,3 +1,42 @@
+# CaImagingAnalysisFr 0.5.0
+
+## New Features - Classical Machine Learning
+
+### Cell Type Classification
+* `classify_cell_types()` - Classify neurons by activity patterns using ranger, xgboost, SVM, or glmnet
+* `predict_cell_types()` - Predict cell types for new data
+* Automatic feature extraction from traces (statistical, temporal, spectral)
+* Feature importance ranking for model interpretation
+
+### Neural Decoding
+* `decode_behavior()` - Predict behavioral variables from neural activity
+* Methods: ridge, lasso, elastic_net, ranger, xgboost
+* `create_lagged_features()` - Include temporal context with time lags
+* `cv_decode_behavior()` - Cross-validated decoder evaluation
+* Returns R-squared, correlation, and decoder weights
+
+### Event/Spike Classification
+* `train_event_classifier()` - Train ML classifier on annotated events
+* `detect_events_ml()` - Apply trained classifier to new data
+* Window-based feature extraction around each time point
+* Class balancing for imbalanced event data
+
+### Ensemble Methods
+* `ensemble_spike_detection()` - Combine multiple spike detection methods
+* Voting ensemble (majority rule)
+* Stacking ensemble with ranger or xgboost meta-learner
+
+### Feature Extraction
+* `extract_trace_features()` - Comprehensive feature extraction
+* Statistical features: mean, SD, skewness, kurtosis, IQR, CV
+* Temporal features: autocorrelation, derivative stats, peak statistics
+* Spectral features: centroid, spread, entropy, frequency band power
+
+## Dependencies
+* New suggested packages: ranger, xgboost, e1071, glmnet
+
+---
+
 # CaImagingAnalysisFr 0.4.0
 
 ## New Features - R-Native Advantages

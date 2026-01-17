@@ -262,6 +262,18 @@ export(motion_correct_fast)
 export(median_filter_fast)
 export(threshold_image_fast)
 
+# Classical ML methods
+export(classify_cell_types)
+export(predict_cell_types)
+export(decode_behavior)
+export(predict_decoder)
+export(create_lagged_features)
+export(train_event_classifier)
+export(detect_events_ml)
+export(extract_trace_features)
+export(ensemble_spike_detection)
+export(cv_decode_behavior)
+
 # Rcpp exports (when compiled)
 if (FALSE) {
   useDynLib(CaImagingAnalysisFr, .registration = TRUE)

@@ -1,113 +1,134 @@
 # CaImagingAnalysisFr
 
-Comprehensive R package for calcium imaging analysis.
+A comprehensive R package for calcium imaging analysis, from raw image processing to advanced pharmacological characterization.
 
 [![R-CMD-check](https://github.com/kevinj24fr/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kevinj24fr/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml)
 [![codecov](https://codecov.io/gh/kevinj24fr/CaImagingAnalysisFr/branch/main/graph/badge.svg)](https://codecov.io/gh/kevinj24fr/CaImagingAnalysisFr)
 
 ## Overview
 
-CaImagingAnalysisFr provides a complete toolkit for analyzing calcium imaging data in R. The package covers the full analysis pipeline from raw image processing to statistical inference, without requiring Python dependencies for core functionality.
-
-## Features
-
-**Image Processing**
-- TIFF stack reading and writing
-- Motion correction with subpixel precision
-- Neuropil contamination correction
-
-**Cell Detection and Tracking**
-- Multiple segmentation methods (threshold, k-means, watershed)
-- ROI quality control metrics
-- Cross-session cell registration
-
-**Signal Analysis**
-- Background correction with multiple methods
-- Spike inference (OASIS, Bayesian, threshold-based)
-- Stimulus-aligned analysis (PETH, response metrics)
-
-**Network Analysis**
-- Functional connectivity estimation
-- Graph metrics and community detection
-- Dynamic network analysis
-
-**Batch Processing**
-- Batch effect correction (ComBat, MNN)
-- Reproducible workflows via targets
-- Automated QC reporting
+CaImagingAnalysisFr provides a complete toolkit for analyzing calcium imaging data in R. The package covers the full analysis pipeline from raw image processing to statistical inference and is designed for both general neuroscience applications and specialized pharmacological studies (e.g., GBM cell cultures with drug treatments).
 
 ## Installation
 
-Install from GitHub:
-
 ```r
+# Install from GitHub
 # install.packages("remotes")
 remotes::install_github("kevinj24fr/CaImagingAnalysisFr")
 ```
+
+## Core Features
+
+### Image Processing and Preprocessing
+- TIFF/HDF5/NWB file I/O
+- Motion correction with subpixel precision
+- Neuropil contamination correction
+- Background subtraction and dF/F computation
+
+### Cell Detection and Tracking
+- Multiple segmentation methods (threshold, watershed, k-means)
+- ROI quality control and curation
+- Cross-session cell registration using Hungarian algorithm matching
+
+### Signal Analysis
+- Spike inference (OASIS, Bayesian, threshold-based, ML ensemble)
+- Transient detection with kinetic characterization
+- Stimulus-aligned analysis (PETH, response metrics, statistical testing)
+
+### Network Analysis
+- Functional connectivity (correlation, partial correlation, Granger causality)
+- Graph metrics and community detection
+- Dynamic network analysis and stability metrics
+
+## Advanced Analysis Modules
+
+### Pharmacological Analysis
+Tools for in vitro/ex vivo drug studies:
+- Responder classification (activated/inhibited/non-responder)
+- Dose-response curve fitting (Hill equation)
+- Temporal drug response characterization
+- Recovery analysis after washout
+
+### Calcium Wave Analysis
+- Wave detection with propagation speed and direction
+- Initiation site identification
+- Wave participation metrics per cell
+
+### Information Theory
+- Mutual information between cell pairs
+- Transfer entropy for directed connectivity
+- Active information storage and entropy rate
+
+### Oscillation and Spectral Analysis
+- Power spectral density (Welch, multitaper)
+- Coherence and phase-locking analysis
+- Frequency band power quantification
+
+### State Space Analysis
+- Population trajectory visualization (PCA, UMAP, t-SNE)
+- Fixed point detection
+- Trajectory comparison (Procrustes, DTW, Frechet distance)
+
+### Neural Assemblies
+- Assembly detection (PCA, ICA, NMF, correlation-based)
+- Assembly activation tracking
+- Sequence detection and replay analysis
+
+## R-Native Performance Features
+
+### S7 Type System
+Type-safe classes for calcium imaging data:
+```r
+traces <- CalciumTraces(data = trace_matrix, frame_rate = 10)
+movie <- CalciumMovie(data = movie_array, frame_rate = 30)
+```
+
+### data.table Integration
+High-performance operations for large datasets:
+```r
+dt <- traces_to_dt(traces)
+dt_compute_dff(dt, baseline_frames = 1:100)
+dt_detect_events(dt, threshold = 2.5)
+```
+
+### Parallel Processing
+Multi-core analysis via future/furrr:
+```r
+setup_parallel(workers = 8)
+results <- parallel_spike_detection(traces, method = "oasis")
+```
+
+### Out-of-Core Processing
+Arrow/DuckDB backend for datasets exceeding RAM:
+```r
+save_traces_parquet(traces, "experiment.parquet")
+results <- query_traces("SELECT * FROM traces WHERE cell_id < 100")
+```
+
+### Rcpp Acceleration
+C++ implementations for computationally intensive operations with automatic R fallbacks.
 
 ## Quick Start
 
 ```r
 library(CaImagingAnalysisFr)
 
-# Generate example data
-data <- generate_synthetic_data(n_cells = 20, n_time = 1000)
+# Load or generate data
+data <- generate_synthetic_data(n_cells = 50, n_time = 3000)
 
-# Correct calcium traces
+# Basic analysis pipeline
 corrected <- calcium_correction(data, method = "modern")
-
-# Infer spikes
 spikes <- infer_spikes(corrected, method = "oasis")
+connectivity <- functional_connectivity(corrected)
 
-# Compute functional connectivity
-connectivity <- functional_connectivity(corrected, method = "correlation")
-
-# Generate QC report
-qc <- generate_qc_report(data = corrected)
-```
-
-## Motion Correction
-
-```r
-# Read imaging data
-movie <- read_tiff_stack("recording.tif")
-
-# Correct motion
-corrected_movie <- motion_correct(movie, method = "template")
-
-# Assess correction quality
-quality <- assess_motion_correction(movie, corrected_movie)
-```
-## Stimulus-Aligned Analysis
-
-```r
-# Align traces to stimulus events
-aligned <- align_to_events(
-  traces = cell_traces,
-  events = stimulus_times,
-  pre_frames = 30,
-  post_frames = 60
+# Pharmacological analysis (for drug treatment experiments)
+responders <- classify_responders(baseline_traces, treatment_traces)
+report <- gbm_analysis_report(
+  baseline_traces = baseline,
+  treatment_traces = treatment,
+  positions = cell_positions,
+  frame_rate = 10
 )
-
-# Compute response metrics
-metrics <- compute_response_metrics(aligned, response_window = c(5, 30))
-
-# Statistical testing
-stats <- test_event_responses(aligned, test = "wilcox")
-```
-
-## Cross-Session Registration
-
-```r
-# Register cells across sessions
-registration <- register_cells(
-  sessions = list(session1_rois, session2_rois),
-  method = "hungarian",
-  max_distance = 10
-)
-
-# Extract matched traces
-matched <- extract_registered_traces(registration, traces_list)
 ```
 
 ## Documentation
@@ -119,17 +140,20 @@ matched <- extract_registered_traces(registration, traces_list)
 ## Requirements
 
 - R >= 4.1.0
-- See DESCRIPTION for package dependencies
+- Core dependencies: ggplot2, stats, MASS, igraph
+- Optional packages for extended functionality:
+  - S7, data.table, Rcpp (performance features)
+  - future, furrr (parallelization)
+  - arrow, duckdb (out-of-core processing)
+  - ranger, xgboost, e1071, glmnet (machine learning)
 
 ## Citation
 
-If you use this package in your research, please cite:
-
-```
+```bibtex
 @software{CaImagingAnalysisFr,
   title = {CaImagingAnalysisFr: Comprehensive Calcium Imaging Analysis in R},
   author = {Kevin J and contributors},
-  year = {2024},
+  year = {2026},
   url = {https://github.com/kevinj24fr/CaImagingAnalysisFr}
 }
 ```

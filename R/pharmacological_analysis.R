@@ -62,11 +62,10 @@ detect_transients <- function(traces, frame_rate = 10, threshold_sd = 2.5,
     above <- dff > threshold
     events <- .find_events(above, dff, trace, time_vec, min_frames, frame_rate)
 
-    if (nrow(events) > 0) {
+    if (!is.null(events) && nrow(events) > 0) {
       events$cell_id <- cell
+      all_events[[cell]] <- events
     }
-
-    all_events[[cell]] <- events
   }
 
   events_df <- do.call(rbind, all_events)

@@ -1,7 +1,7 @@
 Package: CaImagingAnalysisFr
 Type: Package
 Title: Comprehensive Calcium Imaging Analysis Tools
-Version: 0.3.0
+Version: 0.5.0
 Authors@R: c(
     person("Kevin", "J", email = "kevin@example.com", role = c("aut", "cre")),
     person("Calcium Team", role = "ctb")
@@ -9,8 +9,13 @@ Authors@R: c(
 Description: A comprehensive toolkit for calcium imaging analysis including
     background correction, spike inference, cell segmentation, motion correction,
     neuropil correction, cross-session cell registration, and stimulus-aligned
-    analysis. Provides multiple analysis methods with extensive validation,
-    interactive visualization, and reproducible workflows via the targets package.
+    analysis. Provides modern R-native features: S7 classes for type safety,
+    data.table integration for large trace operations, Rcpp-accelerated hot paths,
+    future/furrr parallelization, formula-based analysis interface, custom ggplot2
+    geoms for calcium imaging visualization, Arrow/DuckDB backend for out-of-core
+    processing, and classical machine learning methods (random forests, gradient
+    boosting, SVMs, regularized regression) for cell classification, neural
+    decoding, and event detection.
 License: MIT + file LICENSE
 URL: https://github.com/kevinj24fr/CaImagingAnalysisFr
 BugReports: https://github.com/kevinj24fr/CaImagingAnalysisFr/issues
@@ -23,6 +28,7 @@ Imports:
     grDevices,
     graphics,
     utils,
+    grid,
     MASS,
     igraph
 Suggests:
@@ -42,9 +48,29 @@ Suggests:
     Rtsne,
     uwot,
     viridis,
+    viridisLite,
     jsonlite,
     tiff,
-    rhdf5
+    rhdf5,
+    S7,
+    data.table,
+    Rcpp (>= 1.0.0),
+    RcppArmadillo,
+    future,
+    furrr,
+    arrow,
+    duckdb,
+    DBI,
+    dplyr,
+    tidyr,
+    lme4,
+    ranger,
+    xgboost,
+    e1071,
+    glmnet
+LinkingTo:
+    Rcpp,
+    RcppArmadillo
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

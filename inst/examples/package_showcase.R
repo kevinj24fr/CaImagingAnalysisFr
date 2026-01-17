@@ -60,8 +60,8 @@ cat("\n========== 3. SPIKE INFERENCE ==========\n")
 spikes <- threshold_spike_detection(traces_dff, threshold_sd = 2.0)
 cat("Detected spikes using threshold method\n")
 
-# Count events per cell
-n_spikes <- spikes$n_events
+# Count events per cell (spike_predictions is a cells x time binary matrix)
+n_spikes <- rowSums(spikes$spike_predictions)
 cat(sprintf("Total events detected: %d\n", sum(n_spikes)))
 cat(sprintf("Mean events per cell: %.1f\n", mean(n_spikes)))
 

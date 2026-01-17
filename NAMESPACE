@@ -274,6 +274,71 @@ export(extract_trace_features)
 export(ensemble_spike_detection)
 export(cv_decode_behavior)
 
+# Neural assemblies
+export(detect_assemblies)
+export(detect_assemblies_correlation)
+export(compute_assembly_activation)
+export(detect_assembly_events)
+export(test_assembly_coactivation)
+export(plot_assemblies)
+
+# Sequence detection
+export(detect_sequences)
+export(detect_replay)
+export(compute_reactivation_strength)
+export(plot_sequences)
+
+# Pharmacological analysis
+export(detect_transients)
+export(summarize_transients_by_condition)
+export(compare_conditions)
+export(compute_synchrony_index)
+export(detect_network_bursts)
+export(fit_dose_response)
+export(plot_dose_response)
+export(pharmacological_report)
+
+# State space analysis
+export(compute_trajectories)
+export(trajectory_velocity)
+export(find_fixed_points)
+export(trajectory_curvature)
+export(compare_trajectories)
+export(plot_trajectory)
+export(estimate_dimensionality)
+
+# Information theory
+export(mutual_information)
+export(transfer_entropy)
+export(transfer_entropy_matrix)
+export(test_transfer_entropy)
+export(active_information_storage)
+export(entropy_rate)
+export(information_network)
+export(partial_information)
+export(plot_information_matrix)
+
+# Oscillation analysis
+export(compute_power_spectrum)
+export(detect_oscillations)
+export(compute_band_power)
+export(compute_coherence)
+export(coherence_matrix)
+export(phase_locking_value)
+export(compare_spectra)
+export(plot_spectrum)
+
+# Variability analysis
+export(compute_fano_factor)
+export(compute_noise_correlations)
+export(compute_signal_correlations)
+export(compute_cv)
+export(compute_reliability)
+export(compute_response_precision)
+export(decompose_variability)
+export(compare_variability)
+export(plot_variability)
+
 # Rcpp exports (when compiled)
 if (FALSE) {
   useDynLib(CaImagingAnalysisFr, .registration = TRUE)

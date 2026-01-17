@@ -1,3 +1,63 @@
+# CaImagingAnalysisFr 0.6.0
+
+## New Features - Advanced Analysis Methods
+
+### Pharmacological Analysis (for in vitro/ex vivo experiments)
+* `detect_transients()` - Identify calcium events with kinetic properties
+* `summarize_transients_by_condition()` - Compare event properties across treatments
+* `compare_conditions()` - Statistical tests between treatment groups
+* `compute_synchrony_index()` - Measure cell-cell coordination
+* `detect_network_bursts()` - Population-level burst detection
+* `fit_dose_response()` - Dose-response curve fitting (Hill equation)
+* `pharmacological_report()` - Comprehensive treatment comparison
+
+### Neural Assemblies
+* `detect_assemblies()` - Find co-active cell groups (PCA, ICA, NMF methods)
+* `detect_assemblies_correlation()` - Correlation-based assembly detection
+* `compute_assembly_activation()` - Track assembly activity over time
+* `detect_assembly_events()` - Find assembly activation events
+* `test_assembly_coactivation()` - Statistical testing of co-activation
+
+### Sequence Detection
+* `detect_sequences()` - Find temporal activity sequences
+* `detect_replay()` - Detect compressed sequence replay
+* `compute_reactivation_strength()` - Measure sequence reactivation
+
+### State Space Analysis
+* `compute_trajectories()` - Population trajectory projection (PCA, UMAP, t-SNE)
+* `trajectory_velocity()` - Speed through state space
+* `find_fixed_points()` - Identify stable states
+* `compare_trajectories()` - Compare trajectories (Procrustes, Hausdorff, DTW)
+* `estimate_dimensionality()` - Intrinsic dimensionality estimation
+
+### Information Theory
+* `mutual_information()` - Pairwise MI between cells
+* `transfer_entropy()` - Directed information transfer
+* `transfer_entropy_matrix()` - Full TE connectivity matrix
+* `active_information_storage()` - Self-predictive information
+* `information_network()` - Build directed networks from TE
+
+### Oscillation Analysis
+* `compute_power_spectrum()` - Power spectral density (Welch, periodogram)
+* `detect_oscillations()` - Find dominant frequency peaks
+* `compute_band_power()` - Power in frequency bands
+* `compute_coherence()` - Cross-spectral coherence
+* `phase_locking_value()` - Phase synchronization measure
+* `compare_spectra()` - Statistical comparison of spectra
+
+### Variability Analysis
+* `compute_fano_factor()` - Variance/mean ratio
+* `compute_noise_correlations()` - Trial-to-trial correlation
+* `compute_signal_correlations()` - Stimulus-driven correlation
+* `compute_cv()` - Coefficient of variation
+* `compute_reliability()` - Response reliability across trials
+* `decompose_variability()` - Shared vs private variance
+
+## Dependencies
+* New suggested packages: fastICA, cluster, dtw, signal, multitaper
+
+---
+
 # CaImagingAnalysisFr 0.5.0
 
 ## New Features - Classical Machine Learning

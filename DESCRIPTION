@@ -1,7 +1,7 @@
 Package: CaImagingAnalysisFr
 Type: Package
 Title: Comprehensive Calcium Imaging Analysis Tools
-Version: 0.5.0
+Version: 0.6.0
 Authors@R: c(
     person("Kevin", "J", email = "kevin@example.com", role = c("aut", "cre")),
     person("Calcium Team", role = "ctb")
@@ -67,7 +67,12 @@ Suggests:
     ranger,
     xgboost,
     e1071,
-    glmnet
+    glmnet,
+    fastICA,
+    cluster,
+    dtw,
+    signal,
+    multitaper
 LinkingTo:
     Rcpp,
     RcppArmadillo

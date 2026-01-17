@@ -1,187 +1,143 @@
 # CaImagingAnalysisFr
 
-> **A professional, robust, and state-of-the-art R package for advanced calcium imaging analysis—no Python required.**
+Comprehensive R package for calcium imaging analysis.
 
----
+[![R-CMD-check](https://github.com/kevinj24fr/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kevinj24fr/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml)
+[![codecov](https://codecov.io/gh/kevinj24fr/CaImagingAnalysisFr/branch/main/graph/badge.svg)](https://codecov.io/gh/kevinj24fr/CaImagingAnalysisFr)
 
-## 🚀 Table of Contents
-- [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Comprehensive Usage](#comprehensive-usage)
-- [Vignettes & Tutorials](#vignettes--tutorials)
-- [Segmentation & Quality Guidance](#segmentation--quality-guidance)
-- [API Reference](#api-reference)
-- [Contributing](#contributing)
-- [Citing](#citing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
-- [Contact](#contact)
+## Overview
 
----
+CaImagingAnalysisFr provides a complete toolkit for analyzing calcium imaging data in R. The package covers the full analysis pipeline from raw image processing to statistical inference, without requiring Python dependencies for core functionality.
 
-## ✨ Features
-- 🧠 **Automated Cell Segmentation** (Suite2p, Cellpose, CaImAn, k-means, threshold) — all in base R
-- 🔬 **Deep Learning Spike Inference** (base R, no Python required)
-- 🧬 **Batch Effect Correction** (ComBat, MNN, deep harmonization)
-- 🧹 **Advanced Denoising** (NMF, ICA, wavelet)
-- 🕸️ **Dynamic Network & Causality Analysis**
-- 🤖 **Unsupervised Learning & Anomaly Detection**
-- 📊 **Bayesian Modeling & Model Comparison**
-- 📋 **Automated Reporting & Interactive QC**
-- 🗂️ **Data Curation & Metadata Handling**
-- 🛠️ **End-to-End Professional Workflow**
+## Features
 
----
+**Image Processing**
+- TIFF stack reading and writing
+- Motion correction with subpixel precision
+- Neuropil contamination correction
 
-## 🛠️ Installation
+**Cell Detection and Tracking**
+- Multiple segmentation methods (threshold, k-means, watershed)
+- ROI quality control metrics
+- Cross-session cell registration
 
-**From CRAN:**
+**Signal Analysis**
+- Background correction with multiple methods
+- Spike inference (OASIS, Bayesian, threshold-based)
+- Stimulus-aligned analysis (PETH, response metrics)
+
+**Network Analysis**
+- Functional connectivity estimation
+- Graph metrics and community detection
+- Dynamic network analysis
+
+**Batch Processing**
+- Batch effect correction (ComBat, MNN)
+- Reproducible workflows via targets
+- Automated QC reporting
+
+## Installation
+
+Install from GitHub:
+
 ```r
-install.packages("CaImagingAnalysisFr")
+# install.packages("remotes")
+remotes::install_github("kevinj24fr/CaImagingAnalysisFr")
 ```
 
----
-
-## ⚡ Quick Start
+## Quick Start
 
 ```r
-# Load the package
 library(CaImagingAnalysisFr)
 
-# Generate synthetic data
-synthetic_data <- generate_synthetic_data(
-  n_cells = 30,
-  n_time = 500,
-  spike_prob = 0.1
-)
+# Generate example data
+data <- generate_synthetic_data(n_cells = 20, n_time = 1000)
 
-# Basic calcium correction (include both cells and background)
-corrected_traces <- calcium_correction(synthetic_data, method = "modern")
+# Correct calcium traces
+corrected <- calcium_correction(data, method = "modern")
 
-# Extract just the cell traces for further analysis
-cell_traces <- corrected_traces[, grep("^Cell_", names(corrected_traces))]
+# Infer spikes
+spikes <- infer_spikes(corrected, method = "oasis")
 
-# Spike inference
-spike_results <- infer_spikes(corrected_traces, method = "oasis")
+# Compute functional connectivity
+connectivity <- functional_connectivity(corrected, method = "correlation")
 
-# Plot results
-plot_cell_trace(
-  corrected_df = data.frame(Time = 1:ncol(cell_traces), Cell_1 = cell_traces[1, ]),
-  cell = "Cell_1"
-)
-
-# Batch correction example
-batch_labels <- rep(1:2, each = 5)
-corrected_batch <- batch_correction(
-  cell_traces, 
-  batch = batch_labels, 
-  method = "combat"
-)
-
-# Network analysis
-network_result <- functional_connectivity(
-  cell_traces, 
-  method = "correlation", 
-  threshold = 0.3
-)
-
-# Bayesian modeling
-bayesian_result <- bayesian_spike_inference(
-  cell_traces[1, ], 
-  model_type = "poisson", 
-  n_samples = 100
-)
-
-# Generate quality control report
-qc_report <- generate_qc_report(data = cell_traces)
-
-print("Quick start completed successfully!")
+# Generate QC report
+qc <- generate_qc_report(data = corrected)
 ```
 
----
-
-## 📚 Comprehensive Usage
+## Motion Correction
 
 ```r
-# Advanced segmentation
-segmentation_result <- segment_cells(
-  image_data = array(rnorm(100*100*50), dim = c(100, 100, 50)),
-  method = "threshold"
+# Read imaging data
+movie <- read_tiff_stack("recording.tif")
+
+# Correct motion
+corrected_movie <- motion_correct(movie, method = "template")
+
+# Assess correction quality
+quality <- assess_motion_correction(movie, corrected_movie)
+```
+## Stimulus-Aligned Analysis
+
+```r
+# Align traces to stimulus events
+aligned <- align_to_events(
+  traces = cell_traces,
+  events = stimulus_times,
+  pre_frames = 30,
+  post_frames = 60
 )
 
-# Deep learning spike inference
-deep_spikes <- deep_spike_inference(
-  cell_traces[1, ], 
-  model_type = "lstm"
-)
+# Compute response metrics
+metrics <- compute_response_metrics(aligned, response_window = c(5, 30))
 
-# Denoising with NMF
-nmf_result <- nmf_decompose(
-  abs(cell_traces), 
-  n_components = 3
-)
-
-# Dynamic network analysis
-dynamic_network <- time_varying_connectivity(
-  cell_traces, 
-  window_size = 50, 
-  step_size = 10
-)
-
-# Bayesian model comparison
-model_comparison <- bayesian_model_comparison(
-  list(model1 = bayesian_result, model2 = deep_spikes)
-)
+# Statistical testing
+stats <- test_event_responses(aligned, test = "wilcox")
 ```
 
----
+## Cross-Session Registration
 
-## 📖 Vignettes & Tutorials
-- Getting Started: Basic and intermediate workflow
-- Power Features: Advanced analytics and unique capabilities
-- Basic Tutorial: Step-by-step guide for new users
+```r
+# Register cells across sessions
+registration <- register_cells(
+  sessions = list(session1_rois, session2_rois),
+  method = "hungarian",
+  max_distance = 10
+)
 
----
+# Extract matched traces
+matched <- extract_registered_traces(registration, traces_list)
+```
 
-## 🧩 Segmentation & Quality Guidance
-- **Number of ROIs (`n_roi`)**: Should match expected cell count. Too high = over-segmentation; too low = missed cells.
-- **Area**: Should match expected cell size. Large variance = inconsistent segmentation.
-- **Eccentricity**: 0 (circle) to 1 (line). Most cells: 0.3–0.8. High = elongated/merged.
-- **Solidity**: Area/convex hull area. Near 1 = compact/convex (good). Low = irregular/fragmented.
-- **Jaccard**: Overlap with ground truth. Near 1 = ideal; <0.5 = poor.
+## Documentation
 
-Use these metrics to tune segmentation and assess reliability.
+- Function reference: `help(package = "CaImagingAnalysisFr")`
+- Vignettes: `browseVignettes("CaImagingAnalysisFr")`
+- Package website: https://kevinj24fr.github.io/CaImagingAnalysisFr/
 
----
+## Requirements
 
-## 📚 API Reference
-See the package documentation for complete function reference.
+- R >= 4.1.0
+- See DESCRIPTION for package dependencies
 
----
+## Citation
 
-## 🤝 Contributing
-We welcome contributions! Please see the contributing guidelines for code style and how to run tests. All contributors and feedback are appreciated.
+If you use this package in your research, please cite:
 
----
+```
+@software{CaImagingAnalysisFr,
+  title = {CaImagingAnalysisFr: Comprehensive Calcium Imaging Analysis in R},
+  author = {Kevin J and contributors},
+  year = {2024},
+  url = {https://github.com/kevinj24fr/CaImagingAnalysisFr}
+}
+```
 
-## 📖 Citing
-If you use CaImagingAnalysisFr in your research, please cite:
+## Contributing
 
-> Calcium Team (2024). CaImagingAnalysisFr: Professional Calcium Imaging Analysis in R.
+Contributions are welcome. Please open an issue to discuss proposed changes or submit a pull request.
 
----
+## License
 
-## 📝 License
-This project is licensed under the MIT License. See LICENSE file for details.
-
----
-
-## 🙏 Acknowledgments
-- Inspired by Suite2p, CaImAn, Cellpose, and the open-source neuroscience community.
-- Thanks to all contributors and users!
-
----
-
-## 📬 Contact
-For questions, issues, or support, please contact the maintainer.
+MIT License. See [LICENSE](LICENSE) for details.

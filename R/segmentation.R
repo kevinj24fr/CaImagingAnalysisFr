@@ -463,10 +463,46 @@ threshold_segmentation <- function(image_data, cell_diameter) {
 # These are simplified versions for demonstration
 
 label_connected_components <- function(binary_mask) {
-  # Simplified connected component labeling
-  # For now, just return the binary mask as is
-  # In a full implementation, this would use flood fill or union-find
-  return(binary_mask)
+  # Connected component labeling using flood-fill algorithm
+  nrow_img <- nrow(binary_mask)
+  ncol_img <- ncol(binary_mask)
+  labels <- matrix(0, nrow_img, ncol_img)
+  current_label <- 0
+
+  # Iterate through each pixel
+  for (i in 1:nrow_img) {
+    for (j in 1:ncol_img) {
+      if (binary_mask[i, j] == 1 && labels[i, j] == 0) {
+        # Found an unlabeled foreground pixel, start new component
+        current_label <- current_label + 1
+
+        # BFS flood fill using a queue (implemented as vectors for base R)
+        queue_i <- i
+        queue_j <- j
+
+        while (length(queue_i) > 0) {
+          # Pop from queue
+          ci <- queue_i[1]
+          cj <- queue_j[1]
+          queue_i <- queue_i[-1]
+          queue_j <- queue_j[-1]
+
+          # Skip if out of bounds or already labeled or background
+          if (ci < 1 || ci > nrow_img || cj < 1 || cj > ncol_img) next
+          if (labels[ci, cj] != 0 || binary_mask[ci, cj] == 0) next
+
+          # Label this pixel
+          labels[ci, cj] <- current_label
+
+          # Add 4-connected neighbors to queue
+          queue_i <- c(queue_i, ci - 1, ci + 1, ci, ci)
+          queue_j <- c(queue_j, cj, cj, cj - 1, cj + 1)
+        }
+      }
+    }
+  }
+
+  return(labels)
 }
 
 flood_fill <- function(result, visited, i, j, value) {
@@ -481,71 +517,666 @@ flood_fill <- function(result, visited, i, j, value) {
 }
 
 distance_transform <- function(binary_mask) {
-  # Simplified distance transform
-  # For now, just return the binary mask
-  return(binary_mask)
+  # Euclidean distance transform using two-pass algorithm
+  nrow_img <- nrow(binary_mask)
+  ncol_img <- ncol(binary_mask)
+
+  # Initialize distance matrix (large value for foreground, 0 for background)
+  dist <- matrix(0, nrow_img, ncol_img)
+  dist[binary_mask == 1] <- Inf
+
+  # Forward pass (top-left to bottom-right)
+  for (i in 1:nrow_img) {
+    for (j in 1:ncol_img) {
+      if (binary_mask[i, j] == 1) {
+        min_dist <- Inf
+        # Check neighbors above and to the left
+        if (i > 1) min_dist <- min(min_dist, dist[i - 1, j] + 1)
+        if (j > 1) min_dist <- min(min_dist, dist[i, j - 1] + 1)
+        if (i > 1 && j > 1) min_dist <- min(min_dist, dist[i - 1, j - 1] + sqrt(2))
+        if (i > 1 && j < ncol_img) min_dist <- min(min_dist, dist[i - 1, j + 1] + sqrt(2))
+        dist[i, j] <- min_dist
+      }
+    }
+  }
+
+  # Backward pass (bottom-right to top-left)
+  for (i in nrow_img:1) {
+    for (j in ncol_img:1) {
+      if (binary_mask[i, j] == 1) {
+        min_dist <- dist[i, j]
+        # Check neighbors below and to the right
+        if (i < nrow_img) min_dist <- min(min_dist, dist[i + 1, j] + 1)
+        if (j < ncol_img) min_dist <- min(min_dist, dist[i, j + 1] + 1)
+        if (i < nrow_img && j < ncol_img) min_dist <- min(min_dist, dist[i + 1, j + 1] + sqrt(2))
+        if (i < nrow_img && j > 1) min_dist <- min(min_dist, dist[i + 1, j - 1] + sqrt(2))
+        dist[i, j] <- min_dist
+      }
+    }
+  }
+
+  # Handle Inf values (isolated pixels)
+  dist[is.infinite(dist)] <- 0
+
+  return(dist)
 }
 
 find_local_maxima <- function(distance, min_distance) {
-  # Simplified local maxima detection
-  # For now, return empty list
-  return(list())
+  # Find local maxima in distance transform for watershed seeding
+  nrow_img <- nrow(distance)
+  ncol_img <- ncol(distance)
+  maxima <- list()
+
+  # Find all local maxima (pixels larger than all neighbors within min_distance)
+  for (i in 1:nrow_img) {
+    for (j in 1:ncol_img) {
+      if (distance[i, j] == 0) next  # Skip background
+
+      # Check if this is a local maximum
+      is_max <- TRUE
+      val <- distance[i, j]
+
+      # Search neighborhood
+      for (di in (-min_distance):min_distance) {
+        for (dj in (-min_distance):min_distance) {
+          if (di == 0 && dj == 0) next
+          ni <- i + di
+          nj <- j + dj
+          if (ni >= 1 && ni <= nrow_img && nj >= 1 && nj <= ncol_img) {
+            if (distance[ni, nj] > val) {
+              is_max <- FALSE
+              break
+            }
+          }
+        }
+        if (!is_max) break
+      }
+
+      if (is_max && val > 0) {
+        maxima[[length(maxima) + 1]] <- c(row = i, col = j, value = val)
+      }
+    }
+  }
+
+  # Filter maxima that are too close together (non-maximum suppression)
+  if (length(maxima) > 1) {
+    filtered <- list()
+    used <- rep(FALSE, length(maxima))
+
+    for (i in seq_along(maxima)) {
+      if (used[i]) next
+
+      best_idx <- i
+      best_val <- maxima[[i]][3]
+
+      # Find best in neighborhood
+      for (j in seq_along(maxima)) {
+        if (i == j || used[j]) next
+        dist <- sqrt((maxima[[i]][1] - maxima[[j]][1])^2 +
+                    (maxima[[i]][2] - maxima[[j]][2])^2)
+        if (dist < min_distance) {
+          used[j] <- TRUE
+          if (maxima[[j]][3] > best_val) {
+            best_idx <- j
+            best_val <- maxima[[j]][3]
+          }
+        }
+      }
+
+      filtered[[length(filtered) + 1]] <- maxima[[best_idx]]
+      used[best_idx] <- TRUE
+    }
+    maxima <- filtered
+  }
+
+  return(maxima)
 }
 
 create_rois_from_maxima <- function(maxima, distance, cell_diameter) {
-  # Simplified ROI creation
-  # For now, return empty list
-  return(list())
+  # Create ROIs by expanding from local maxima (simplified watershed)
+  if (length(maxima) == 0) return(list())
+
+  nrow_img <- nrow(distance)
+  ncol_img <- ncol(distance)
+  radius <- ceiling(cell_diameter / 2)
+
+  rois <- list()
+  labels <- matrix(0, nrow_img, ncol_img)
+
+  # Assign each maximum a label and expand
+
+  for (idx in seq_along(maxima)) {
+    seed <- maxima[[idx]]
+    row_c <- seed[1]
+    col_c <- seed[2]
+
+    # Collect pixels belonging to this ROI using region growing
+    roi_pixels <- matrix(nrow = 0, ncol = 2)
+    queue_i <- row_c
+    queue_j <- col_c
+
+    while (length(queue_i) > 0) {
+      ci <- queue_i[1]
+      cj <- queue_j[1]
+      queue_i <- queue_i[-1]
+      queue_j <- queue_j[-1]
+
+      # Skip if out of bounds or already labeled or too far from seed
+      if (ci < 1 || ci > nrow_img || cj < 1 || cj > ncol_img) next
+      if (labels[ci, cj] != 0) next
+      if (distance[ci, cj] == 0) next
+
+      dist_to_seed <- sqrt((ci - row_c)^2 + (cj - col_c)^2)
+      if (dist_to_seed > radius * 1.5) next
+
+      # Label this pixel
+      labels[ci, cj] <- idx
+      roi_pixels <- rbind(roi_pixels, c(ci, cj))
+
+      # Add 4-connected neighbors
+      queue_i <- c(queue_i, ci - 1, ci + 1, ci, ci)
+      queue_j <- c(queue_j, cj, cj, cj - 1, cj + 1)
+    }
+
+    if (nrow(roi_pixels) > 0) {
+      colnames(roi_pixels) <- c("row", "col")
+      rois[[idx]] <- roi_pixels
+    }
+  }
+
+  return(rois)
 }
 
 apply_convolution <- function(image, kernel) {
-  # Simplified convolution
-  # For now, just return the image
-  return(image)
+  # 2D convolution with zero-padding
+  nrow_img <- nrow(image)
+  ncol_img <- ncol(image)
+  nrow_k <- nrow(kernel)
+  ncol_k <- ncol(kernel)
+
+  # Padding size
+  pad_r <- floor(nrow_k / 2)
+  pad_c <- floor(ncol_k / 2)
+
+  # Zero-pad the image
+  padded <- matrix(0, nrow_img + 2 * pad_r, ncol_img + 2 * pad_c)
+  padded[(pad_r + 1):(nrow_img + pad_r), (pad_c + 1):(ncol_img + pad_c)] <- image
+
+  # Output matrix
+  output <- matrix(0, nrow_img, ncol_img)
+
+  # Perform convolution
+  for (i in 1:nrow_img) {
+    for (j in 1:ncol_img) {
+      patch <- padded[i:(i + nrow_k - 1), j:(j + ncol_k - 1)]
+      output[i, j] <- sum(patch * kernel)
+    }
+  }
+
+  return(output)
 }
 
 filter_contours <- function(contours, cell_diameter) {
-  # Simplified contour filtering
-  # For now, return empty list
-  return(list())
+  # Filter contours by size and circularity
+  if (length(contours) == 0) return(list())
+
+  min_area <- (cell_diameter / 4)^2 * pi  # Minimum expected cell area
+  max_area <- (cell_diameter * 2)^2 * pi   # Maximum expected cell area
+
+  filtered <- list()
+
+  for (i in seq_along(contours)) {
+    contour <- contours[[i]]
+    if (is.null(contour) || nrow(contour) < 3) next
+
+    # Calculate area (number of pixels enclosed)
+    area <- nrow(contour)
+
+    # Calculate perimeter (sum of distances between consecutive points)
+    perimeter <- 0
+    for (j in 1:(nrow(contour) - 1)) {
+      perimeter <- perimeter + sqrt(sum((contour[j, ] - contour[j + 1, ])^2))
+    }
+    # Close the contour
+    perimeter <- perimeter + sqrt(sum((contour[nrow(contour), ] - contour[1, ])^2))
+
+    # Calculate circularity (4 * pi * area / perimeter^2)
+    circularity <- if (perimeter > 0) 4 * pi * area / (perimeter^2) else 0
+
+    # Filter by area and circularity (cells are roughly circular)
+    if (area >= min_area && area <= max_area && circularity > 0.3) {
+      filtered[[length(filtered) + 1]] <- contour
+    }
+  }
+
+  return(filtered)
 }
 
 create_rois_from_contours <- function(contours, dims) {
-  # Simplified ROI creation from contours
-  # For now, return empty list
-  return(list())
+  # Create ROI masks from contour point lists
+  if (length(contours) == 0) return(list())
+
+  rois <- list()
+
+  for (i in seq_along(contours)) {
+    contour <- contours[[i]]
+    if (is.null(contour) || nrow(contour) < 3) next
+
+    # Create a binary mask for this ROI
+    roi_mask <- matrix(0, dims[1], dims[2])
+
+    # Fill the contour using scan-line algorithm
+    x_coords <- contour[, 1]
+    y_coords <- contour[, 2]
+
+    min_x <- max(1, floor(min(x_coords)))
+    max_x <- min(dims[1], ceiling(max(x_coords)))
+    min_y <- max(1, floor(min(y_coords)))
+    max_y <- min(dims[2], ceiling(max(y_coords)))
+
+    # Point-in-polygon test using ray casting
+    for (x in min_x:max_x) {
+      for (y in min_y:max_y) {
+        # Ray casting algorithm
+        inside <- FALSE
+        n <- nrow(contour)
+        j <- n
+
+        for (k in 1:n) {
+          xi <- x_coords[k]
+          yi <- y_coords[k]
+          xj <- x_coords[j]
+          yj <- y_coords[j]
+
+          if (((yi > y) != (yj > y)) &&
+              (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+            inside <- !inside
+          }
+          j <- k
+        }
+
+        if (inside) {
+          roi_mask[x, y] <- 1
+        }
+      }
+    }
+
+    rois[[i]] <- list(
+      mask = roi_mask,
+      contour = contour,
+      centroid = c(mean(x_coords), mean(y_coords)),
+      area = sum(roi_mask)
+    )
+  }
+
+  return(rois)
 }
 
 extract_roi_properties <- function(rois, image_data) {
-  # Simplified ROI property extraction
-  # For now, return empty list
-  return(list())
+  # Extract properties from ROIs including mean intensity, area, eccentricity
+  if (length(rois) == 0) return(list())
+
+  # Handle 3D image data (take mean projection)
+  if (length(dim(image_data)) == 3) {
+    image_2d <- apply(image_data, c(1, 2), mean, na.rm = TRUE)
+  } else {
+    image_2d <- image_data
+  }
+
+  properties <- list()
+
+  for (i in seq_along(rois)) {
+    roi <- rois[[i]]
+    if (is.null(roi)) next
+
+    # Handle different ROI formats
+    if (is.list(roi) && !is.null(roi$mask)) {
+      mask <- roi$mask
+      pixels <- which(mask == 1, arr.ind = TRUE)
+    } else if (is.matrix(roi)) {
+      pixels <- roi
+    } else {
+      next
+    }
+
+    if (nrow(pixels) == 0) next
+
+    # Area
+    area <- nrow(pixels)
+
+    # Centroid
+    centroid <- colMeans(pixels)
+
+    # Extract intensities
+    intensities <- numeric(nrow(pixels))
+    for (j in 1:nrow(pixels)) {
+      r <- pixels[j, 1]
+      c <- pixels[j, 2]
+      if (r >= 1 && r <= nrow(image_2d) && c >= 1 && c <= ncol(image_2d)) {
+        intensities[j] <- image_2d[r, c]
+      }
+    }
+
+    # Mean intensity
+    mean_intensity <- mean(intensities, na.rm = TRUE)
+
+    # Calculate eccentricity from covariance matrix
+    eccentricity <- 0
+    if (nrow(pixels) > 2) {
+      cov_mat <- cov(pixels)
+      if (all(is.finite(cov_mat))) {
+        eig <- eigen(cov_mat)$values
+        if (all(eig > 0)) {
+          eccentricity <- sqrt(1 - min(eig) / max(eig))
+        }
+      }
+    }
+
+    # Solidity (area / convex hull area)
+    solidity <- 1
+    if (nrow(pixels) > 3) {
+      tryCatch({
+        hull_idx <- chull(pixels)
+        hull_area <- abs(sum((pixels[hull_idx, 1] - mean(pixels[hull_idx, 1])) *
+                            (pixels[c(hull_idx[-1], hull_idx[1]), 2] -
+                             pixels[c(hull_idx[length(hull_idx)], hull_idx[-length(hull_idx)]), 2]))) / 2
+        if (hull_area > 0) solidity <- area / hull_area
+      }, error = function(e) {})
+    }
+
+    properties[[i]] <- list(
+      area = area,
+      centroid = centroid,
+      mean_intensity = mean_intensity,
+      eccentricity = eccentricity,
+      solidity = solidity
+    )
+  }
+
+  return(properties)
 }
 
 convert_rois_to_coordinates <- function(rois) {
-  # Simplified ROI to coordinate conversion
-  # For now, return empty data frame
-  return(data.frame(x = numeric(0), y = numeric(0), intensity = numeric(0)))
+  # Convert ROIs to coordinate data frame for export/editing
+  if (length(rois) == 0) {
+    return(data.frame(x = numeric(0), y = numeric(0), intensity = numeric(0), roi_id = integer(0)))
+  }
+
+  all_coords <- list()
+
+  for (i in seq_along(rois)) {
+    roi <- rois[[i]]
+    if (is.null(roi)) next
+
+    # Handle different ROI formats
+    if (is.list(roi) && !is.null(roi$mask)) {
+      pixels <- which(roi$mask == 1, arr.ind = TRUE)
+      intensity <- rep(NA, nrow(pixels))
+    } else if (is.matrix(roi)) {
+      pixels <- roi
+      intensity <- if (ncol(roi) >= 3) roi[, 3] else rep(NA, nrow(pixels))
+    } else if (is.list(roi) && !is.null(roi$contour)) {
+      pixels <- roi$contour
+      intensity <- rep(NA, nrow(pixels))
+    } else {
+      next
+    }
+
+    if (nrow(pixels) == 0) next
+
+    coords_df <- data.frame(
+      x = pixels[, 1],
+      y = pixels[, 2],
+      intensity = intensity,
+      roi_id = rep(i, nrow(pixels))
+    )
+
+    all_coords[[length(all_coords) + 1]] <- coords_df
+  }
+
+  if (length(all_coords) == 0) {
+    return(data.frame(x = numeric(0), y = numeric(0), intensity = numeric(0), roi_id = integer(0)))
+  }
+
+  return(do.call(rbind, all_coords))
 }
 
 calculate_size_metrics <- function(rois) {
-  # Simplified size metrics calculation
-  return(list())
+  # Calculate size metrics for QC filtering
+  if (length(rois) == 0) return(list(areas = numeric(0), mean_area = NA, sd_area = NA))
+
+  areas <- numeric(length(rois))
+
+  for (i in seq_along(rois)) {
+    roi <- rois[[i]]
+    if (is.null(roi)) {
+      areas[i] <- 0
+      next
+    }
+
+    if (is.list(roi) && !is.null(roi$mask)) {
+      areas[i] <- sum(roi$mask)
+    } else if (is.list(roi) && !is.null(roi$area)) {
+      areas[i] <- roi$area
+    } else if (is.matrix(roi)) {
+      areas[i] <- nrow(roi)
+    } else {
+      areas[i] <- 0
+    }
+  }
+
+  return(list(
+    areas = areas,
+    mean_area = mean(areas[areas > 0], na.rm = TRUE),
+    sd_area = sd(areas[areas > 0], na.rm = TRUE),
+    min_area = min(areas[areas > 0], na.rm = TRUE),
+    max_area = max(areas[areas > 0], na.rm = TRUE),
+    median_area = median(areas[areas > 0], na.rm = TRUE)
+  ))
 }
 
 calculate_shape_metrics <- function(rois) {
-  # Simplified shape metrics calculation
-  return(list())
+  # Calculate shape metrics (eccentricity, solidity, circularity)
+  if (length(rois) == 0) {
+    return(list(eccentricities = numeric(0), solidities = numeric(0), circularities = numeric(0)))
+  }
+
+  n <- length(rois)
+  eccentricities <- numeric(n)
+  solidities <- numeric(n)
+  circularities <- numeric(n)
+
+  for (i in seq_along(rois)) {
+    roi <- rois[[i]]
+    if (is.null(roi)) next
+
+    # Get pixel coordinates
+    if (is.list(roi) && !is.null(roi$mask)) {
+      pixels <- which(roi$mask == 1, arr.ind = TRUE)
+    } else if (is.matrix(roi)) {
+      pixels <- roi[, 1:2, drop = FALSE]
+    } else {
+      next
+    }
+
+    if (nrow(pixels) < 3) next
+
+    area <- nrow(pixels)
+
+    # Eccentricity from covariance matrix
+    cov_mat <- cov(pixels)
+    if (all(is.finite(cov_mat))) {
+      eig <- eigen(cov_mat)$values
+      if (all(eig > 0)) {
+        eccentricities[i] <- sqrt(1 - min(eig) / max(eig))
+      }
+    }
+
+    # Solidity and circularity
+    if (nrow(pixels) > 3) {
+      tryCatch({
+        hull_idx <- chull(pixels)
+        hull_points <- pixels[hull_idx, ]
+
+        # Convex hull area using shoelace formula
+        n_hull <- nrow(hull_points)
+        hull_area <- 0.5 * abs(sum(hull_points[, 1] * c(hull_points[-1, 2], hull_points[1, 2]) -
+                                   c(hull_points[-1, 1], hull_points[1, 1]) * hull_points[, 2]))
+
+        if (hull_area > 0) solidities[i] <- area / hull_area
+
+        # Perimeter from hull
+        perimeter <- 0
+        for (j in 1:(n_hull - 1)) {
+          perimeter <- perimeter + sqrt(sum((hull_points[j, ] - hull_points[j + 1, ])^2))
+        }
+        perimeter <- perimeter + sqrt(sum((hull_points[n_hull, ] - hull_points[1, ])^2))
+
+        if (perimeter > 0) {
+          circularities[i] <- 4 * pi * area / (perimeter^2)
+        }
+      }, error = function(e) {})
+    }
+  }
+
+  return(list(
+    eccentricities = eccentricities,
+    solidities = solidities,
+    circularities = circularities,
+    mean_eccentricity = mean(eccentricities[eccentricities > 0], na.rm = TRUE),
+    mean_solidity = mean(solidities[solidities > 0], na.rm = TRUE),
+    mean_circularity = mean(circularities[circularities > 0], na.rm = TRUE)
+  ))
 }
 
 calculate_intensity_metrics <- function(rois, image_data) {
-  # Simplified intensity metrics calculation
-  return(list())
+  # Calculate intensity metrics from ROIs and image
+  if (length(rois) == 0 || is.null(image_data)) {
+    return(list(mean_intensities = numeric(0), snr = numeric(0)))
+  }
+
+  # Handle 3D data
+  if (length(dim(image_data)) == 3) {
+    image_2d <- apply(image_data, c(1, 2), mean, na.rm = TRUE)
+  } else {
+    image_2d <- image_data
+  }
+
+  n <- length(rois)
+  mean_intensities <- numeric(n)
+  max_intensities <- numeric(n)
+  min_intensities <- numeric(n)
+  snr <- numeric(n)
+
+  # Calculate global background
+  global_mean <- mean(image_2d, na.rm = TRUE)
+  global_sd <- sd(image_2d, na.rm = TRUE)
+
+  for (i in seq_along(rois)) {
+    roi <- rois[[i]]
+    if (is.null(roi)) next
+
+    # Get pixel coordinates
+    if (is.list(roi) && !is.null(roi$mask)) {
+      pixels <- which(roi$mask == 1, arr.ind = TRUE)
+    } else if (is.matrix(roi)) {
+      pixels <- roi[, 1:2, drop = FALSE]
+    } else {
+      next
+    }
+
+    if (nrow(pixels) == 0) next
+
+    # Extract intensities
+    intensities <- numeric(nrow(pixels))
+    for (j in 1:nrow(pixels)) {
+      r <- pixels[j, 1]
+      c <- pixels[j, 2]
+      if (r >= 1 && r <= nrow(image_2d) && c >= 1 && c <= ncol(image_2d)) {
+        intensities[j] <- image_2d[r, c]
+      } else {
+        intensities[j] <- NA
+      }
+    }
+
+    intensities <- intensities[!is.na(intensities)]
+    if (length(intensities) > 0) {
+      mean_intensities[i] <- mean(intensities, na.rm = TRUE)
+      max_intensities[i] <- max(intensities, na.rm = TRUE)
+      min_intensities[i] <- min(intensities, na.rm = TRUE)
+
+      # SNR relative to background
+      if (global_sd > 0) {
+        snr[i] <- (mean_intensities[i] - global_mean) / global_sd
+      }
+    }
+  }
+
+  return(list(
+    mean_intensities = mean_intensities,
+    max_intensities = max_intensities,
+    min_intensities = min_intensities,
+    snr = snr,
+    overall_mean = mean(mean_intensities[mean_intensities > 0], na.rm = TRUE),
+    overall_snr = mean(snr[is.finite(snr)], na.rm = TRUE)
+  ))
 }
 
 calculate_overall_quality <- function(quality_results) {
-  # Simplified overall quality calculation
-  return(0.5)
+  # Calculate composite quality score from size, shape, and intensity metrics
+  scores <- c()
+  weights <- c()
+
+  # Size quality: prefer ROIs within expected range
+  if (!is.null(quality_results$size_metrics)) {
+    size_m <- quality_results$size_metrics
+    if (!is.na(size_m$mean_area) && !is.na(size_m$sd_area) && size_m$mean_area > 0) {
+      # Lower coefficient of variation = better
+      cv <- size_m$sd_area / size_m$mean_area
+      size_score <- max(0, 1 - cv)
+      scores <- c(scores, size_score)
+      weights <- c(weights, 0.3)
+    }
+  }
+
+  # Shape quality: prefer circular, solid shapes
+  if (!is.null(quality_results$shape_metrics)) {
+    shape_m <- quality_results$shape_metrics
+    shape_scores <- c()
+
+    if (!is.na(shape_m$mean_circularity)) {
+      shape_scores <- c(shape_scores, shape_m$mean_circularity)
+    }
+    if (!is.na(shape_m$mean_solidity)) {
+      shape_scores <- c(shape_scores, shape_m$mean_solidity)
+    }
+    # Low eccentricity = more circular = better
+    if (!is.na(shape_m$mean_eccentricity)) {
+      shape_scores <- c(shape_scores, 1 - shape_m$mean_eccentricity)
+    }
+
+    if (length(shape_scores) > 0) {
+      scores <- c(scores, mean(shape_scores, na.rm = TRUE))
+      weights <- c(weights, 0.3)
+    }
+  }
+
+  # Intensity quality: higher SNR = better
+  if (!is.null(quality_results$intensity_metrics)) {
+    int_m <- quality_results$intensity_metrics
+    if (!is.na(int_m$overall_snr) && is.finite(int_m$overall_snr)) {
+      # Normalize SNR to 0-1 range (SNR > 3 is excellent)
+      snr_score <- min(1, max(0, int_m$overall_snr / 5))
+      scores <- c(scores, snr_score)
+      weights <- c(weights, 0.4)
+    }
+  }
+
+  # Weighted average
+  if (length(scores) == 0) return(0.5)
+
+  overall_score <- sum(scores * weights) / sum(weights)
+  return(max(0, min(1, overall_score)))
 }
 
 # --- Advanced Base R Image Processing Utilities ---

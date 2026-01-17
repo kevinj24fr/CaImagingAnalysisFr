@@ -253,18 +253,25 @@ for (i in seq_len(min(3, assemblies$n_assemblies))) {
 
 cat("\n========== 12. VARIABILITY ANALYSIS ==========\n")
 
-# Compute Fano factor
-fano <- compute_fano_factor(traces_dff, window_size = 100)
-cat(sprintf("Mean Fano factor: %.3f\n", mean(fano$fano_factors, na.rm = TRUE)))
+# Compute Fano factor (global, no window)
+fano <- compute_fano_factor(traces_dff)
+cat(sprintf("Mean Fano factor: %.3f\n", mean(fano$fano_factor, na.rm = TRUE)))
 
 # Compute coefficient of variation
 cv_result <- compute_cv(traces_dff)
-cat(sprintf("Mean CV: %.3f\n", mean(cv_result$cv, na.rm = TRUE)))
+cat(sprintf("Mean CV: %.3f\n", mean(abs(cv_result$cv), na.rm = TRUE)))
 
-# Noise correlations (subset for speed)
-noise_corr <- compute_noise_correlations(subset_traces)
-cat(sprintf("Mean noise correlation: %.3f\n",
-            mean(noise_corr[upper.tri(noise_corr)], na.rm = TRUE)))
+# Noise correlations require trial structure (list of matrices)
+# Create pseudo-trials by splitting the recording
+n_trials <- 5
+trial_length <- ncol(subset_traces) %/% n_trials
+trial_list <- lapply(1:n_trials, function(t) {
+  start <- (t - 1) * trial_length + 1
+  end <- t * trial_length
+  subset_traces[, start:end]
+})
+noise_result <- compute_noise_correlations(trial_list)
+cat(sprintf("Mean noise correlation: %.3f\n", noise_result$mean_noise_correlation))
 
 # -----------------------------------------------------------------------------
 # 13. TRANSIENT SHAPE CLASSIFICATION
@@ -309,13 +316,14 @@ cat(sprintf("  Duration: %.1f minutes\n", ncol(traces_dff) / 10 / 60))
 cat(sprintf("  Frame rate: 10 Hz\n"))
 
 cat("\nActivity Metrics:\n")
-cat(sprintf("  Total transients: %d\n", nrow(transients$events)))
+n_transients <- if (!is.null(transients$events)) nrow(transients$events) else 0
+cat(sprintf("  Total transients: %d\n", n_transients))
 cat(sprintf("  Mean rate: %.2f events/cell/minute\n",
-            nrow(transients$events) / nrow(traces_dff) / (ncol(traces_dff) / 10 / 60)))
+            n_transients / nrow(traces_dff) / (ncol(traces_dff) / 10 / 60)))
 
 cat("\nNetwork Properties:\n")
-cat(sprintf("  Communities: %d\n", n_communities))
-cat(sprintf("  Clustering: %.3f\n", metrics$clustering_coefficient))
+cat(sprintf("  Communities: %s\n", ifelse(is.na(n_communities), "N/A", n_communities)))
+cat(sprintf("  Density: %.3f\n", fc_result$network_properties$density))
 
 cat("\nPharmacology (simulated):\n")
 cat(sprintf("  Responders: %.1f%%\n", responders$responder_fraction * 100))

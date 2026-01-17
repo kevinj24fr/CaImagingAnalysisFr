@@ -358,6 +358,33 @@ export(classify_transient_shapes)
 export(plot_transient_shapes)
 export(gbm_analysis_report)
 
+# GPFA (Gaussian Process Factor Analysis)
+export(fit_gpfa)
+export(gpfa_project)
+export(gpfa_orthonormalize)
+export(gpfa_cv)
+export(plot_gpfa)
+export(split_into_trials)
+
+# dPCA (Demixed Principal Component Analysis)
+export(fit_dpca)
+export(dpca_project)
+export(dpca_decode)
+export(dpca_summary)
+export(plot_dpca)
+
+# Tuning curve analysis
+export(fit_orientation_tuning)
+export(fit_contrast_response)
+export(fit_place_field)
+export(fit_tuning_curve)
+export(compute_osi)
+export(compute_dsi)
+export(compute_gosi)
+export(compute_spatial_information)
+export(plot_tuning_curve)
+export(tuning_summary)
+
 # Rcpp exports (when compiled)
 if (FALSE) {
   useDynLib(CaImagingAnalysisFr, .registration = TRUE)

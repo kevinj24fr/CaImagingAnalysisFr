@@ -74,6 +74,20 @@ Tools for in vitro/ex vivo drug studies:
 - Assembly activation tracking
 - Sequence detection and replay analysis
 
+### Population Dynamics (GPFA & dPCA)
+Modern latent variable methods for trial-structured data:
+- **GPFA**: Extract smooth low-dimensional trajectories with GP priors
+- **dPCA**: Demix variance by task parameters (stimulus, time, decision)
+- Cross-validation for dimensionality selection
+- Decoding from demixed components
+
+### Tuning Curve Analysis
+Characterize neural selectivity:
+- Orientation/direction tuning (von Mises fits, OSI/DSI)
+- Contrast response functions (Naka-Rushton)
+- Place field fitting (2D Gaussian)
+- Spatial information in bits/spike
+
 ## R-Native Performance Features
 
 ### S7 Type System

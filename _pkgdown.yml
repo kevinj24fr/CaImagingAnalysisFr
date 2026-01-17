@@ -1,26 +1,335 @@
-site:
-  title: "CaImagingAnalysisFr"
-  url: https://kevinj24fr.github.io/CaImagingAnalysisFr/
+url: https://kevinj24fr.github.io/CaImagingAnalysisFr/
 
 template:
-  bootswatch: flatly
   bootstrap: 5
+  bootswatch: flatly
 
 navbar:
   structure:
-    left: [reference, articles, github]
-    right: [README]
-  left:
-    - text: "Reference"
-      href: reference/index.html
-      id: reference
-    - text: "Articles"
-      href: articles/index.html
-      id: articles
-    - text: "GitHub"
+    left: [intro, reference, articles, news]
+    right: [search, github]
+  components:
+    intro:
+      text: Get Started
+      href: index.html
+    news:
+      text: Changelog
+      href: news/index.html
+    github:
+      icon: fab fa-github
       href: https://github.com/kevinj24fr/CaImagingAnalysisFr
-      id: github
-  right:
-    - text: "README"
-      href: ../README.html
-      id: README 
+
+reference:
+- title: Image I/O and Preprocessing
+  desc: Read/write imaging data and preprocessing operations
+  contents:
+  - read_tiff_stack
+  - write_tiff_stack
+  - read_calcium_imaging
+  - extract_traces_from_rois
+
+- title: Motion Correction
+  desc: Correct for sample movement during recording
+  contents:
+  - motion_correct
+  - phase_correlation
+  - shift_image
+  - assess_motion_correction
+  - starts_with("motion_correct_")
+  - starts_with("shift_image_")
+  - starts_with("phase_correlation_")
+
+- title: Cell Segmentation
+  desc: Detect and segment individual cells
+  contents:
+  - segment_cells
+  - cellpose_segmentation
+  - suite2p_segmentation
+  - caiman_segmentation
+  - region_properties
+  - roi_quality_control
+
+- title: Signal Processing
+  desc: Background correction, dF/F computation, and filtering
+  contents:
+  - calcium_correction
+  - calcium_correction_chunked
+  - neuropil_correct
+  - extract_neuropil_traces
+  - estimate_neuropil_coefficient
+  - wavelet_denoise
+
+- title: Spike Inference
+  desc: Detect spikes and calcium events from traces
+  contents:
+  - infer_spikes
+  - infer_spikes_chunked
+  - oasis_spike_inference
+  - bayesian_spike_inference
+  - threshold_spike_detection
+  - adaptive_threshold_detection
+  - statistical_spike_inference
+  - ensemble_spike_detection
+  - probabilistic_spike_detection
+
+- title: Transient Detection
+  desc: Detect and characterize calcium transients
+  contents:
+  - detect_transients
+  - summarize_transients_by_condition
+  - classify_transient_shapes
+  - plot_transient_shapes
+
+- title: Stimulus-Aligned Analysis
+  desc: Align data to events and compute response metrics
+  contents:
+  - align_to_events
+  - compute_response_metrics
+  - test_event_responses
+  - synchronize_behavior
+
+- title: Cell Registration
+  desc: Match cells across recording sessions
+  contents:
+  - register_cells
+  - compute_roi_centroids
+  - extract_registered_traces
+
+- title: Network Analysis
+  desc: Functional connectivity and graph analysis
+  contents:
+  - functional_connectivity
+  - graph_metrics
+  - community_detection
+  - dynamic_community_detection
+  - network_stability_analysis
+  - time_varying_connectivity
+  - dynamic_network_metrics
+
+- title: Pharmacological Analysis
+  desc: Tools for drug treatment experiments
+  contents:
+  - classify_responders
+  - subtype_by_response
+  - compare_conditions
+  - fit_dose_response
+  - plot_dose_response
+  - pharmacological_report
+
+- title: Advanced Pharmacology (GBM)
+
+  desc: Specialized tools for GBM calcium imaging
+  contents:
+  - analyze_baseline
+  - compare_baseline
+  - compute_calcium_load
+  - analyze_temporal_response
+  - fit_response_kinetics
+  - analyze_recovery
+  - compute_excitability
+  - gbm_analysis_report
+
+- title: Calcium Wave Analysis
+  desc: Detect and characterize propagating calcium waves
+  contents:
+  - detect_calcium_waves
+  - identify_initiation_sites
+  - compute_wave_participation
+  - detect_network_bursts
+  - compute_synchrony_index
+
+- title: Neural Assemblies
+  desc: Detect co-active cell groups
+  contents:
+  - detect_assemblies
+  - detect_assemblies_correlation
+  - compute_assembly_activation
+  - detect_assembly_events
+  - test_assembly_coactivation
+  - plot_assemblies
+
+- title: Sequence Detection
+  desc: Find temporal activity patterns
+  contents:
+  - detect_sequences
+  - detect_replay
+  - compute_reactivation_strength
+  - plot_sequences
+
+- title: State Space Analysis
+  desc: Population trajectory analysis
+  contents:
+  - compute_trajectories
+  - trajectory_velocity
+  - trajectory_curvature
+  - find_fixed_points
+  - compare_trajectories
+  - estimate_dimensionality
+  - plot_trajectory
+
+- title: Information Theory
+  desc: Information-theoretic measures
+  contents:
+  - mutual_information
+  - transfer_entropy
+  - transfer_entropy_matrix
+  - test_transfer_entropy
+  - active_information_storage
+  - entropy_rate
+  - information_network
+  - partial_information
+  - plot_information_matrix
+
+- title: Oscillation Analysis
+  desc: Spectral and coherence analysis
+  contents:
+  - compute_power_spectrum
+  - detect_oscillations
+  - compute_band_power
+  - compute_coherence
+  - coherence_matrix
+  - phase_locking_value
+  - compare_spectra
+  - plot_spectrum
+
+- title: Variability Analysis
+  desc: Trial-to-trial variability measures
+  contents:
+  - compute_fano_factor
+  - compute_cv
+  - compute_noise_correlations
+  - compute_signal_correlations
+  - compute_reliability
+  - compute_response_precision
+  - decompose_variability
+  - compare_variability
+  - plot_variability
+
+- title: Spatial Analysis
+  desc: Distance-dependent analysis
+  contents:
+  - compute_spatial_correlation
+  - compare_spatial_correlation
+
+- title: Machine Learning
+  desc: Classification and decoding
+  contents:
+  - classify_cell_types
+  - predict_cell_types
+  - decode_behavior
+  - predict_decoder
+  - cv_decode_behavior
+  - train_event_classifier
+  - detect_events_ml
+  - extract_trace_features
+  - create_lagged_features
+
+- title: Batch Correction
+  desc: Handle batch effects across experiments
+  contents:
+  - batch_correction
+  - combat_correction
+  - mnn_correction
+  - detect_batch_effects
+  - batch_quality_control
+  - cross_batch_validation
+
+- title: S7 Classes
+  desc: Type-safe calcium imaging objects
+  contents:
+  - CalciumMovie
+  - CalciumTraces
+  - SpikeTrains
+  - ROISet
+  - ExperimentSession
+  - as_calcium_traces
+  - as_calcium_movie
+  - as_roi_set
+  - is_calcium_object
+
+- title: data.table Operations
+  desc: High-performance trace operations
+  contents:
+  - starts_with("dt_")
+  - traces_to_dt
+
+- title: Parallel Processing
+  desc: Multi-core analysis
+  contents:
+  - setup_parallel
+  - shutdown_parallel
+  - parallel_info
+  - starts_with("parallel_")
+
+- title: Arrow/DuckDB Backend
+  desc: Out-of-core data processing
+  contents:
+  - save_traces_parquet
+  - load_traces_parquet
+  - duckdb_traces
+  - close_duckdb_traces
+  - query_traces
+  - stream_process_traces
+  - create_partitioned_dataset
+  - open_partitioned_dataset
+  - arrow_cell_summary
+  - convert_trace_format
+
+- title: Formula Interface
+  desc: Formula-based analysis
+  contents:
+  - analyze_traces
+  - fit_response_model
+  - detect_spikes_formula
+  - define_pipeline
+  - run_pipeline
+
+- title: Visualization
+  desc: Plotting functions
+  contents:
+  - plot_cell_trace
+  - plot_multiple_cells
+  - multi_panel_calcium_plot
+  - publication_calcium_plot
+  - calcium_activity_heatmap
+  - temporal_correlation_heatmap
+  - network_visualization
+  - plot_segmentation_overlay
+  - visualize_3d_calcium
+
+- title: ggplot2 Extensions
+  desc: Custom geoms and scales
+  contents:
+  - geom_calcium_heatmap
+  - geom_spike_train
+  - geom_aligned_trace
+  - scale_fill_calcium
+  - scale_fill_correlation
+  - facet_cell
+  - plot_traces
+  - plot_correlation_matrix
+  - plot_spike_raster
+  - plot_aligned_responses
+
+- title: Reporting and Export
+  desc: Generate reports and export data
+  contents:
+  - generate_qc_report
+  - generate_analysis_report
+  - generate_analysis_summary
+  - export_processed_data
+  - export_analysis_pipeline
+  - save_publication_figure
+
+- title: Validation
+  desc: Data validation utilities
+  contents:
+  - starts_with("validate_")
+
+- title: Utilities
+  desc: Helper functions
+  contents:
+  - generate_synthetic_data
+  - create_synthetic_data
+  - get_config
+  - benchmark_performance

@@ -1,3 +1,62 @@
+# CaImagingAnalysisFr 0.4.0
+
+## New Features - R-Native Advantages
+
+### S7 Class System
+* Added type-safe S7 classes: `CalciumMovie`, `CalciumTraces`, `SpikeTrains`, `ROISet`, `ExperimentSession`
+* Converter functions: `as_calcium_traces()`, `as_calcium_movie()`, `as_roi_set()`
+* Runtime validation and method dispatch with S7
+
+### data.table Integration
+* High-performance trace operations: `traces_to_dt()`, `dt_to_traces()`
+* Fast dF/F computation: `dt_compute_dff()` with rolling baseline support
+* Grouped operations: `dt_zscore()`, `dt_detect_events()`, `dt_cell_summary()`
+* Efficient correlation: `dt_pairwise_cor()`
+* Trace manipulation: `dt_bin_traces()`, `dt_transform()`, `dt_smooth()`
+
+### Parallel Processing (future/furrr)
+* Backend configuration: `setup_parallel()`, `shutdown_parallel()`, `parallel_info()`
+* Parallel analysis: `parallel_apply_traces()`, `parallel_motion_correct()`
+* Parallel detection: `parallel_spike_detection()`, `parallel_extract_traces()`
+* Batch processing: `parallel_batch_process()`, `parallel_cross_correlation()`
+
+### Formula Interface
+* Formula-based analysis: `analyze_traces(dff ~ time | cell_id, data)`
+* Response modeling: `fit_response_model(amplitude ~ stimulus | cell_id, data)`
+* Pipeline definition: `define_pipeline(result ~ motion_correct + extract_traces + compute_dff)`
+* Spike detection: `detect_spikes_formula(spikes ~ trace + threshold(2.5))`
+
+### Custom ggplot2 Visualization
+* Calcium-specific geoms: `geom_calcium_heatmap()`, `geom_spike_train()`, `geom_aligned_trace()`
+* Color scales: `scale_fill_calcium()`, `scale_fill_correlation()`
+* Faceting: `facet_cell()` for multi-cell plots
+* Convenience plots: `plot_traces()`, `plot_correlation_matrix()`, `plot_spike_raster()`, `plot_aligned_responses()`
+
+### Arrow/DuckDB Backend
+* Parquet I/O: `save_traces_parquet()`, `load_traces_parquet()`
+* SQL queries: `duckdb_traces()`, `query_traces()` for large datasets
+* Streaming: `stream_process_traces()` for memory-efficient processing
+* Partitioned storage: `create_partitioned_dataset()` for multi-session data
+* Summary statistics: `arrow_cell_summary()` on out-of-core data
+
+### Rcpp Acceleration
+* C++ implementations for hot paths with R fallbacks
+* Motion correction: `shift_image_fast()`, `phase_correlation_fast()`, `motion_correct_fast()`
+* Image processing: `gaussian_blur_fast()`, `median_filter_fast()`, `threshold_image_fast()`
+* Segmentation: `connected_components_fast()`, `distance_transform_fast()`
+* Trace extraction: `extract_trace_fast()`, `local_correlation_fast()`
+
+## Improvements
+* All new functions have pure R fallbacks when optional packages are not installed
+* Package structure supports optional dependencies (S7, data.table, Rcpp, future, arrow, duckdb)
+* Comprehensive NAMESPACE exports for all new functionality
+
+## Dependencies
+* New suggested packages: S7, data.table, Rcpp, RcppArmadillo, future, furrr, arrow, duckdb, DBI, dplyr, tidyr, lme4, viridisLite
+* LinkingTo: Rcpp, RcppArmadillo (for compiled code)
+
+---
+
 # CaImagingAnalysisFr 0.3.0
 
 ## New Features

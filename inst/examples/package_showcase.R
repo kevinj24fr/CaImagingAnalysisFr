@@ -57,15 +57,11 @@ cat(sprintf("Trace range: [%.3f, %.3f]\n", min(traces_dff), max(traces_dff)))
 cat("\n========== 3. SPIKE INFERENCE ==========\n")
 
 # Detect spikes using threshold method
-spikes <- infer_spikes(traces_dff, method = "threshold", threshold = 2.0)
+spikes <- threshold_spike_detection(traces_dff, threshold_sd = 2.0)
 cat("Detected spikes using threshold method\n")
 
 # Count events per cell
-if (is.list(spikes) && "spike_times" %in% names(spikes)) {
-  n_spikes <- sapply(spikes$spike_times, length)
-} else {
-  n_spikes <- rowSums(spikes > 0)
-}
+n_spikes <- spikes$n_events
 cat(sprintf("Total events detected: %d\n", sum(n_spikes)))
 cat(sprintf("Mean events per cell: %.1f\n", mean(n_spikes)))
 

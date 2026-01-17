@@ -220,13 +220,13 @@ if (!is.null(spectrum$peak_frequency)) {
   cat(sprintf("Dominant frequency: %.3f Hz\n", spectrum$peak_frequency))
 }
 
-# Compute band power
+# Compute band power (uses the spectrum computed above)
 bands <- list(
   slow = c(0.01, 0.1),
   medium = c(0.1, 1),
   fast = c(1, 5)
 )
-band_power <- compute_band_power(traces_dff[1, ], frame_rate = 10, bands = bands)
+band_power <- compute_band_power(spectrum, bands = bands)
 cat("Band power distribution:\n")
 for (band in names(band_power$band_power)) {
   cat(sprintf("  %s: %.1f%%\n", band, band_power$relative_power[[band]] * 100))

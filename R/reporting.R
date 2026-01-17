@@ -284,7 +284,8 @@ create_pipeline_script <- function(analysis_results, include_comments, include_d
 
 #' Export Analysis as Jupyter Notebook
 #'
-#' Export the analysis pipeline as a Jupyter notebook.
+#' Export the analysis pipeline as a Jupyter notebook (R kernel).
+#' Uses rmarkdown to convert R Markdown to notebook format.
 #'
 #' @param analysis_results List containing analysis results
 #' @param output_file Path for output notebook (default: "calcium_analysis.ipynb")
@@ -293,22 +294,62 @@ create_pipeline_script <- function(analysis_results, include_comments, include_d
 #' @return Path to generated notebook
 #' @export
 export_jupyter_notebook <- function(analysis_results, output_file = "calcium_analysis.ipynb", kernel = "ir", ...) {
-  if (!requireNamespace("knitr", quietly = TRUE)) {
-    stop("Package 'knitr' is required for notebook export")
+  if (!requireNamespace("rmarkdown", quietly = TRUE)) {
+    stop("Package 'rmarkdown' is required for notebook export. Install with: install.packages('rmarkdown')")
   }
-  
+
   # Create temporary Rmd file
   rmd_content <- create_notebook_rmd(analysis_results)
   temp_rmd <- tempfile(fileext = ".Rmd")
   writeLines(rmd_content, temp_rmd)
-  
-  # Convert to notebook
-  knitr::pandoc(temp_rmd, output = output_file, format = "ipynb")
-  
+
+  # Try to convert using rmarkdown's notebook format
+  tryCatch({
+    # Modern approach: use rmarkdown with html_notebook output then convert
+    # First render to HTML notebook
+    temp_html <- tempfile(fileext = ".nb.html")
+    rmarkdown::render(
+      input = temp_rmd,
+      output_file = temp_html,
+      output_format = rmarkdown::html_notebook(),
+      quiet = TRUE
+    )
+
+    # If user wants .ipynb specifically, we need additional tooling
+    if (grepl("\\.ipynb$", output_file)) {
+      # Check if jupytext or nbconvert is available
+      jupytext_available <- tryCatch({
+        system2("jupytext", "--version", stdout = FALSE, stderr = FALSE) == 0
+      }, error = function(e) FALSE)
+
+      if (jupytext_available) {
+        # Use jupytext to convert Rmd to ipynb directly
+        system2("jupytext", c("--to", "notebook", temp_rmd, "-o", output_file))
+        message("Jupyter notebook exported: ", output_file)
+      } else {
+        # Fallback: save as .Rmd with .ipynb extension note
+        rmd_output <- sub("\\.ipynb$", ".Rmd", output_file)
+        file.copy(temp_rmd, rmd_output, overwrite = TRUE)
+        message("Note: jupytext not found. Saved as R Markdown: ", rmd_output)
+        message("Install jupytext (pip install jupytext) for native .ipynb export")
+        output_file <- rmd_output
+      }
+    } else {
+      # Just copy the Rmd file
+      file.copy(temp_rmd, output_file, overwrite = TRUE)
+      message("R Markdown notebook exported: ", output_file)
+    }
+  }, error = function(e) {
+    # Fallback: just save the Rmd file
+    rmd_fallback <- sub("\\.[^.]+$", ".Rmd", output_file)
+    file.copy(temp_rmd, rmd_fallback, overwrite = TRUE)
+    message("Exported as R Markdown (render with rmarkdown::render): ", rmd_fallback)
+    output_file <- rmd_fallback
+  })
+
   # Clean up
   unlink(temp_rmd)
-  
-  message("Jupyter notebook exported: ", output_file)
+
   return(output_file)
 }
 

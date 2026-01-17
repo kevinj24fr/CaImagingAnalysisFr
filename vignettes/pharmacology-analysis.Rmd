@@ -1,0 +1,382 @@
+---
+title: "Pharmacological Analysis for Calcium Imaging"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Pharmacological Analysis for Calcium Imaging}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  eval = FALSE
+)
+```
+
+This vignette demonstrates the pharmacological analysis tools in CaImagingAnalysisFr, designed for in vitro calcium imaging experiments with drug treatments.
+
+## Overview
+
+When studying drug effects on cellular calcium dynamics, common questions include:
+
+- Which cells respond to treatment?
+- How does calcium activity change with drug application?
+- Do cells recover after washout?
+- How do calcium waves propagate through the culture?
+
+CaImagingAnalysisFr provides specialized tools to answer these questions.
+
+## Setup
+
+```{r load}
+library(CaImagingAnalysisFr)
+```
+
+## Experimental Design
+
+A typical pharmacological experiment has three phases:
+
+1. **Baseline**: Pre-drug recording
+
+2. **Treatment**: During drug application
+3. **Recovery**: After drug washout (optional)
+
+```{r data-structure}
+# Example: 10 minutes baseline, 10 minutes drug, 10 minutes washout
+# At 10 Hz = 6000 frames per phase
+
+frame_rate <- 10
+baseline_frames <- 1:6000
+treatment_frames <- 6001:12000
+recovery_frames <- 12001:18000
+
+# Extract phase-specific traces
+baseline_traces <- traces[, baseline_frames]
+treatment_traces <- traces[, treatment_frames]
+recovery_traces <- traces[, recovery_frames]
+```
+
+## Responder Analysis
+
+### Classifying Responders
+
+Identify cells that respond to drug treatment:
+
+```{r responders}
+# Classify cells as activated, inhibited, or non-responders
+resp <- classify_responders(
+  baseline_traces,
+  treatment_traces,
+  method = "threshold",
+  threshold_sd = 2
+)
+
+# View results
+print(resp$summary)
+# activated inhibited non_responder
+#        15        8            27
+
+# Responder fraction
+print(paste("Responder fraction:", round(resp$responder_fraction * 100), "%"))
+
+# Access per-cell results
+head(resp$results)
+```
+
+### Response Subtypes
+
+Cluster cells by their response dynamics:
+
+```{r subtypes}
+# Identify response subtypes
+subtypes <- subtype_by_response(
+  treatment_traces,
+  n_subtypes = 4,
+  method = "kmeans"
+)
+
+# View subtype characteristics
+for (i in seq_along(subtypes$subtype_stats)) {
+  cat(sprintf("Subtype %d: %d cells (%.1f%%), peak at frame %d\n",
+              i,
+              subtypes$subtype_stats[[i]]$n_cells,
+              subtypes$subtype_stats[[i]]$fraction * 100,
+              subtypes$subtype_stats[[i]]$peak_time))
+}
+```
+
+## Baseline Calcium Analysis
+
+### Resting Calcium Levels
+
+Compare baseline calcium between conditions:
+
+```{r baseline}
+# Analyze baseline characteristics
+baseline_analysis <- analyze_baseline(
+  baseline_traces,
+  method = "percentile",
+  percentile = 10,
+  frame_rate = frame_rate
+)
+
+print(paste("Mean baseline:", round(baseline_analysis$mean_baseline, 3)))
+print(paste("Baseline stability (CV):", round(mean(baseline_analysis$stability), 3)))
+```
+
+### Calcium Load
+
+Compute total calcium exposure (area under curve):
+
+```{r calcium-load}
+# Baseline period load
+baseline_load <- compute_calcium_load(
+  baseline_traces,
+  frame_rate = frame_rate,
+  above_baseline = TRUE
+)
+
+# Treatment period load
+treatment_load <- compute_calcium_load(
+  treatment_traces,
+  frame_rate = frame_rate,
+  above_baseline = TRUE
+)
+
+# Compare
+print(paste("Baseline load:", round(baseline_load$mean_load, 2)))
+print(paste("Treatment load:", round(treatment_load$mean_load, 2)))
+print(paste("Fold change:", round(treatment_load$mean_load / baseline_load$mean_load, 2)))
+```
+
+## Temporal Drug Response
+
+### Response Time Course
+
+Characterize how the response evolves over time:
+
+```{r temporal}
+# Combine baseline and treatment for temporal analysis
+full_traces <- cbind(baseline_traces, treatment_traces)
+drug_onset <- ncol(baseline_traces) + 1
+
+# Analyze temporal response
+temporal <- analyze_temporal_response(
+  full_traces,
+  drug_onset = drug_onset,
+  frame_rate = frame_rate,
+  bin_size = 10  # 10-second bins
+)
+
+# Key metrics
+print(paste("Time to peak:", round(temporal$time_to_peak, 1), "seconds"))
+print(paste("Response type:", temporal$response_type))  # "sustained" or "transient"
+```
+### Response Kinetics
+
+Fit exponential models to response dynamics:
+
+```{r kinetics}
+# Fit rise and decay kinetics
+kinetics <- fit_response_kinetics(
+  temporal$bin_times,
+  temporal$mean_response,
+  model_type = "rise_decay"
+)
+
+if (!is.null(kinetics$model)) {
+  print(paste("Rise tau:", round(kinetics$tau_rise, 2), "seconds"))
+  print(paste("Decay tau:", round(kinetics$tau_decay, 2), "seconds"))
+}
+```
+
+## Calcium Wave Analysis
+
+### Detecting Waves
+
+Identify propagating calcium waves:
+
+```{r waves}
+# Requires cell positions (x, y coordinates)
+# positions <- cbind(roi_centroids$x, roi_centroids$y)
+
+waves <- detect_calcium_waves(
+  treatment_traces,
+  positions = positions,
+  frame_rate = frame_rate,
+  threshold_sd = 2,
+  min_cells = 5,
+  max_delay = 2  # seconds
+)
+
+print(paste("Detected", waves$n_waves, "waves"))
+print(paste("Mean wave speed:", round(waves$mean_speed, 2), "um/s"))
+print(paste("Wave rate:", round(waves$wave_rate, 2), "per minute"))
+```
+
+### Initiation Sites
+
+Find cells that frequently start waves:
+
+```{r initiation}
+# Identify wave initiation sites
+initiators <- identify_initiation_sites(waves, n_cells = nrow(traces), positions)
+
+# Top initiators
+head(initiators[order(-initiators$initiation_count), ], 10)
+```
+
+### Wave Participation
+
+Measure how often each cell participates in waves:
+
+```{r participation}
+participation <- compute_wave_participation(waves, n_cells = nrow(traces))
+
+# Cells with high participation
+high_participation <- participation$highly_participating
+print(paste("Cells with high wave participation:", length(high_participation)))
+```
+
+## Spatial Correlation
+
+### Distance-Dependent Correlation
+
+Analyze how correlation depends on cell-cell distance:
+
+```{r spatial}
+# Compute spatial correlation
+spatial_baseline <- compute_spatial_correlation(baseline_traces, positions, n_bins = 10)
+spatial_treatment <- compute_spatial_correlation(treatment_traces, positions, n_bins = 10)
+
+# Space constant (correlation decay distance)
+print(paste("Baseline space constant:", round(spatial_baseline$space_constant, 1), "um"))
+print(paste("Treatment space constant:", round(spatial_treatment$space_constant, 1), "um"))
+
+# Compare between conditions
+comparison <- compare_spatial_correlation(spatial_baseline, spatial_treatment)
+print(paste("P-value:", format(comparison$p_value, digits = 3)))
+```
+
+## Recovery Analysis
+
+Characterize return to baseline after drug washout:
+
+```{r recovery}
+# Analyze recovery
+recovery <- analyze_recovery(
+  traces = cbind(baseline_traces, treatment_traces, recovery_traces),
+  baseline_period = baseline_frames,
+  treatment_period = treatment_frames,
+  recovery_period = recovery_frames,
+  frame_rate = frame_rate
+)
+
+# Recovery times
+print(paste("Time to 50% recovery:", round(recovery$t50, 1), "seconds"))
+print(paste("Time to 90% recovery:", round(recovery$t90, 1), "seconds"))
+
+# Recovery classification
+print(paste("Full recovery:", round(recovery$full_recovery_fraction * 100), "%"))
+print(paste("Partial recovery:", round(recovery$partial_recovery_fraction * 100), "%"))
+```
+
+## Transient Shape Classification
+
+Categorize calcium transients by their waveform:
+
+```{r shapes}
+# Classify transient shapes
+shapes <- classify_transient_shapes(
+  treatment_traces,
+  frame_rate = frame_rate,
+  n_classes = 4
+)
+
+# Shape distribution
+print(shapes$shape_summary)
+
+# Plot representative shapes
+plot_transient_shapes(shapes)
+```
+
+## Excitability Metrics
+
+Measure cellular excitability:
+
+```{r excitability}
+# Compute excitability metrics
+baseline_excite <- compute_excitability(baseline_traces, frame_rate)
+treatment_excite <- compute_excitability(treatment_traces, frame_rate)
+
+# Compare event rates
+print(paste("Baseline event rate:", round(baseline_excite$mean_event_rate, 2), "/min"))
+print(paste("Treatment event rate:", round(treatment_excite$mean_event_rate, 2), "/min"))
+```
+
+## Comprehensive Report
+
+Generate a full analysis report:
+
+```{r report}
+# Run comprehensive GBM analysis
+report <- gbm_analysis_report(
+  baseline_traces = baseline_traces,
+  treatment_traces = treatment_traces,
+  recovery_traces = recovery_traces,  # optional
+  positions = positions,               # optional, enables spatial analysis
+  frame_rate = frame_rate
+)
+
+# Print summary
+print(report)
+
+# Access specific results
+report$responders$responder_fraction
+report$calcium_load$treatment$mean_load
+report$waves$treatment$n_waves
+```
+
+## Dose-Response Analysis
+
+For experiments with multiple drug concentrations:
+
+```{r dose-response}
+# Example: responses at different concentrations
+concentrations <- c(0, 0.1, 1, 10, 100)  # uM
+responses <- c(0.05, 0.15, 0.45, 0.82, 0.95)  # normalized response
+
+# Fit Hill equation
+dr <- fit_dose_response(concentrations, responses)
+
+print(paste("EC50:", round(dr$ec50, 2), "uM"))
+print(paste("Hill coefficient:", round(dr$hill, 2)))
+
+# Plot
+plot_dose_response(dr)
+```
+
+## Statistical Comparisons
+
+Compare conditions statistically:
+
+```{r stats}
+# Compare multiple conditions
+comparison <- compare_conditions(
+  list(control = control_traces, drug = treatment_traces),
+  metrics = c("mean", "amplitude", "frequency"),
+  test = "wilcox"
+)
+
+print(comparison)
+```
+
+## Session Info
+
+```{r session, eval = TRUE}
+sessionInfo()
+```

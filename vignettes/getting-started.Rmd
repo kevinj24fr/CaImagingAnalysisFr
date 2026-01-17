@@ -1,0 +1,221 @@
+---
+title: "Getting Started with CaImagingAnalysisFr"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with CaImagingAnalysisFr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  eval = FALSE
+)
+```
+
+This vignette introduces the basic workflow for analyzing calcium imaging data with CaImagingAnalysisFr.
+
+## Installation
+
+```{r install}
+# Install from GitHub
+# install.packages("remotes")
+remotes::install_github("kevinj24fr/CaImagingAnalysisFr")
+```
+
+## Loading the Package
+
+```{r load}
+library(CaImagingAnalysisFr)
+```
+
+## Basic Workflow
+
+A typical calcium imaging analysis pipeline consists of:
+
+1. Loading data
+2. Motion correction
+3. Cell segmentation / ROI extraction
+4. Trace extraction and preprocessing
+5. Spike inference
+6. Downstream analysis
+
+### Step 1: Generate or Load Data
+
+For this tutorial, we'll use synthetic data:
+
+```{r data}
+# Generate synthetic calcium imaging data
+set.seed(42)
+data <- generate_synthetic_data(
+ n_cells = 50,
+ n_time = 3000,
+ spike_prob = 0.02,
+ frame_rate = 10
+)
+
+# View structure
+dim(data)
+```
+
+For real data, you can load TIFF stacks:
+
+```{r load-tiff}
+# Load a TIFF stack
+movie <- read_tiff_stack("path/to/recording.tif")
+
+# Or load from various formats (HDF5, NWB, MATLAB)
+movie <- read_calcium_imaging("path/to/data.h5", format = "hdf5")
+```
+
+### Step 2: Motion Correction
+
+Correct for sample movement during recording:
+
+```{r motion}
+# Apply motion correction
+corrected_movie <- motion_correct(
+ movie,
+ method = "template",
+ max_shift = 20
+)
+
+# Assess correction quality
+quality <- assess_motion_correction(movie, corrected_movie)
+print(quality$improvement)
+```
+
+### Step 3: Cell Segmentation
+
+Identify individual cells in the field of view:
+
+```{r segment}
+# Segment cells using watershed method
+masks <- segment_cells(
+ corrected_movie,
+ method = "watershed",
+ min_area = 50,
+ max_area = 500
+)
+
+# Get ROI properties
+props <- region_properties(masks)
+print(paste("Found", nrow(props), "cells"))
+```
+
+### Step 4: Extract and Preprocess Traces
+
+Extract fluorescence traces from ROIs:
+
+```{r traces}
+# Extract raw traces
+raw_traces <- extract_traces_from_rois(corrected_movie, masks)
+
+# Apply background correction and compute dF/F
+corrected <- calcium_correction(raw_traces, method = "modern")
+
+# Optional: neuropil correction
+corrected <- neuropil_correct(
+ raw_traces,
+ neuropil_traces,
+ coefficient = 0.7
+)
+```
+
+### Step 5: Spike Inference
+
+Detect neural activity events:
+
+```{r spikes}
+# OASIS deconvolution (recommended)
+spikes <- infer_spikes(corrected, method = "oasis")
+
+# Alternative: threshold-based detection
+spikes_threshold <- infer_spikes(corrected, method = "threshold", threshold = 2.5)
+
+# Alternative: Bayesian inference
+spikes_bayes <- infer_spikes(corrected, method = "bayesian")
+```
+
+### Step 6: Downstream Analysis
+
+#### Functional Connectivity
+
+```{r connectivity}
+# Compute pairwise correlations
+connectivity <- functional_connectivity(corrected, method = "correlation")
+
+# Graph-theoretic analysis
+metrics <- graph_metrics(connectivity)
+print(metrics$clustering_coefficient)
+
+# Community detection
+communities <- community_detection(connectivity, method = "louvain")
+```
+
+#### Stimulus-Aligned Analysis
+
+```{r stimulus}
+# Define stimulus times (in frames)
+stimulus_times <- c(100, 500, 900, 1300)
+
+# Align traces to stimuli
+aligned <- align_to_events(
+ traces = corrected,
+ events = stimulus_times,
+ pre_frames = 30,
+ post_frames = 60
+)
+
+# Compute response metrics
+metrics <- compute_response_metrics(
+ aligned,
+ baseline_window = c(1, 30),
+ response_window = c(31, 60)
+)
+
+# Statistical testing
+stats <- test_event_responses(aligned, test = "wilcox")
+```
+
+## Visualization
+
+```{r viz}
+# Plot traces for multiple cells
+plot_multiple_cells(corrected, cells = 1:5, frame_rate = 10)
+
+# Heatmap of all cell activity
+calcium_activity_heatmap(corrected)
+
+# Network visualization
+network_visualization(connectivity, communities = communities$membership)
+```
+
+## Quality Control
+
+Generate a comprehensive QC report:
+
+```{r qc}
+qc_report <- generate_qc_report(
+ traces = corrected,
+ spikes = spikes,
+ rois = masks
+)
+
+print(qc_report)
+```
+
+## Next Steps
+
+- See `vignette("pharmacology-analysis")` for drug treatment experiments
+- See `vignette("performance-features")` for S7 classes, data.table, and parallel processing
+
+## Session Info
+
+```{r session, eval = TRUE}
+sessionInfo()
+```

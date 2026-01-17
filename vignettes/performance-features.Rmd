@@ -1,0 +1,458 @@
+---
+title: "Performance Features and R-Native Tools"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Performance Features and R-Native Tools}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  eval = FALSE
+)
+```
+
+CaImagingAnalysisFr includes several R-native performance features for handling large datasets efficiently. This vignette covers S7 classes, data.table operations, parallel processing, and out-of-core computing with Arrow/DuckDB.
+
+## Installation of Optional Dependencies
+
+These features require optional packages:
+
+```{r install-deps}
+# S7 type system
+install.packages("S7")
+
+# High-performance data operations
+install.packages("data.table")
+
+# Parallel processing
+install.packages(c("future", "furrr"))
+
+# Out-of-core processing
+install.packages(c("arrow", "duckdb"))
+
+# C++ acceleration (requires compilation)
+install.packages(c("Rcpp", "RcppArmadillo"))
+```
+
+## S7 Type System
+
+S7 provides type-safe classes for calcium imaging data with validation and method dispatch.
+
+### Creating S7 Objects
+
+```{r s7-create}
+library(CaImagingAnalysisFr)
+
+# Create a CalciumTraces object
+traces <- CalciumTraces(
+  data = trace_matrix,      # cells x time matrix
+  frame_rate = 10,
+  cell_ids = paste0("cell_", 1:nrow(trace_matrix))
+)
+
+# Create a CalciumMovie object
+movie <- CalciumMovie(
+  data = movie_array,       # height x width x time array
+  frame_rate = 30
+)
+
+# Create an ROI set
+rois <- ROISet(
+  masks = mask_list,
+  centroids = centroid_matrix,
+  areas = area_vector
+)
+```
+
+### Type Validation
+
+S7 objects validate inputs automatically:
+
+```{r s7-validation}
+# This will error if frame_rate is negative
+traces <- CalciumTraces(data = mat, frame_rate = -10)
+# Error: frame_rate must be positive
+
+# This will error if data is not a matrix
+traces <- CalciumTraces(data = "not a matrix", frame_rate = 10)
+# Error: data must be a numeric matrix
+```
+
+### Converting Existing Data
+
+```{r s7-convert}
+# Convert matrix to CalciumTraces
+traces <- as_calcium_traces(existing_matrix, frame_rate = 10)
+
+# Convert array to CalciumMovie
+movie <- as_calcium_movie(existing_array, frame_rate = 30)
+
+# Check if object is a calcium type
+is_calcium_object(traces)  # TRUE
+```
+
+### Experiment Sessions
+
+Bundle related data together:
+
+```{r s7-session}
+session <- ExperimentSession(
+  traces = traces,
+  spikes = spike_matrix,
+  rois = rois,
+  metadata = list(
+    animal_id = "mouse_001",
+    date = "2026-01-15",
+    condition = "control"
+  )
+)
+
+# Access components
+session@traces
+session@metadata$condition
+```
+
+## data.table Operations
+
+data.table provides fast operations on large trace datasets.
+
+### Converting to data.table Format
+
+```{r dt-convert}
+# Convert matrix to long-format data.table
+dt <- traces_to_dt(trace_matrix, frame_rate = 10)
+
+head(dt)
+#    cell_id frame     time    value
+# 1:       1     1 0.000000 0.234521
+# 2:       1     2 0.100000 0.245123
+# ...
+
+# Convert back to matrix
+mat <- dt_to_traces(dt)
+```
+
+### Fast dF/F Computation
+
+```{r dt-dff}
+# Compute dF/F with rolling baseline
+dt_dff <- dt_compute_dff(
+  dt,
+  baseline_frames = 1:100,
+  method = "rolling",
+  window = 500
+)
+
+# Z-score normalization
+dt_zscore <- dt_zscore(dt)
+```
+
+### Event Detection
+
+```{r dt-events}
+# Detect events per cell
+events <- dt_detect_events(dt, threshold = 2.5, min_duration = 3)
+
+head(events)
+#    cell_id start_frame end_frame peak_frame peak_value
+# 1:       1         145       152        148   3.245123
+```
+
+### Grouped Operations
+
+```{r dt-grouped}
+# Summary statistics per cell
+summary <- dt_cell_summary(dt)
+
+head(summary)
+#    cell_id     mean       sd      min      max n_events
+# 1:       1  0.00234  0.45123 -1.23456  4.56789       12
+
+# Bin traces temporally
+dt_binned <- dt_bin_traces(dt, bin_size = 10)
+
+# Apply custom transformation
+dt_transformed <- dt_transform(dt, function(x) (x - mean(x)) / sd(x))
+```
+
+### Pairwise Correlations
+
+```{r dt-cor}
+# Fast pairwise correlation matrix
+cor_mat <- dt_pairwise_cor(dt)
+```
+
+## Parallel Processing
+
+Use multiple CPU cores for computationally intensive operations.
+
+### Setup
+
+```{r parallel-setup}
+# Configure parallel backend
+setup_parallel(workers = 8)
+
+# Check current configuration
+parallel_info()
+# Backend: multisession
+# Workers: 8
+# Available cores: 16
+
+# When done, shut down workers
+# shutdown_parallel()
+```
+
+### Parallel Trace Analysis
+
+```{r parallel-traces}
+# Apply function to each cell in parallel
+results <- parallel_apply_traces(
+  traces,
+  function(x) {
+    # Complex per-cell computation
+    list(
+      mean = mean(x),
+      peaks = find_peaks(x),
+      spectrum = compute_power_spectrum(x)
+    )
+  }
+)
+```
+
+### Parallel Spike Detection
+
+```{r parallel-spikes}
+# Detect spikes across all cells in parallel
+spikes <- parallel_spike_detection(
+  traces,
+  method = "oasis",
+  frame_rate = 10
+)
+```
+
+### Parallel Motion Correction
+
+```{r parallel-motion}
+# Process multiple recordings in parallel
+corrected_movies <- parallel_motion_correct(
+  movie_list,
+  method = "template",
+  max_shift = 20
+)
+```
+
+### Batch Processing
+
+```{r parallel-batch}
+# Process multiple files
+file_list <- list.files("data/", pattern = "*.tif", full.names = TRUE)
+
+results <- parallel_batch_process(
+  file_list,
+  function(file) {
+    movie <- read_tiff_stack(file)
+    corrected <- motion_correct(movie)
+    traces <- extract_traces(corrected, masks)
+    spikes <- infer_spikes(traces)
+    list(traces = traces, spikes = spikes)
+  }
+)
+```
+
+## Arrow/DuckDB Backend
+
+For datasets too large to fit in memory, use Arrow and DuckDB for out-of-core processing.
+
+### Saving to Parquet
+
+```{r arrow-save}
+# Save traces to Parquet format (compressed, columnar)
+save_traces_parquet(traces, "experiment_traces.parquet")
+
+# Load back (memory-mapped, not fully loaded)
+traces_arrow <- load_traces_parquet("experiment_traces.parquet")
+```
+
+### SQL Queries on Traces
+
+```{r duckdb-query}
+# Open DuckDB connection to trace data
+con <- duckdb_traces("experiment_traces.parquet")
+
+# Query specific cells or time ranges
+active_cells <- query_traces(
+  con,
+  "SELECT cell_id, AVG(value) as mean_activity
+   FROM traces
+   WHERE frame BETWEEN 1000 AND 2000
+   GROUP BY cell_id
+   HAVING AVG(value) > 0.5
+   ORDER BY mean_activity DESC"
+)
+
+# Don't forget to close
+close_duckdb_traces(con)
+```
+
+### Streaming Processing
+
+Process data in chunks without loading everything:
+
+```{r arrow-stream}
+# Stream process large dataset
+results <- stream_process_traces(
+  "large_experiment.parquet",
+  chunk_size = 10000,
+  function(chunk) {
+    # Process each chunk
+    summarize_chunk(chunk)
+  }
+)
+```
+
+### Partitioned Datasets
+
+For multi-session experiments:
+
+```{r arrow-partitioned}
+# Create partitioned dataset (one file per session)
+create_partitioned_dataset(
+  trace_list,
+  "multi_session_data/",
+  partition_by = "session_id"
+)
+
+# Open partitioned dataset
+dataset <- open_partitioned_dataset("multi_session_data/")
+
+# Query across all sessions
+all_summaries <- arrow_cell_summary(dataset)
+```
+
+## Formula Interface
+
+Use R formulas for common analyses:
+
+```{r formula}
+# Analyze traces with formula syntax
+results <- analyze_traces(
+  dff ~ time | cell_id,
+  data = trace_data
+)
+
+# Fit response model
+model <- fit_response_model(
+  amplitude ~ stimulus * condition | cell_id,
+  data = response_data
+)
+
+# Spike detection with formula
+spikes <- detect_spikes_formula(
+  spikes ~ trace + threshold(2.5) + method("oasis"),
+  data = traces
+)
+```
+
+### Analysis Pipelines
+
+Define reusable pipelines:
+
+```{r pipeline}
+# Define pipeline
+pipeline <- define_pipeline(
+  result ~ motion_correct(method = "template") +
+           extract_traces(masks) +
+           calcium_correction(method = "modern") +
+           infer_spikes(method = "oasis")
+)
+
+# Run on data
+results <- run_pipeline(pipeline, movie)
+```
+
+## Rcpp Acceleration
+
+C++ implementations are used automatically when available:
+
+```{r rcpp}
+# These functions use C++ when Rcpp is installed, R fallback otherwise
+
+# Fast motion correction
+corrected <- motion_correct_fast(movie, reference)
+
+# Fast image operations
+blurred <- gaussian_blur_fast(image, sigma = 2)
+filtered <- median_filter_fast(image, size = 3)
+
+# Fast trace extraction
+traces <- extract_trace_fast(movie, mask)
+```
+
+## Benchmarking
+
+Compare performance of different backends:
+
+```{r benchmark}
+# Generate test data
+large_traces <- matrix(rnorm(1000 * 100000), nrow = 1000)
+
+# Benchmark different approaches
+benchmark_performance(
+  large_traces,
+  operations = c("correlation", "dff", "spike_detection"),
+  backends = c("base", "data.table", "rcpp")
+)
+
+# Results show speedup factors for each backend
+```
+
+## Best Practices
+
+### Memory Management
+
+```{r memory}
+# Check memory usage
+check_memory_usage(traces)
+
+# For large datasets, use chunked processing
+corrected <- calcium_correction_chunked(
+  traces,
+  chunk_size = 100,  # cells per chunk
+  method = "modern"
+)
+
+# Or use Arrow backend
+save_traces_parquet(traces, "temp.parquet")
+# Process with streaming...
+```
+
+### Choosing the Right Backend
+
+| Dataset Size | Recommended Approach |
+|--------------|---------------------|
+| < 1 GB | Base R or data.table |
+| 1-10 GB | data.table + parallel |
+| > 10 GB | Arrow/DuckDB streaming |
+
+### Parallel Processing Guidelines
+
+```{r parallel-guidelines}
+# Rule of thumb: workers = physical cores - 1
+n_cores <- parallel::detectCores(logical = FALSE)
+setup_parallel(workers = n_cores - 1)
+
+# For memory-intensive tasks, use fewer workers
+setup_parallel(workers = 4, memory_per_worker = "4GB")
+```
+
+## Session Info
+
+```{r session, eval = TRUE}
+sessionInfo()
+```

@@ -1,3 +1,47 @@
+# CaImagingAnalysisFr 0.7.0
+
+## New Features - Advanced Pharmacological Analysis
+
+Specialized analysis tools for GBM calcium imaging and pharmacological experiments.
+
+### Responder Analysis
+* `classify_responders()` - Classify cells as activated, inhibited, or non-responders
+* `subtype_by_response()` - Cluster cells by response dynamics (kmeans, hierarchical, DTW)
+
+### Baseline and Calcium Load
+* `analyze_baseline()` - Characterize resting calcium levels and stability
+* `compare_baseline()` - Statistical comparison between conditions
+* `compute_calcium_load()` - Total calcium exposure (AUC above baseline)
+
+### Calcium Wave Propagation
+* `detect_calcium_waves()` - Identify propagating waves with speed and direction
+* `identify_initiation_sites()` - Find cells that frequently initiate waves
+* `compute_wave_participation()` - Measure wave participation per cell
+
+### Temporal Drug Response
+* `analyze_temporal_response()` - Characterize response time course
+* `fit_response_kinetics()` - Fit exponential rise/decay models
+
+### Spatial Correlation
+* `compute_spatial_correlation()` - Distance-dependent correlation analysis
+* `compare_spatial_correlation()` - Compare space constants between conditions
+
+### Recovery Analysis
+* `analyze_recovery()` - Characterize return to baseline after washout
+* Time to 50%/75%/90% recovery, recovery classification per cell
+
+### Excitability Metrics
+* `compute_excitability()` - Threshold, refractory period, event rates
+
+### Transient Shape Classification
+* `classify_transient_shapes()` - Categorize waveforms (fast/slow decay, sustained, oscillatory)
+* `plot_transient_shapes()` - Visualize shape classes
+
+### Comprehensive Reporting
+* `gbm_analysis_report()` - Full analysis pipeline for GBM pharmacology experiments
+
+---
+
 # CaImagingAnalysisFr 0.6.0
 
 ## New Features - Advanced Analysis Methods

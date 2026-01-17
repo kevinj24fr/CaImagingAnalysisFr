@@ -87,24 +87,30 @@ if (nrow(transients$events) > 0) {
 cat("\n========== 5. NETWORK ANALYSIS ==========\n")
 
 # Compute functional connectivity
-connectivity <- functional_connectivity(traces_dff, method = "correlation")
+fc_result <- functional_connectivity(traces_dff, method = "correlation")
+connectivity <- fc_result$connectivity_matrix
+# Replace any NA/NaN with 0 for downstream analysis
+connectivity[is.na(connectivity)] <- 0
 cat("Computed correlation-based connectivity\n")
 
 # Threshold to get significant connections
 threshold <- 0.3
-n_connections <- sum(abs(connectivity) > threshold &
-                     upper.tri(connectivity))
+conn_upper <- connectivity[upper.tri(connectivity)]
+n_connections <- sum(abs(conn_upper) > threshold, na.rm = TRUE)
 cat(sprintf("Connections above r=%.1f: %d\n", threshold, n_connections))
 
-# Graph metrics
-metrics <- graph_metrics(connectivity)
-cat(sprintf("Network density: %.3f\n", metrics$density))
-cat(sprintf("Mean clustering coefficient: %.3f\n", metrics$clustering_coefficient))
+# Graph metrics (use thresholded matrix from the result)
+cat(sprintf("Network density: %.3f\n", fc_result$network_properties$density))
 
-# Community detection
-communities <- community_detection(connectivity, method = "louvain")
-n_communities <- length(unique(communities$membership))
-cat(sprintf("Detected %d communities\n", n_communities))
+# Community detection (requires igraph package)
+if (requireNamespace("igraph", quietly = TRUE)) {
+  communities <- community_detection(connectivity, method = "louvain")
+  n_communities <- length(unique(communities$membership))
+  cat(sprintf("Detected %d communities\n", n_communities))
+} else {
+  cat("Skipping community detection (igraph not installed)\n")
+  n_communities <- NA
+}
 
 # -----------------------------------------------------------------------------
 # 6. PHARMACOLOGICAL ANALYSIS (Simulated Drug Response)

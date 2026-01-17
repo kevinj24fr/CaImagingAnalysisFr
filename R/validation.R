@@ -1,10 +1,10 @@
 #' Validate input data frame
-#' 
+#'
 #' @param raw_df Data frame to validate
 #' @param require_cells Whether to require cell columns
 #' @param require_background Whether to require background columns
 #' @return TRUE if valid, throws error otherwise
-#' @keywords internal
+#' @export
 validate_data_frame <- function(raw_df, require_cells = TRUE, require_background = TRUE) {
   config <- get_config()
   
@@ -54,12 +54,12 @@ validate_data_frame <- function(raw_df, require_cells = TRUE, require_background
 }
 
 #' Validate quality control parameters
-#' 
+#'
 #' @param raw_df Input data frame
 #' @param cell_cols Cell column names
 #' @param bg_cols Background column names
 #' @return TRUE if passes quality control
-#' @keywords internal
+#' @export
 validate_quality_control <- function(raw_df, cell_cols, bg_cols) {
   config <- get_config()
   qc <- config$quality_control
@@ -108,13 +108,13 @@ validate_quality_control <- function(raw_df, cell_cols, bg_cols) {
 }
 
 #' Validate numeric parameters
-#' 
+#'
 #' @param value Parameter value
 #' @param min_val Minimum allowed value
 #' @param max_val Maximum allowed value
 #' @param param_name Parameter name for error messages
 #' @return TRUE if valid, throws error otherwise
-#' @keywords internal
+#' @export
 validate_numeric_param <- function(value, min_val, max_val, param_name) {
   if (!is.numeric(value) || length(value) != 1) {
     stop(param_name, " must be a single numeric value")
@@ -128,11 +128,11 @@ validate_numeric_param <- function(value, min_val, max_val, param_name) {
 }
 
 #' Validate trace vector
-#' 
+#'
 #' @param trace Numeric vector to validate
 #' @param param_name Parameter name for error messages
 #' @return TRUE if valid, throws error otherwise
-#' @keywords internal
+#' @export
 validate_trace <- function(trace, param_name = "trace") {
   if (!is.numeric(trace)) {
     stop(param_name, " must be a numeric vector")
@@ -159,10 +159,10 @@ validate_trace <- function(trace, param_name = "trace") {
 }
 
 #' Validate temporal consistency
-#' 
+#'
 #' @param raw_df Input data frame
 #' @return TRUE if temporally consistent
-#' @keywords internal
+#' @export
 validate_temporal_consistency <- function(raw_df) {
   config <- get_config()
   
@@ -217,82 +217,133 @@ check_memory_usage <- function(data_size) {
   TRUE
 }
 
-#' Validate Spike Detection Results
+# NOTE: validate_spike_detection is defined in statistical_validation.R
+# with a more comprehensive implementation including quality metrics
+
+#' Validate Probability
 #'
-#' Validate spike detection results for quality and consistency.
+#' Validate that a value is a probability between 0 and 1.
 #'
-#' @param spikes Spike detection results (vector or list)
-#' @param trace Original calcium trace
-#' @param method Spike detection method used
-#' @param ... Additional arguments
-#' @return Validation results
+#' @param value Value to check
+#' @param name Name of the parameter (for error message)
+#' @return NULL if valid, throws error if invalid
 #' @export
-validate_spike_detection <- function(spikes, trace = NULL, method = NULL, ...) {
-  
-  # Handle different input types
-  if (is.vector(spikes)) {
-    # If spikes is a vector, assume it's the spike indicators
-    spike_indicators <- spikes
-    spike_times <- which(spike_indicators > 0)
-  } else if (is.list(spikes)) {
-    # If spikes is a list, extract spike indicators
-    if ("spikes" %in% names(spikes)) {
-      spike_indicators <- spikes$spikes
-    } else if ("spike" %in% names(spikes)) {
-      spike_indicators <- spikes$spike
-    } else {
-      stop("Spike results must contain 'spikes' or 'spike' field")
-    }
-    spike_times <- which(spike_indicators > 0)
-  } else {
-    stop("Spikes must be a vector or list")
+validate_probability <- function(value, name = "value") {
+  if (!is.numeric(value) || length(value) != 1 || value < 0 || value > 1) {
+    stop(sprintf("%s must be a probability between 0 and 1", name))
   }
-  
-  # Basic validation
-  validation_results <- list()
-  
-  # Check for valid spike indicators
-  if (!is.numeric(spike_indicators)) {
-    validation_results$valid_indicators <- FALSE
-    validation_results$error <- "Spike indicators must be numeric"
-    return(validation_results)
+}
+
+#' Validate Calcium Trace
+#'
+#' Validate input calcium trace for Bayesian analysis.
+#'
+#' @param trace Calcium trace to validate
+#' @return NULL if valid, throws error if invalid
+#' @export
+validate_calcium_trace <- function(trace) {
+  if (is.null(trace)) {
+    stop("calcium_trace must be a numeric vector")
   }
-  
-  # Check for reasonable spike count
-  n_spikes <- length(spike_times)
-  if (n_spikes == 0) {
-    validation_results$spike_count <- "No spikes detected"
-  } else if (n_spikes > length(spike_indicators) * 0.5) {
-    validation_results$spike_count <- "Warning: High spike count (>50% of timepoints)"
-  } else {
-    validation_results$spike_count <- paste("Detected", n_spikes, "spikes")
+  if (!is.numeric(trace)) {
+    stop("calcium_trace must be a numeric vector")
   }
-  
-  # Check for minimum interval between spikes (if trace length is available)
-  if (length(spike_indicators) > 1 && n_spikes > 1) {
-    intervals <- diff(spike_times)
-    min_interval <- min(intervals, na.rm = TRUE)
-    if (min_interval < 3) {
-      validation_results$min_interval <- "Warning: Spikes too close together (<3 frames)"
-    } else {
-      validation_results$min_interval <- paste("Minimum interval:", min_interval, "frames")
-    }
+  if (length(trace) < 10) {
+    stop("calcium_trace must be a numeric vector with at least 10 elements")
   }
-  
-  # Check for reasonable spike amplitudes (if trace is provided)
-  if (!is.null(trace) && length(trace) == length(spike_indicators)) {
-    spike_amplitudes <- trace[spike_times]
-    if (length(spike_amplitudes) > 0) {
-      mean_amplitude <- mean(spike_amplitudes, na.rm = TRUE)
-      validation_results$mean_amplitude <- paste("Mean spike amplitude:", round(mean_amplitude, 3))
-    }
+  if (any(is.na(trace) | is.infinite(trace))) {
+    stop("calcium_trace contains NA or infinite values")
   }
-  
-  # Method-specific validation
-  if (!is.null(method)) {
-    validation_results$method <- method
+}
+
+#' Validate Calcium Traces Matrix
+#'
+#' Validate input matrix of calcium traces for hierarchical Bayesian analysis.
+#'
+#' @param traces Matrix of calcium traces
+#' @return NULL if valid, throws error if invalid
+#' @export
+validate_calcium_traces_matrix <- function(traces) {
+  if (is.null(traces) || !is.matrix(traces)) {
+    stop("calcium_traces must be a matrix")
   }
-  
-  validation_results$valid <- TRUE
-  return(validation_results)
+  if (nrow(traces) < 1 || ncol(traces) < 10) {
+    stop("calcium_traces must be a matrix with at least 1 row and 10 columns")
+  }
+  if (any(is.na(traces) | is.infinite(traces))) {
+    stop("calcium_traces contains NA or infinite values")
+  }
+}
+
+#' Validate Positive Numeric
+#'
+#' Validate that a value is a positive numeric value.
+#'
+#' @param value Value to check
+#' @param name Name of the parameter (for error message)
+#' @return NULL if valid, throws error if invalid
+#' @export
+validate_positive_numeric <- function(value, name = "value") {
+  if (!is.numeric(value) || length(value) != 1 || value <= 0) {
+    stop(sprintf("%s must be a positive numeric value", name))
+  }
+}
+
+#' Validate Positive Integer
+#'
+#' Validate that a value is a positive integer.
+#'
+#' @param value Value to check
+#' @param name Name of the parameter (for error message)
+#' @return NULL if valid, throws error if invalid
+#' @export
+validate_positive_integer <- function(value, name = "value") {
+  if (!is.numeric(value) || length(value) != 1 || value <= 0 || value != as.integer(value)) {
+    stop(sprintf("%s must be a positive integer", name))
+  }
+}
+
+#' Validate Character
+#'
+#' Validate that a value is a single character string.
+#'
+#' @param value Value to check
+#' @param name Name of the parameter (for error message)
+#' @return NULL if valid, throws error if invalid
+#' @export
+validate_character <- function(value, name = "value") {
+  if (!is.character(value) || length(value) != 1) {
+    stop(sprintf("%s must be a single character string", name))
+  }
+}
+
+#' Validate Character Vector
+#'
+#' Validate that a value is a character vector with at least one element.
+#'
+#' @param value Value to check
+#' @param name Name of the parameter (for error message)
+#' @return NULL if valid, throws error if invalid
+#' @export
+validate_character_vector <- function(value, name = "value") {
+  if (!is.character(value)) {
+    stop(sprintf("%s must be a character vector", name))
+  }
+  if (length(value) == 0) {
+    stop(sprintf("%s must be a character vector with at least one element", name))
+  }
+}
+
+#' Validate Logical
+#'
+#' Validate that a value is a single logical value.
+#'
+#' @param value Value to check
+#' @param name Name of the parameter (for error message)
+#' @return NULL if valid, throws error if invalid
+#' @export
+validate_logical <- function(value, name = "value") {
+  if (!is.logical(value) || length(value) != 1) {
+    stop(sprintf("%s must be a single logical value", name))
+  }
 } 

@@ -165,46 +165,7 @@ infer_spikes_chunked <- function(corrected_df,
   return(results)
 }
 
-#' Convert spike inference result to data frame format
-#' 
-#' @param spike_result Result from infer_spikes function
-#' @return Data frame with fit and spike columns
-#' @keywords internal
-convert_spike_result_to_df <- function(spike_result) {
-  # Extract components from spike_result
-  if ("calcium_est" %in% names(spike_result)) {
-    fit <- spike_result$calcium_est
-  } else if ("fit" %in% names(spike_result)) {
-    fit <- spike_result$fit
-  } else {
-    # Fallback: use original trace as fit
-    fit <- spike_result$trace
-  }
-  
-  if ("spikes" %in% names(spike_result)) {
-    spike <- spike_result$spikes
-  } else if ("spike" %in% names(spike_result)) {
-    spike <- spike_result$spike
-  } else {
-    # Fallback: create spike vector from spike_times
-    n <- length(fit)
-    spike <- rep(0, n)
-    if ("spike_times" %in% names(spike_result)) {
-      spike[spike_result$spike_times] <- 1
-    }
-  }
-  
-  # Ensure both vectors have the same length
-  n <- max(length(fit), length(spike))
-  if (length(fit) < n) fit <- c(fit, rep(NA, n - length(fit)))
-  if (length(spike) < n) spike <- c(spike, rep(0, n - length(spike)))
-  
-  data.frame(
-    fit = fit,
-    spike = spike,
-    stringsAsFactors = FALSE
-  )
-}
+# NOTE: convert_spike_result_to_df is defined in infer_spikes.R
 
 #' Process a single trace in chunks
 #' 

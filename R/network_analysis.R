@@ -279,38 +279,33 @@ compute_basic_properties <- function(adjacency_matrix) {
 
 #' Compute Simple Clustering Coefficient
 #'
-#' Compute clustering coefficient without igraph.
+#' Compute clustering coefficient without igraph using vectorized operations.
 #'
 #' @param adjacency_matrix Adjacency matrix
 #' @return Clustering coefficient
 #' @keywords internal
 compute_simple_clustering <- function(adjacency_matrix) {
   n_nodes <- nrow(adjacency_matrix)
-  total_triangles <- 0
-  total_triplets <- 0
-  
-  for (i in 1:n_nodes) {
-    for (j in 1:n_nodes) {
-      for (k in 1:n_nodes) {
-        if (i != j && j != k && i != k) {
-          # Check if i-j-k forms a triplet
-          if (adjacency_matrix[i, j] != 0 && adjacency_matrix[j, k] != 0) {
-            total_triplets <- total_triplets + 1
-            
-            # Check if i-k also exists (forming a triangle)
-            if (adjacency_matrix[i, k] != 0) {
-              total_triangles <- total_triangles + 1
-            }
-          }
-        }
-      }
-    }
-  }
-  
+
+  # Convert to binary adjacency matrix for efficiency
+  adj_binary <- (adjacency_matrix != 0) * 1
+  diag(adj_binary) <- 0  # Remove self-loops
+
+  # Compute number of triangles using matrix multiplication
+  # A³[i,i] / 2 gives number of triangles containing node i
+  adj_squared <- adj_binary %*% adj_binary
+  adj_cubed_diag <- diag(adj_binary %*% adj_squared)
+  total_triangles <- sum(adj_cubed_diag) / 6  # Each triangle counted 6 times
+
+  # Compute number of connected triplets (paths of length 2)
+  # For each node, count pairs of neighbors
+  degrees <- rowSums(adj_binary)
+  total_triplets <- sum(degrees * (degrees - 1)) / 2
+
   if (total_triplets == 0) {
     return(0)
   } else {
-    return(total_triangles / total_triplets)
+    return(3 * total_triangles / total_triplets)
   }
 }
 
@@ -641,29 +636,35 @@ graph_metrics <- function(adjacency_matrix, ...) {
 
 #' Compute Betweenness Centrality
 #'
+#' Compute simplified betweenness centrality using vectorized operations.
+#' This counts 2-paths through each node as a proxy for betweenness.
+#'
 #' @param adjacency_matrix Adjacency matrix
 #' @return Betweenness centrality values
 #' @keywords internal
 compute_betweenness_centrality <- function(adjacency_matrix) {
   n_nodes <- nrow(adjacency_matrix)
-  betweenness <- numeric(n_nodes)
-  
-  # Simplified betweenness centrality
-  for (i in 1:n_nodes) {
-    centrality <- 0
-    for (j in 1:n_nodes) {
-      for (k in 1:n_nodes) {
-        if (i != j && j != k && i != k) {
-          # Check if i is on shortest path between j and k
-          if (adjacency_matrix[j, i] != 0 && adjacency_matrix[i, k] != 0) {
-            centrality <- centrality + 1
-          }
-        }
-      }
-    }
-    betweenness[i] <- centrality
-  }
-  
+
+  # Convert to binary adjacency matrix
+  adj_binary <- (adjacency_matrix != 0) * 1
+  diag(adj_binary) <- 0
+
+  # Count number of 2-paths through each node using matrix operations
+
+  # For each node i, count pairs (j,k) where j->i and i->k exist
+  # This is the product of in-degree and out-degree for each node
+  in_degree <- colSums(adj_binary)
+  out_degree <- rowSums(adj_binary)
+
+  # For undirected graphs, use degree squared minus self-paths
+  # betweenness[i] = sum over all j,k of paths j->i->k
+  # This equals (degree[i])^2 - degree[i] for undirected graphs
+  betweenness <- in_degree * out_degree
+
+  # Subtract paths that would go back to the same node
+  # (paths j->i->j are not valid shortest paths)
+  betweenness <- betweenness - rowSums(adj_binary * t(adj_binary))
+
   return(betweenness)
 }
 
@@ -709,32 +710,35 @@ compute_closeness_centrality <- function(adjacency_matrix) {
 
 #' Extract Connections from Thresholded Matrix
 #'
-#' Convert thresholded adjacency matrix to edge list.
+#' Convert thresholded adjacency matrix to edge list using vectorized operations.
 #'
 #' @param thresholded_matrix Thresholded adjacency matrix
 #' @return Data frame with columns: from, to, weight
 #' @keywords internal
 extract_connections <- function(thresholded_matrix) {
   n_nodes <- nrow(thresholded_matrix)
-  
-  # Find non-zero entries (upper triangle only to avoid duplicates)
-  connections <- data.frame(
-    from = integer(0),
-    to = integer(0),
-    weight = numeric(0)
-  )
-  
-  for (i in 1:(n_nodes-1)) {
-    for (j in (i+1):n_nodes) {
-      if (thresholded_matrix[i, j] != 0) {
-        connections <- rbind(connections, data.frame(
-          from = i,
-          to = j,
-          weight = thresholded_matrix[i, j]
-        ))
-      }
-    }
+
+  # Use vectorized approach to find non-zero entries in upper triangle
+  upper_tri <- upper.tri(thresholded_matrix)
+  non_zero_mask <- upper_tri & (thresholded_matrix != 0)
+
+  # Get row and column indices of non-zero entries
+  indices <- which(non_zero_mask, arr.ind = TRUE)
+
+  if (nrow(indices) == 0) {
+    return(data.frame(
+      from = integer(0),
+      to = integer(0),
+      weight = numeric(0)
+    ))
   }
-  
-  return(connections)
+
+  # Extract weights for non-zero entries
+  weights <- thresholded_matrix[non_zero_mask]
+
+  return(data.frame(
+    from = indices[, 1],
+    to = indices[, 2],
+    weight = weights
+  ))
 } 

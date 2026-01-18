@@ -1235,22 +1235,31 @@ RunGraphMetrics <- function(object, graph = NULL, threshold = 0.3) {
 
   conn_matrix <- GetGraph(object, graph)
 
-  # Compute graph metrics
+  # Compute graph metrics from graph_metrics function
   metrics <- graph_metrics(conn_matrix, threshold = threshold)
 
-  # Add to metadata
+  # Compute node strength (sum of absolute edge weights)
+  strength <- rowSums(abs(conn_matrix))
+
+  # Compute global transitivity (mean clustering coefficient)
+  transitivity <- mean(metrics$clustering, na.rm = TRUE)
+
+  # Add node-level metrics to metadata
   object <- AddMetaData(object, metrics$degree, "graph_degree")
-  object <- AddMetaData(object, metrics$strength, "graph_strength")
+  object <- AddMetaData(object, strength, "graph_strength")
   object <- AddMetaData(object, metrics$clustering, "graph_clustering")
   if (!is.null(metrics$betweenness)) {
     object <- AddMetaData(object, metrics$betweenness, "graph_betweenness")
+  }
+  if (!is.null(metrics$closeness)) {
+    object <- AddMetaData(object, metrics$closeness, "graph_closeness")
   }
 
   # Store global metrics
   object$misc$graph_metrics <- list(
     density = metrics$density,
-    transitivity = metrics$transitivity,
-    modularity = metrics$modularity
+    transitivity = transitivity,
+    n_nodes = metrics$n_nodes
   )
 
   log_command(object, "RunGraphMetrics", list(

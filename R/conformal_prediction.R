@@ -564,3 +564,120 @@ evaluate_conformal <- function(pred, y_true) {
     conditional_coverage = tapply(covered, cut(y_true, 5), mean)
   )
 }
+
+#' Plot Conformal Prediction Bands
+#'
+#' Create a publication-ready plot of conformal prediction intervals.
+#'
+#' @param pred Conformal prediction result from conformal_predict or adaptive_conformal
+#' @param y_true Optional vector of true values
+#' @param x_values Optional x-axis values (default: 1:n)
+#' @param title Plot title
+#' @param xlab X-axis label
+#' @param ylab Y-axis label
+#' @param band_color Color for prediction bands
+#' @param band_alpha Transparency for bands
+#' @param line_color Color for prediction line
+#' @param point_color Color for true values
+#' @param highlight_errors Whether to highlight points outside bands
+#'
+#' @return ggplot2 object
+#' @export
+plot_conformal_bands <- function(pred, y_true = NULL, x_values = NULL,
+                                  title = "Conformal Prediction",
+                                  xlab = "Index", ylab = "Value",
+                                  band_color = "steelblue",
+                                  band_alpha = 0.3,
+                                  line_color = "steelblue",
+                                  point_color = "black",
+                                  highlight_errors = TRUE) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("ggplot2 required for plotting")
+  }
+
+  # Determine number of predictions
+  n <- if (!is.null(pred$pred)) {
+    length(pred$pred)
+  } else if (!is.null(pred$lower)) {
+    length(pred$lower)
+  } else {
+    stop("Invalid prediction object")
+  }
+
+  # X values
+  if (is.null(x_values)) {
+    x_values <- seq_len(n)
+  }
+
+  # Build data frame
+  df <- data.frame(
+    x = x_values,
+    lower = pred$lower,
+    upper = pred$upper
+  )
+
+  # Add predictions if available
+  if (!is.null(pred$pred)) {
+    df$pred <- pred$pred
+  } else {
+    df$pred <- (pred$lower + pred$upper) / 2
+  }
+
+  # Add true values if provided
+  if (!is.null(y_true)) {
+    df$y_true <- y_true
+    df$covered <- y_true >= pred$lower & y_true <= pred$upper
+  }
+
+  # Coverage rate
+  coverage <- if (!is.null(pred$coverage)) {
+    pred$coverage
+  } else if (!is.null(y_true)) {
+    mean(df$covered)
+  } else {
+    NA
+  }
+
+  # Build plot
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = x)) +
+    ggplot2::geom_ribbon(
+      ggplot2::aes(ymin = lower, ymax = upper),
+      fill = band_color, alpha = band_alpha
+    ) +
+    ggplot2::geom_line(
+      ggplot2::aes(y = pred),
+      color = line_color, linewidth = 0.8
+    )
+
+  # Add true values
+  if (!is.null(y_true)) {
+    if (highlight_errors) {
+      p <- p + ggplot2::geom_point(
+        ggplot2::aes(y = y_true, color = covered),
+        size = 1.5
+      ) +
+        ggplot2::scale_color_manual(
+          values = c("TRUE" = point_color, "FALSE" = "red"),
+          labels = c("TRUE" = "Covered", "FALSE" = "Uncovered"),
+          name = ""
+        )
+    } else {
+      p <- p + ggplot2::geom_point(
+        ggplot2::aes(y = y_true),
+        color = point_color, size = 1.5
+      )
+    }
+  }
+
+  # Add coverage to title if available
+  if (!is.na(coverage)) {
+    title <- sprintf("%s (%.1f%% coverage)", title, coverage * 100)
+  }
+
+  p + ggplot2::labs(title = title, x = xlab, y = ylab) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(hjust = 0.5, face = "bold"),
+      legend.position = "bottom"
+    )
+}

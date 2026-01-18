@@ -385,6 +385,47 @@ export(compute_spatial_information)
 export(plot_tuning_curve)
 export(tuning_summary)
 
+# Publication theme and visualization
+export(pub_colors)
+export(theme_publication)
+export(scale_fill_publication)
+export(scale_color_publication)
+export(scale_colour_publication)
+export(scale_fill_publication_d)
+export(add_panel_label)
+export(format_pvalue)
+export(save_pub_figure)
+export(combine_panels)
+
+# Publication plots - Neural activity
+export(plot_neural_raster)
+export(plot_spike_raster_pub)
+
+# Publication plots - Trajectories and state space
+export(plot_gpfa_trajectory)
+export(plot_dpca_components)
+export(plot_flow_field)
+
+# Publication plots - Network analysis
+export(plot_connectivity_matrix)
+export(plot_circular_network)
+export(plot_assembly_timeline)
+
+# Publication plots - Tuning curves
+export(plot_tuning_polar)
+export(plot_population_tuning)
+export(plot_selectivity_distribution)
+
+# Publication plots - Pharmacology
+export(plot_response_waterfall)
+export(plot_response_comparison)
+export(plot_temporal_response)
+export(plot_event_triggered)
+export(plot_dose_response_pub)
+
+# Publication plots - Summary
+export(plot_analysis_summary)
+
 # Rcpp exports (when compiled)
 if (FALSE) {
   useDynLib(CaImagingAnalysisFr, .registration = TRUE)

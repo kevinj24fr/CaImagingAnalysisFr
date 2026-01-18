@@ -19,3 +19,4 @@ Community detection results
 \description{
 Detect communities in functional connectivity network.
 }
+\keyword{internal}

@@ -35,3 +35,7 @@ List containing MCMC samples and inference results
 \description{
 Infer spikes using Bayesian methods with MCMC sampling.
 }
+\note{
+Use \code{\link{RunSpikes}} for CaExperiment workflow
+}
+\keyword{internal}

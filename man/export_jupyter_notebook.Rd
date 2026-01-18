@@ -24,5 +24,6 @@ export_jupyter_notebook(
 Path to generated notebook
 }
 \description{
-Export the analysis pipeline as a Jupyter notebook.
+Export the analysis pipeline as a Jupyter notebook (R kernel).
+Uses rmarkdown to convert R Markdown to notebook format.
 }

@@ -19,4 +19,3 @@ TRUE if passes quality control
 \description{
 Validate quality control parameters
 }
-\keyword{internal}

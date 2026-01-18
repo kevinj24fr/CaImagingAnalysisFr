@@ -32,3 +32,4 @@ List containing connectivity matrix and network properties
 \description{
 Compute functional connectivity between calcium imaging traces.
 }
+\keyword{internal}

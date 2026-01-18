@@ -23,3 +23,4 @@ Matrix of reduced dimensions
 \description{
 Reduce dimensionality using UMAP.
 }
+\keyword{internal}

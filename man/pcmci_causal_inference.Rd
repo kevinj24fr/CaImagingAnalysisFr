@@ -29,3 +29,4 @@ List containing causal graph and statistics
 \description{
 Perform causal inference using PCMCI algorithm (Runge et al., 2019).
 }
+\keyword{internal}

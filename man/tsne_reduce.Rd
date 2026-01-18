@@ -21,3 +21,4 @@ Matrix of reduced dimensions
 \description{
 Reduce dimensionality using t-SNE.
 }
+\keyword{internal}

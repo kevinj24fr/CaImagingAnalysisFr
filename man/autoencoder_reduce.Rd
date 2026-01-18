@@ -29,3 +29,4 @@ Matrix of encoded representations
 \description{
 Reduce dimensionality using a simple autoencoder (requires Python keras).
 }
+\keyword{internal}

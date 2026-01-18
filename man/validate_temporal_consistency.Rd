@@ -15,4 +15,3 @@ TRUE if temporally consistent
 \description{
 Validate temporal consistency
 }
-\keyword{internal}

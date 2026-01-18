@@ -26,3 +26,4 @@ List containing community assignments and modularity scores
 \description{
 Detect communities in time-varying networks.
 }
+\keyword{internal}

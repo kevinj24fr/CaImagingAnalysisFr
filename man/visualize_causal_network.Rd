@@ -26,3 +26,4 @@ ggplot object or list of plots
 \description{
 Create visualizations for causal networks and time-varying connectivity.
 }
+\keyword{internal}

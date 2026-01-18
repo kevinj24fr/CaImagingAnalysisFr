@@ -19,3 +19,4 @@ List containing spike times and inferred calcium
 \description{
 Infer spikes using CaImAn algorithm (Giovannucci et al., 2019).
 }
+\keyword{internal}

@@ -21,3 +21,4 @@ Vector of anomaly scores
 \description{
 Detect anomalies using statistical outlier detection methods.
 }
+\keyword{internal}

@@ -21,4 +21,3 @@ TRUE if valid, throws error otherwise
 \description{
 Validate numeric parameters
 }
-\keyword{internal}

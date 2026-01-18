@@ -17,3 +17,4 @@ hclust object
 \description{
 Cluster cells or time points using hierarchical clustering.
 }
+\keyword{internal}

@@ -41,3 +41,4 @@ spikes <- infer_spikes(corrected$Cell_1)
 # spikes <- infer_spikes(corrected$Cell_1, method = "deep", model_path = "cascade_model.h5")
 
 }
+\keyword{internal}

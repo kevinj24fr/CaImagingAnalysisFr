@@ -32,3 +32,4 @@ List containing CCM results and causality measures
 \description{
 Perform convergent cross mapping for causal inference.
 }
+\keyword{internal}

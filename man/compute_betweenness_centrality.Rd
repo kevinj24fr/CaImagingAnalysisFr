@@ -13,6 +13,7 @@ compute_betweenness_centrality(adjacency_matrix)
 Betweenness centrality values
 }
 \description{
-Compute Betweenness Centrality
+Compute simplified betweenness centrality using vectorized operations.
+This counts 2-paths through each node as a proxy for betweenness.
 }
 \keyword{internal}

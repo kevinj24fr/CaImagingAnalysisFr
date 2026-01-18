@@ -19,3 +19,4 @@ List with cluster assignments and centers
 \description{
 Cluster cells or time points using k-means.
 }
+\keyword{internal}

@@ -17,3 +17,4 @@ List of graph metrics
 \description{
 Compute various graph metrics for network analysis.
 }
+\keyword{internal}

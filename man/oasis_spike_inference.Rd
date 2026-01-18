@@ -19,3 +19,4 @@ List containing spike times and inferred calcium
 \description{
 Infer spikes using OASIS algorithm (Friedrich et al., 2017).
 }
+\keyword{internal}

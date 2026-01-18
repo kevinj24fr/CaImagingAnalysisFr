@@ -942,6 +942,7 @@ RunSpikes <- function(object,
                       method = c("oasis", "threshold", "bayesian", "statistical"),
                       assay = NULL,
                       name = NULL,
+                      threshold_sd = 2.5,
                       ...) {
   if (!inherits(object, "CaExperiment")) {
     stop("object must be a CaExperiment")
@@ -959,13 +960,53 @@ RunSpikes <- function(object,
 
   traces <- GetTraces(object, assay = assay)
 
-  # Run spike inference
-  result <- infer_spikes(traces, method = method, ...)
+  # Run spike inference based on method
+  result <- switch(method,
+    threshold = {
+      # Use threshold_spike_detection
+      threshold_spike_detection(traces, threshold_sd = threshold_sd, ...)
+    },
+    statistical = {
+      # Use statistical_spike_inference
+      statistical_spike_inference(traces, ...)
+    },
+    oasis = {
+      # Apply infer_spikes to each cell
+      n_cells <- nrow(traces)
+      spike_matrix <- matrix(0, nrow = n_cells, ncol = ncol(traces))
+      rownames(spike_matrix) <- rownames(traces)
+      for (i in seq_len(n_cells)) {
+        res <- infer_spikes(traces[i, ], method = "oasis", verbose = FALSE, ...)
+        if (is.data.frame(res) && "spike" %in% names(res)) {
+          spike_matrix[i, ] <- res$spike
+        }
+      }
+      list(spike_predictions = spike_matrix, method = "oasis")
+    },
+    bayesian = {
+      # Use bayesian_spike_inference for each cell
+      n_cells <- nrow(traces)
+      spike_matrix <- matrix(0, nrow = n_cells, ncol = ncol(traces))
+      rownames(spike_matrix) <- rownames(traces)
+      for (i in seq_len(n_cells)) {
+        res <- bayesian_spike_inference(traces[i, ], ...)
+        if (is.list(res) && "spikes" %in% names(res)) {
+          spike_matrix[i, ] <- res$spikes
+        }
+      }
+      list(spike_predictions = spike_matrix, method = "bayesian")
+    }
+  )
 
-  # Store spikes
-  if (is.list(result) && "spikes" %in% names(result)) {
-    object$spikes[[name]] <- result$spikes
-    # Store additional info in misc
+  # Store spikes - handle different result formats
+  if (is.list(result)) {
+    if ("spike_predictions" %in% names(result)) {
+      object$spikes[[name]] <- result$spike_predictions
+    } else if ("spikes" %in% names(result)) {
+      object$spikes[[name]] <- result$spikes
+    } else {
+      object$spikes[[name]] <- result
+    }
     object$misc[[paste0("spikes_", name)]] <- result
   } else {
     object$spikes[[name]] <- result
@@ -973,14 +1014,16 @@ RunSpikes <- function(object,
 
   # Add spike rate to metadata
   spike_matrix <- object$spikes[[name]]
-  spike_rates <- rowSums(spike_matrix > 0, na.rm = TRUE) / Duration(object)
-  object <- AddMetaData(object, spike_rates, paste0("spike_rate_", name))
+  if (is.matrix(spike_matrix)) {
+    spike_rates <- rowSums(spike_matrix > 0, na.rm = TRUE) / Duration(object)
+    object <- AddMetaData(object, spike_rates, paste0("spike_rate_", name))
+  }
 
   log_command(object, "RunSpikes", list(
     method = method,
+    threshold_sd = threshold_sd,
     source_assay = assay,
-    name = name,
-    ...
+    name = name
   ))
 }
 

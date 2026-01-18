@@ -167,6 +167,39 @@ reference:
   - estimate_dimensionality
   - plot_trajectory
 
+- title: GPFA (Gaussian Process Factor Analysis)
+  desc: Extract smooth latent trajectories from population activity
+  contents:
+  - fit_gpfa
+  - gpfa_project
+  - gpfa_orthonormalize
+  - gpfa_cv
+  - plot_gpfa
+  - split_into_trials
+
+- title: dPCA (Demixed PCA)
+  desc: Separate neural variance by task parameters
+  contents:
+  - fit_dpca
+  - dpca_project
+  - dpca_decode
+  - dpca_summary
+  - plot_dpca
+
+- title: Tuning Curve Analysis
+  desc: Fit and analyze neural tuning to stimulus features
+  contents:
+  - fit_orientation_tuning
+  - fit_contrast_response
+  - fit_place_field
+  - fit_tuning_curve
+  - compute_osi
+  - compute_dsi
+  - compute_gosi
+  - compute_spatial_information
+  - plot_tuning_curve
+  - tuning_summary
+
 - title: Information Theory
   desc: Information-theoretic measures
   contents:

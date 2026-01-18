@@ -18,7 +18,7 @@ NULL
 #' @param n_shuffles Number of shuffles for significance testing
 #'
 #' @return List with detected sequences
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -299,7 +299,7 @@ detect_sequences <- function(spikes, method = "template", min_cells = 5,
 #' @param threshold Correlation threshold for replay detection
 #'
 #' @return List of replay events
-#' @export
+#' @keywords internal
 detect_replay <- function(spikes, template, compression_range = c(1, 20),
                            threshold = 0.5) {
   n_cells <- nrow(spikes)
@@ -406,7 +406,7 @@ detect_replay <- function(spikes, template, compression_range = c(1, 20),
 #' @param window_size Window size for computing reactivation
 #'
 #' @return Vector of reactivation strengths over time
-#' @export
+#' @keywords internal
 compute_reactivation_strength <- function(spikes, sequence, window_size = 10) {
   if (is.list(sequence)) {
     cells <- sequence$cells
@@ -448,7 +448,7 @@ compute_reactivation_strength <- function(spikes, sequence, window_size = 10) {
 #' @param n_sequences Number of sequences to plot
 #'
 #' @return ggplot object
-#' @export
+#' @keywords internal
 plot_sequences <- function(sequences, spikes = NULL, n_sequences = 5) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 required")

@@ -17,7 +17,7 @@ NULL
 #'   (1D convolution filters), or "correlation" (correlation-weighted)
 #' @param ... Additional arguments passed to the specific method
 #' @return List containing spike times and inferred calcium
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' trace <- rnorm(1000) + cumsum(rnorm(1000, sd = 0.1))
@@ -50,7 +50,7 @@ statistical_spike_inference <- function(trace, method = c("rolling", "convolutio
 #' @param threshold_sd Number of SDs above rolling mean (default: 2)
 #' @param ... Additional arguments
 #' @return List containing spike times, spike vector, and filtered trace
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' trace <- rnorm(500)
@@ -121,7 +121,7 @@ rolling_stats_inference <- function(trace, window_size = 20, threshold_sd = 2, .
 #' @param threshold_quantile Quantile threshold for spike detection (default: 0.9)
 #' @param ... Additional arguments
 #' @return List containing spike times, spike vector, and feature maps
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' trace <- rnorm(500)
@@ -201,7 +201,7 @@ convolutional_inference <- function(trace, kernel_size = 5, threshold_quantile =
 #' @param threshold_quantile Quantile threshold for spike detection (default: 0.9)
 #' @param ... Additional arguments
 #' @return List containing spike times, spike vector, and correlation weights
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' trace <- rnorm(500)
@@ -419,7 +419,7 @@ estimate_calcium <- function(trace, spikes) {
 # Deprecated aliases for backwards compatibility
 
 #' @rdname statistical_spike_inference
-#' @export
+#' @keywords internal
 deep_spike_inference <- function(trace, model_type = "rolling", ...) {
   .Deprecated("statistical_spike_inference",
               msg = "deep_spike_inference() is deprecated. Use statistical_spike_inference() instead - this uses statistical methods, not deep learning.")

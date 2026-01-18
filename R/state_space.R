@@ -17,7 +17,7 @@ NULL
 #' @param ... Additional arguments passed to reduction method
 #'
 #' @return List with trajectories and reduction details
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -96,7 +96,7 @@ compute_trajectories <- function(traces, method = "pca", n_dims = 3, ...) {
 #' @param trajectory State trajectory object
 #'
 #' @return Vector of velocities at each time point
-#' @export
+#' @keywords internal
 trajectory_velocity <- function(trajectory) {
   coords <- trajectory$coords
   n_time <- nrow(coords)
@@ -117,7 +117,7 @@ trajectory_velocity <- function(trajectory) {
 #' @param min_dwell Minimum frames to be considered dwelling
 #'
 #' @return List with fixed point locations and dwell times
-#' @export
+#' @keywords internal
 find_fixed_points <- function(trajectory, n_clusters = 5, min_dwell = 10) {
   coords <- trajectory$coords
   velocity <- trajectory_velocity(trajectory)
@@ -168,7 +168,7 @@ find_fixed_points <- function(trajectory, n_clusters = 5, min_dwell = 10) {
 #' @param window Smoothing window
 #'
 #' @return Vector of curvature values
-#' @export
+#' @keywords internal
 trajectory_curvature <- function(trajectory, window = 5) {
   coords <- trajectory$coords
   n_time <- nrow(coords)
@@ -212,7 +212,7 @@ trajectory_curvature <- function(trajectory, window = 5) {
 #' @param method Comparison method: "frechet", "hausdorff", "dtw", "procrustes"
 #'
 #' @return Distance or similarity measure
-#' @export
+#' @keywords internal
 compare_trajectories <- function(traj1, traj2, method = "procrustes") {
   coords1 <- traj1$coords
   coords2 <- traj2$coords
@@ -335,7 +335,7 @@ compare_trajectories <- function(traj1, traj2, method = "procrustes") {
 #' @param show_points Show individual points
 #'
 #' @return ggplot or plotly object
-#' @export
+#' @keywords internal
 plot_trajectory <- function(trajectory, color_by = "time", dims = NULL,
                             show_points = FALSE) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
@@ -403,7 +403,7 @@ plot_trajectory <- function(trajectory, color_by = "time", dims = NULL,
 #' @param method Method: "participation_ratio", "broken_stick", "eigenvalue"
 #'
 #' @return Estimated dimensionality
-#' @export
+#' @keywords internal
 estimate_dimensionality <- function(traces, method = "participation_ratio") {
   # PCA
   pca <- prcomp(t(traces), center = TRUE, scale. = TRUE)

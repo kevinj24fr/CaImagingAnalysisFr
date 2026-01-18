@@ -16,7 +16,7 @@ NULL
 #' @param threshold Threshold for significant connections (default: 0.3)
 #' @param ... Additional arguments
 #' @return List containing time-varying connectivity matrices and metadata
-#' @export
+#' @keywords internal
 time_varying_connectivity <- function(traces, window_size = 50, step_size = 10, method = "pearson", threshold = 0.3, ...) {
   n_cells <- nrow(traces)
   n_time <- ncol(traces)
@@ -74,7 +74,7 @@ time_varying_connectivity <- function(traces, window_size = 50, step_size = 10, 
 #' @param resolution Resolution parameter for community detection (default: 1.0)
 #' @param ... Additional arguments
 #' @return List containing community assignments and modularity scores
-#' @export
+#' @keywords internal
 dynamic_community_detection <- function(connectivity_result, method = "louvain", resolution = 1.0, ...) {
   message("Running dynamic community detection")
   
@@ -129,7 +129,7 @@ dynamic_community_detection <- function(connectivity_result, method = "louvain",
 #' @param method PCMCI method ("pcmci", "pcmci_plus")
 #' @param ... Additional arguments
 #' @return List containing causal graph and statistics
-#' @export
+#' @keywords internal
 pcmci_causal_inference <- function(traces, max_lag = 5, alpha = 0.05, method = "pcmci", ...) {
   message("Running PCMCI causal inference")
   
@@ -181,7 +181,7 @@ pcmci_causal_inference <- function(traces, max_lag = 5, alpha = 0.05, method = "
 #' @param n_replicates Number of replicates (default: 100)
 #' @param ... Additional arguments
 #' @return List containing CCM results and causality measures
-#' @export
+#' @keywords internal
 convergent_cross_mapping <- function(trace1, trace2, embedding_dim = 3, library_sizes = seq(10, 100, by = 10), n_replicates = 100, ...) {
   message("Running Convergent Cross Mapping")
   
@@ -239,7 +239,7 @@ convergent_cross_mapping <- function(trace1, trace2, embedding_dim = 3, library_
 #' @param metrics Vector of metrics to calculate ("density", "clustering", "efficiency", "modularity")
 #' @param ... Additional arguments
 #' @return Data frame with time-varying network metrics
-#' @export
+#' @keywords internal
 dynamic_network_metrics <- function(connectivity_result, metrics = c("density", "clustering", "efficiency"), ...) {
   n_windows <- connectivity_result$metadata$n_windows
   n_cells <- connectivity_result$metadata$n_cells
@@ -294,7 +294,7 @@ dynamic_network_metrics <- function(connectivity_result, metrics = c("density", 
 #' @param window_pairs Matrix of window pairs to compare (default: NULL, compare consecutive)
 #' @param ... Additional arguments
 #' @return List containing stability measures and analysis
-#' @export
+#' @keywords internal
 network_stability_analysis <- function(connectivity_result, method = "jaccard", window_pairs = NULL, ...) {
   n_windows <- connectivity_result$metadata$n_windows
   
@@ -349,7 +349,7 @@ network_stability_analysis <- function(connectivity_result, method = "jaccard", 
 #' @param layout Network layout ("spring", "circular", "random")
 #' @param ... Additional arguments
 #' @return ggplot object or list of plots
-#' @export
+#' @keywords internal
 visualize_causal_network <- function(causal_result, plot_type = "network", layout = "spring", ...) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 is required for network visualization")
@@ -431,7 +431,7 @@ visualize_causal_network <- function(causal_result, plot_type = "network", layou
 #' @param alpha Significance level (default: 0.05)
 #' @param ... Additional arguments
 #' @return List containing results from all causality methods
-#' @export
+#' @keywords internal
 multi_cell_causality_analysis <- function(traces, methods = c("pcmci", "ccm"), max_lag = 5, alpha = 0.05, ...) {
   n_cells <- nrow(traces)
   results <- list()

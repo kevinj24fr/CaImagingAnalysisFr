@@ -32,10 +32,11 @@ NULL
 #'   \item{decoders}{Decoding matrices (components -> neurons)}
 #' }
 #'
-#' @export
+#' @keywords internal
+#' @note Use \code{\link{RunDPCA}} for CaExperiment workflow
 #'
 #' @examples
-#' \dontrun
+#' \dontrun{
 #' # Create trial data with stimulus and time conditions
 #' # data: neurons x time x trials
 #' # labels: data frame with 'stimulus' column
@@ -277,7 +278,7 @@ fit_dpca <- function(data, labels = NULL, n_components = 10,
 #' @param new_data New data array (neurons x time x trials)
 #'
 #' @return List of projections per marginalization
-#' @export
+#' @keywords internal
 dpca_project <- function(dpca_model, new_data) {
   n_neurons <- dim(new_data)[1]
   n_time <- dim(new_data)[2]
@@ -312,7 +313,7 @@ dpca_project <- function(dpca_model, new_data) {
 #' @param n_shuffles Number of label shuffles for significance
 #'
 #' @return Data frame with decoding accuracy per marginalization and time
-#' @export
+#' @keywords internal
 dpca_decode <- function(dpca_model, trial_data, labels, n_shuffles = 100) {
   n_time <- dim(trial_data)[2]
   n_trials <- dim(trial_data)[3]
@@ -392,7 +393,7 @@ dpca_decode <- function(dpca_model, trial_data, labels, n_shuffles = 100) {
 #' @param plot_type "trajectories", "variance", or "weights"
 #'
 #' @return ggplot object
-#' @export
+#' @keywords internal
 plot_dpca <- function(dpca_model, marginalization = NULL,
                       components = 1:3, plot_type = "trajectories") {
 
@@ -481,7 +482,7 @@ plot_dpca <- function(dpca_model, marginalization = NULL,
 #' @param dpca_model Fitted dPCA model
 #'
 #' @return Data frame with variance explained by each marginalization
-#' @export
+#' @keywords internal
 dpca_summary <- function(dpca_model) {
   summary_data <- do.call(rbind, lapply(dpca_model$marg_names, function(m) {
     var_exp <- dpca_model$explained_var[[m]]

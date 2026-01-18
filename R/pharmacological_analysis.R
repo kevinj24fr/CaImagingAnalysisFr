@@ -19,7 +19,7 @@ NULL
 #' @param baseline_window Window size for rolling baseline (seconds)
 #'
 #' @return List with transient times, amplitudes, durations, and kinetics
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -171,7 +171,7 @@ detect_transients <- function(traces, frame_rate = 10, threshold_sd = 2.5,
 #' @param metrics Metrics to compare
 #'
 #' @return Summary data frame with statistics per condition
-#' @export
+#' @keywords internal
 summarize_transients_by_condition <- function(transients_list,
                                                metrics = c("frequency", "amplitude",
                                                           "duration", "rise_time")) {
@@ -220,7 +220,7 @@ summarize_transients_by_condition <- function(transients_list,
 #' @param metrics Metrics to compare
 #'
 #' @return List with test results for each metric
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -359,7 +359,7 @@ compare_conditions <- function(traces_list, frame_rate = 10,
 #' @param window_size Window for sliding synchrony (NULL for global)
 #'
 #' @return List with synchrony measures
-#' @export
+#' @keywords internal
 compute_synchrony_index <- function(traces, method = "correlation",
                                      window_size = NULL) {
   n_cells <- nrow(traces)
@@ -435,7 +435,7 @@ compute_synchrony_index <- function(traces, method = "correlation",
 #' @param threshold_sd Threshold for cell activation
 #'
 #' @return List with burst times and properties
-#' @export
+#' @keywords internal
 detect_network_bursts <- function(traces, frame_rate = 10,
                                    min_participation = 0.2,
                                    threshold_sd = 2) {
@@ -508,7 +508,7 @@ detect_network_bursts <- function(traces, frame_rate = 10,
 #' @param model Model type: "hill", "logistic", "linear"
 #'
 #' @return Fitted dose-response model
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -594,7 +594,7 @@ fit_dose_response <- function(doses, responses, model = "hill") {
 #' @param log_scale Use log scale for dose axis
 #'
 #' @return ggplot object
-#' @export
+#' @keywords internal
 plot_dose_response <- function(dr, log_scale = TRUE) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 required")
@@ -647,7 +647,7 @@ plot_dose_response <- function(dr, log_scale = TRUE) {
 #' @param conditions_info Optional data frame with condition metadata
 #'
 #' @return List with comprehensive analysis results
-#' @export
+#' @keywords internal
 pharmacological_report <- function(traces_list, frame_rate = 10,
                                    conditions_info = NULL) {
   conditions <- names(traces_list)
@@ -712,7 +712,7 @@ pharmacological_report <- function(traces_list, frame_rate = 10,
 #' @param x Condition comparison object
 #' @param ... Ignored
 #'
-#' @export
+#' @keywords internal
 print.condition_comparison <- function(x, ...) {
   cat("Condition Comparison Results\n")
   cat("============================\n")

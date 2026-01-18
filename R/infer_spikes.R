@@ -26,7 +26,7 @@ NULL
 #' # Try deep learning method (requires model)
 #' # spikes <- infer_spikes(corrected$Cell_1, method = "deep", model_path = "cascade_model.h5")
 #' 
-#' @export
+#' @keywords internal
 infer_spikes <- function(trace, 
                         method = c("oasis", "caiman", "suite2p", "deep"),
                         fallback = TRUE,
@@ -95,7 +95,7 @@ infer_spikes_primary <- function(trace, method, verbose) {
 #' @param lambda Penalty parameter (default: 0.1)
 #' @param ... Additional arguments
 #' @return List containing spike times and inferred calcium
-#' @export
+#' @keywords internal
 oasis_spike_inference <- function(trace, lambda = 0.1, ...) {
   # Base R implementation of OASIS using L1 trend filtering
   message("Running OASIS spike inference")
@@ -167,7 +167,7 @@ oasis_spike_inference <- function(trace, lambda = 0.1, ...) {
 #' @param method CaImAn method ("oasis", "thresholded_oasis", "mcmc")
 #' @param ... Additional arguments
 #' @return List containing spike times and inferred calcium
-#' @export
+#' @keywords internal
 caiman_spike_inference <- function(trace, method = "oasis", ...) {
   message("Running CaImAn spike inference")
   
@@ -254,7 +254,7 @@ caiman_spike_inference <- function(trace, method = "oasis", ...) {
 #' @param trace Calcium trace
 #' @param ... Additional arguments
 #' @return List containing spike times and inferred calcium
-#' @export
+#' @keywords internal
 suite2p_spike_inference <- function(trace, ...) {
   message("Running Suite2p spike inference")
   

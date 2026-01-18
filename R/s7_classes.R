@@ -407,5 +407,4 @@ is_calcium_object <- function(x) {
   inherits(x, c("CalciumMovie", "CalciumTraces", "SpikeTrains", "ROISet", "ExperimentSession"))
 }
 
-# Null coalesce operator
-`%||%` <- function(x, y) if (is.null(x)) y else x
+# Note: %||% operator defined in aaa_utils.R

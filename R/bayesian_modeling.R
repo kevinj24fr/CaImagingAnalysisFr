@@ -22,7 +22,8 @@ NULL
 #' @param prior_spike_rate Optional prior spike rate (must be between 0 and 1)
 #' @param ... Additional arguments
 #' @return List containing MCMC samples and inference results
-#' @export
+#' @keywords internal
+#' @note Use \code{\link{RunSpikes}} for CaExperiment workflow
 bayesian_spike_inference <- function(trace, model_type = "poisson", 
                                    n_samples = 1000, burnin = 100, 
                                    sampling_rate = NULL, prior_spike_rate = NULL, ...) {

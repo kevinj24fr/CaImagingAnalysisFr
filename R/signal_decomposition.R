@@ -711,18 +711,19 @@ ica_decompose <- function(data, n_components = 2, max_iter = 100, tol = 1e-6, ve
   ))
 }
 
-#' Wavelet Denoising
+#' Simple Wavelet-like Denoising for Single Signal
 #'
-#' Denoise calcium imaging data using wavelet transform.
+#' Denoise a single signal using moving average and thresholding.
+#' For batch processing of calcium traces, use \code{\link{wavelet_denoise}} instead.
 #'
-#' @param signal Input signal
-#' @param wavelet Wavelet type
-#' @param level Decomposition level
-#' @param threshold Threshold method
+#' @param signal Input signal vector
+#' @param wavelet Wavelet type (unused, for compatibility)
+#' @param level Decomposition level (unused, for compatibility)
+#' @param threshold Threshold method: "universal" or "simple"
 #' @param verbose Whether to show progress
-#' @return Denoised signal
-#' @export
-wavelet_denoise <- function(signal, wavelet = "db4", level = 3, threshold = "universal", verbose = TRUE) {
+#' @return List with denoised signal and parameters
+#' @keywords internal
+wavelet_denoise_simple <- function(signal, wavelet = "db4", level = 3, threshold = "universal", verbose = TRUE) {
   if (verbose) {
     message("Performing wavelet denoising")
   }

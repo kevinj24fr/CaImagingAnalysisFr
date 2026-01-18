@@ -17,7 +17,7 @@ NULL
 #' @param k Number of neighbors for knn method
 #'
 #' @return Matrix of pairwise mutual information
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -144,7 +144,7 @@ mutual_information <- function(traces, method = "binned", n_bins = 10, k = 3) {
 #' @param history History length
 #'
 #' @return Transfer entropy value
-#' @export
+#' @keywords internal
 transfer_entropy <- function(source, target, lag = 1, n_bins = 5, history = 1) {
   n <- length(source)
 
@@ -203,7 +203,7 @@ transfer_entropy <- function(source, target, lag = 1, n_bins = 5, history = 1) {
 #' @param n_bins Number of bins
 #'
 #' @return Matrix of directed transfer entropy
-#' @export
+#' @keywords internal
 transfer_entropy_matrix <- function(traces, lag = 1, n_bins = 5) {
   n_cells <- nrow(traces)
 
@@ -229,7 +229,7 @@ transfer_entropy_matrix <- function(traces, lag = 1, n_bins = 5) {
 #' @param n_bins Number of bins
 #'
 #' @return List with TE value and p-value
-#' @export
+#' @keywords internal
 test_transfer_entropy <- function(source, target, lag = 1, n_shuffles = 100,
                                    n_bins = 5) {
   observed_te <- transfer_entropy(source, target, lag, n_bins)
@@ -260,7 +260,7 @@ test_transfer_entropy <- function(source, target, lag = 1, n_shuffles = 100,
 #' @param n_bins Number of bins
 #'
 #' @return Active information storage value
-#' @export
+#' @keywords internal
 active_information_storage <- function(trace, history = 1, n_bins = 10) {
   n <- length(trace)
 
@@ -284,7 +284,7 @@ active_information_storage <- function(trace, history = 1, n_bins = 10) {
 #' @param n_bins Number of bins
 #'
 #' @return Entropy rate estimate
-#' @export
+#' @keywords internal
 entropy_rate <- function(trace, max_history = 5, n_bins = 10) {
   # Discretize
   trace_d <- cut(trace, breaks = n_bins, labels = FALSE)
@@ -331,7 +331,7 @@ entropy_rate <- function(trace, max_history = 5, n_bins = 10) {
 #' @param n_bins Number of bins
 #'
 #' @return igraph network object
-#' @export
+#' @keywords internal
 information_network <- function(traces, lag = 1, threshold_percentile = 95,
                                  n_bins = 5) {
   if (!requireNamespace("igraph", quietly = TRUE)) {
@@ -372,7 +372,7 @@ information_network <- function(traces, lag = 1, threshold_percentile = 95,
 #' @param n_bins Number of bins
 #'
 #' @return List with redundancy, synergy, and unique information
-#' @export
+#' @keywords internal
 partial_information <- function(traces, target, sources, n_bins = 5) {
   t_trace <- traces[target, ]
   s1_trace <- traces[sources[1], ]
@@ -420,7 +420,7 @@ partial_information <- function(traces, target, sources, n_bins = 5) {
 #' @param directed Is the matrix directed (asymmetric)?
 #'
 #' @return ggplot object
-#' @export
+#' @keywords internal
 plot_information_matrix <- function(info_matrix, title = "Information Matrix",
                                      directed = FALSE) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {

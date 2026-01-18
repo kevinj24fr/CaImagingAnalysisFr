@@ -27,7 +27,8 @@ NULL
 #'   \item{r_squared}{Goodness of fit}
 #' }
 #'
-#' @export
+#' @keywords internal
+#' @note Use \code{\link{RunTuning}} for CaExperiment workflow
 #'
 #' @examples
 #' \dontrun{
@@ -257,7 +258,7 @@ fit_orientation_tuning <- function(responses, orientations,
 #' @param orientations Vector of orientations in degrees
 #'
 #' @return OSI value (0-1)
-#' @export
+#' @keywords internal
 compute_osi <- function(responses, orientations) {
   pref_idx <- which.max(responses)
   pref_ori <- orientations[pref_idx]
@@ -285,7 +286,7 @@ compute_osi <- function(responses, orientations) {
 #' @param directions Vector of directions in degrees (0-360)
 #'
 #' @return DSI value (0-1)
-#' @export
+#' @keywords internal
 compute_dsi <- function(responses, directions) {
   if (max(directions) <= 180) {
     return(NA_real_)  # Cannot compute DSI without full 360 degrees
@@ -312,7 +313,7 @@ compute_dsi <- function(responses, directions) {
 #' @param orientations Vector of orientations in degrees
 #'
 #' @return gOSI value (0-1)
-#' @export
+#' @keywords internal
 compute_gosi <- function(responses, orientations) {
   # Convert to radians (double for orientation)
   theta <- orientations * 2 * pi / 180
@@ -337,7 +338,7 @@ compute_gosi <- function(responses, orientations) {
 #' @param method "naka_rushton" or "hyperbolic_ratio"
 #'
 #' @return Data frame with parameters: Rmax, C50, n, baseline, r_squared
-#' @export
+#' @keywords internal
 fit_contrast_response <- function(responses, contrasts,
                                   method = c("naka_rushton", "hyperbolic_ratio")) {
   method <- match.arg(method)
@@ -414,7 +415,7 @@ fit_contrast_response <- function(responses, contrasts,
 #' @param min_peak Minimum peak rate to consider as place cell
 #'
 #' @return List with place field parameters
-#' @export
+#' @keywords internal
 fit_place_field <- function(rate_map, x_coords = NULL, y_coords = NULL,
                             min_peak = 1) {
   n_x <- nrow(rate_map)
@@ -499,7 +500,7 @@ fit_place_field <- function(rate_map, x_coords = NULL, y_coords = NULL,
 #' @param occupancy Occupancy map (time spent in each bin)
 #'
 #' @return Spatial information in bits/spike
-#' @export
+#' @keywords internal
 compute_spatial_information <- function(rate_map, occupancy) {
   # Normalize occupancy to probability
   p_x <- occupancy / sum(occupancy, na.rm = TRUE)
@@ -526,7 +527,7 @@ compute_spatial_information <- function(rate_map, occupancy) {
 #' @param circular Whether stimulus dimension is circular (e.g., orientation)
 #'
 #' @return Data frame with fitted parameters
-#' @export
+#' @keywords internal
 fit_tuning_curve <- function(responses, stimulus_values,
                              model = c("gaussian", "sigmoid", "polynomial", "linear"),
                              circular = FALSE) {
@@ -687,7 +688,7 @@ fit_tuning_curve <- function(responses, stimulus_values,
 #' @param show_ci Whether to show confidence intervals (requires bootstrap)
 #'
 #' @return ggplot object
-#' @export
+#' @keywords internal
 plot_tuning_curve <- function(tuning_result, cell = 1, show_fit = TRUE, show_ci = FALSE) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package required")
@@ -776,7 +777,7 @@ plot_tuning_curve <- function(tuning_result, cell = 1, show_fit = TRUE, show_ci 
 #' @param min_r2 Minimum R-squared to include cell
 #'
 #' @return Summary statistics
-#' @export
+#' @keywords internal
 tuning_summary <- function(tuning_result, min_r2 = 0.3) {
   # Filter by fit quality
   good_fits <- tuning_result$r_squared >= min_r2

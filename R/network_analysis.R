@@ -16,7 +16,7 @@ NULL
 #' @param threshold Alternative parameter name for threshold_value (for backward compatibility)
 #' @param ... Additional arguments
 #' @return List containing connectivity matrix and network properties
-#' @export
+#' @keywords internal
 functional_connectivity <- function(traces, method = "correlation", 
                                   threshold_method = "percentile", 
                                   threshold_value = 0.95, 
@@ -123,7 +123,7 @@ mutual_info_connectivity <- function(traces, n_bins = 10, ...) {
 #' @param max_lag Maximum lag for causality analysis OR second time series vector
 #' @param ... Additional arguments
 #' @return Granger causality matrix or pairwise result
-#' @export
+#' @keywords internal
 granger_causality <- function(traces, max_lag = 5, ...) {
   # Check if first argument is a vector (pairwise analysis)
   if (is.vector(traces) && is.vector(max_lag)) {
@@ -526,7 +526,7 @@ compute_conditional_entropy <- function(x, y) {
 #' @param method Community detection method ("louvain", "girvan_newman", "label_propagation")
 #' @param ... Additional arguments
 #' @return Community detection results
-#' @export
+#' @keywords internal
 community_detection <- function(adjacency_matrix, method = "louvain", ...) {
   message("Detecting communities")
   
@@ -567,7 +567,7 @@ community_detection <- function(adjacency_matrix, method = "louvain", ...) {
 #' @param edge_width Edge width scaling
 #' @param ... Additional arguments
 #' @return Network plot
-#' @export
+#' @keywords internal
 network_visualization <- function(adjacency_matrix, layout = "fr", 
                                 vertex_size = 5, edge_width = 1, ...) {
   if (!requireNamespace("igraph", quietly = TRUE)) {
@@ -605,7 +605,7 @@ network_visualization <- function(adjacency_matrix, layout = "fr",
 #' @param adjacency_matrix Adjacency matrix
 #' @param ... Additional arguments
 #' @return List of graph metrics
-#' @export
+#' @keywords internal
 graph_metrics <- function(adjacency_matrix, ...) {
   if (is.list(adjacency_matrix) && "connectivity_matrix" %in% names(adjacency_matrix)) {
     adjacency_matrix <- adjacency_matrix$connectivity_matrix

@@ -1,3 +1,156 @@
+# CaImagingAnalysisFr 0.9.0
+
+## New Features - Advanced Cross-Domain Statistical Methods
+
+Comprehensive suite of modern statistical methods adapted from machine learning, physics, and neuroscience research for advanced calcium imaging analysis. All methods fully integrated with the CaExperiment unified object via Run* methods.
+
+### State Space Models (HMM/SLDS)
+Discrete state inference for identifying neural states and transitions.
+
+* `fit_hmm()` - Hidden Markov Model with Baum-Welch EM algorithm
+* `fit_slds()` - Switching Linear Dynamical Systems for hybrid discrete/continuous states
+* `viterbi_decode()` - Most likely state sequence
+* `forward_backward()` - State posterior probabilities
+* `predict_states()`, `predict_slds()` - State inference for new data
+* `plot_state_model()` - Visualize state transitions and emissions
+* **CaExperiment**: `RunHMM()`, `RunSLDS()`
+
+### Tensor Decomposition
+Multi-way factorization for neurons × time × trials data structures.
+
+* `cp_decompose()` - Canonical Polyadic (PARAFAC) decomposition
+* `tucker_decompose()` - Tucker decomposition with core tensor
+* `create_trial_tensor()` - Organize traces into trial tensor
+* `get_temporal_factors()`, `get_neuron_factors()`, `get_trial_factors()` - Extract factor matrices
+* `reconstruct_tensor()` - Reconstruct from factors
+* `cv_tensor_rank()` - Cross-validation for rank selection
+* `plot_tensor_decomposition()` - Visualize factor structure
+* **CaExperiment**: `RunTensorDecomp()`
+
+### Optimal Transport
+Wasserstein distances and neural manifold alignment.
+
+* `wasserstein_distance()` - Earth mover's distance between distributions
+* `gromov_wasserstein()` - Structure-preserving distance (no correspondence needed)
+* `wasserstein_barycenter()` - Compute average distribution
+* `sinkhorn_distance()` - Entropy-regularized OT for efficiency
+* `compare_representations_ot()` - Compare neural representations
+* `align_sessions_ot()` - Align neural manifolds across sessions
+* `place_field_emd()` - Compare place field distributions
+* `ot_interpolation()` - Interpolate between distributions
+* `plot_ot_alignment()` - Visualize transport plan
+* **CaExperiment**: `RunOTCompare()`
+
+### Topological Data Analysis
+Persistent homology for neural manifold topology characterization.
+
+* `compute_persistent_homology()` - VR filtration for topology features
+* `persistence_wasserstein()`, `persistence_bottleneck()` - Compare persistence diagrams
+* `persistence_landscape()` - Functional summary of homology
+* `persistence_image()` - Vectorized persistence representation
+* `compute_betti_curves()` - Betti numbers vs filtration
+* `analyze_neural_topology()` - Complete topological characterization
+* `plot_persistence_diagram()`, `plot_betti_curves()` - Visualizations
+* **CaExperiment**: `RunTDA()`
+
+### Gaussian Process Regression
+Non-parametric smoothing with principled uncertainty quantification.
+
+* `fit_gp()` - GP regression with multiple kernels (RBF, Matern, periodic)
+* `predict_gp()` - Predictions with variance estimates
+* `fit_gp_traces()`, `predict_gp_traces()` - Multi-cell GP fitting
+* `impute_missing_gp()` - Missing data imputation with uncertainty
+* `fit_sparse_gp()` - Inducing point approximation for large data
+* **CaExperiment**: `RunGPSmooth()`
+
+### Changepoint Detection
+Detect abrupt changes in neural dynamics.
+
+* `detect_changepoints()` - Unified interface for multiple methods
+* `pelt_changepoint()` - PELT algorithm (optimal, O(n))
+* `binseg_changepoint()` - Binary segmentation
+* `cusum_changepoint()` - Cumulative sum control chart
+* `bocpd()` - Bayesian Online Changepoint Detection
+* `detect_population_changepoints()` - Population-level changes
+* `compare_changepoints()` - Compare methods
+* `plot_changepoints()` - Visualize detected changes
+* **CaExperiment**: `RunChangepoints()`
+
+### Recurrence Quantification Analysis
+Characterize nonlinear dynamics and regime transitions.
+
+* `recurrence_plot()` - Construct recurrence matrix
+* `rqa_metrics()` - RR, DET, LAM, entropy, trapping time
+* `cross_recurrence_plot()` - Cross-recurrence between systems
+* `cross_rqa_metrics()` - Joint recurrence analysis
+* `windowed_rqa()` - Time-resolved RQA
+* `detect_regime_transitions()` - Find dynamical regime changes
+* `plot_recurrence()` - Visualize recurrence structure
+* **CaExperiment**: `RunRQA()`
+
+### Mixed-Effects Models
+Hierarchical statistical inference for nested experimental designs.
+
+* `fit_lmm()` - Linear mixed-effects models
+* `fit_glmm()` - Generalized linear mixed models (Poisson, binomial)
+* `prepare_mixed_data()` - Format data for mixed modeling
+* `test_condition_mixed()` - Fixed effect significance testing
+* `compare_conditions_mixed()` - Pairwise condition comparisons
+* `compute_icc()` - Intraclass correlation coefficient
+* `power_mixed()` - Power analysis for mixed designs
+
+### Causal Discovery
+Infer causal structure from observational neural data.
+
+* `pc_algorithm()` - PC algorithm for DAG learning
+* `fci_algorithm()` - FCI for causal graphs with latent confounders
+* `ges_algorithm()` - Greedy equivalence search
+* `discover_neural_causality()` - Neural-specific causal inference
+* `plot_causal_graph()` - Visualize causal structure
+* **CaExperiment**: `RunCausalDiscovery()`
+
+### Neural ODEs
+Continuous-time latent dynamics modeling.
+
+* `fit_neural_ode()` - Learn dx/dt = f_θ(x,t) dynamics
+* `predict_neural_ode()` - Generate continuous trajectories
+* `fit_latent_node()` - Latent Neural ODE for population data
+* `generate_trajectories()` - Sample from learned dynamics
+* `plot_node_phase_space()` - Phase space visualization
+* ODE solvers: Euler, RK4, DOPRI5
+* **CaExperiment**: `RunNeuralODE()`
+
+### Conformal Prediction
+Distribution-free prediction intervals with coverage guarantees.
+
+* `conformal_predictor()` - Train conformal predictor
+* `conformal_predict()` - Prediction intervals with guaranteed coverage
+* `conformal_decode()` - Neural decoding with uncertainty
+* `conformal_classifier()` - Classification with prediction sets
+* `conformal_predict_set()` - Finite-sample valid prediction sets
+* `adaptive_conformal()` - Locally adaptive intervals
+* `evaluate_conformal()` - Evaluate coverage and efficiency
+* `plot_conformal_bands()` - Visualize prediction intervals
+
+### CaExperiment Integration
+
+All new methods integrated with CaExperiment via Run* methods:
+* `RunHMM()` - Fit HMM to traces, store in reductions
+* `RunSLDS()` - Fit SLDS, store latent states and discrete states
+* `RunTensorDecomp()` - Decompose trial tensor, store factors
+* `RunChangepoints()` - Detect changepoints, store in misc
+* `RunTDA()` - Compute persistent homology from reduction
+* `RunRQA()` - Recurrence analysis from reduction
+* `RunCausalDiscovery()` - Learn causal graph, store in graphs
+* `RunNeuralODE()` - Fit Neural ODE, store in reductions
+* `RunGPSmooth()` - GP smooth traces, create new assay
+* `RunOTCompare()` - Compare conditions via OT, store distances
+
+## Bug Fixes
+* Fixed `log_command()` to properly return the modified object for pipe compatibility
+
+---
+
 # CaImagingAnalysisFr 0.8.0
 
 ## New Features - Modern Analysis Methods & Unified Object System

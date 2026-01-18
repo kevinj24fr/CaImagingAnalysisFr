@@ -31,7 +31,8 @@ NULL
 #'   \item{ll_trace}{Log-likelihood trace across iterations}
 #' }
 #'
-#' @export
+#' @keywords internal
+#' @note Use \code{\link{RunGPFA}} for CaExperiment workflow
 #'
 #' @examples
 #' \dontrun{
@@ -331,7 +332,7 @@ fit_gpfa <- function(trials, n_latents = 3, bin_width = 20,
 #' @param new_trials List of new trial matrices
 #'
 #' @return List of latent trajectories for new trials
-#' @export
+#' @keywords internal
 gpfa_project <- function(gpfa_model, new_trials) {
   if (is.array(new_trials) && length(dim(new_trials)) == 3) {
     n_trials <- dim(new_trials)[3]
@@ -356,7 +357,7 @@ gpfa_project <- function(gpfa_model, new_trials) {
 #' @param gpfa_model Fitted GPFA model
 #'
 #' @return List with orthonormalized trajectories and transformation matrix
-#' @export
+#' @keywords internal
 gpfa_orthonormalize <- function(gpfa_model) {
   C <- gpfa_model$C
 
@@ -387,7 +388,7 @@ gpfa_orthonormalize <- function(gpfa_model) {
 #' @param verbose Print progress
 #'
 #' @return Data frame with cross-validation results
-#' @export
+#' @keywords internal
 gpfa_cv <- function(trials, latent_dims = 1:10, n_folds = 5, verbose = TRUE) {
   n_trials <- length(trials)
   fold_ids <- sample(rep(1:n_folds, length.out = n_trials))
@@ -448,7 +449,7 @@ gpfa_cv <- function(trials, latent_dims = 1:10, n_folds = 5, verbose = TRUE) {
 #' @param add_start_end Add markers for start/end points
 #'
 #' @return ggplot object (2D) or plotly object (3D)
-#' @export
+#' @keywords internal
 plot_gpfa <- function(gpfa_model, dims = c(1, 2), trials = NULL,
                       color_by = "time", add_start_end = TRUE) {
 
@@ -520,7 +521,7 @@ plot_gpfa <- function(gpfa_model, dims = c(1, 2), trials = NULL,
 #' @param trial_length Length of each trial (frames)
 #'
 #' @return List of trial matrices
-#' @export
+#' @keywords internal
 split_into_trials <- function(traces, trial_starts, trial_length) {
   lapply(trial_starts, function(start) {
     end <- min(start + trial_length - 1, ncol(traces))

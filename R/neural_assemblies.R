@@ -19,7 +19,7 @@ NULL
 #' @param min_cells Minimum cells per assembly
 #'
 #' @return List with assembly memberships, weights, and activation time courses
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -164,7 +164,7 @@ detect_assemblies <- function(traces, method = "pca", n_assemblies = NULL,
 #' @param cor_method Correlation method
 #'
 #' @return List with assembly assignments
-#' @export
+#' @keywords internal
 detect_assemblies_correlation <- function(traces, method = "hierarchical",
                                            n_assemblies = NULL,
                                            cor_method = "pearson") {
@@ -259,7 +259,7 @@ detect_assemblies_correlation <- function(traces, method = "hierarchical",
 #' @param assemblies Neural assemblies object from detect_assemblies
 #'
 #' @return Matrix of assembly activations (assemblies x time)
-#' @export
+#' @keywords internal
 compute_assembly_activation <- function(traces, assemblies) {
   n_assemblies <- length(assemblies$memberships)
   n_time <- ncol(traces)
@@ -292,7 +292,7 @@ compute_assembly_activation <- function(traces, assemblies) {
 #' @param min_duration Minimum event duration in frames
 #'
 #' @return List of activation events per assembly
-#' @export
+#' @keywords internal
 detect_assembly_events <- function(activations, threshold_sd = 2,
                                     min_duration = 3) {
   n_assemblies <- nrow(activations)
@@ -344,7 +344,7 @@ detect_assembly_events <- function(activations, threshold_sd = 2,
 #' @param method Test method: "correlation", "coincidence"
 #'
 #' @return Matrix of p-values for pairwise coactivation
-#' @export
+#' @keywords internal
 test_assembly_coactivation <- function(activations, n_shuffles = 1000,
                                         method = "correlation") {
   n_assemblies <- nrow(activations)
@@ -400,7 +400,7 @@ test_assembly_coactivation <- function(activations, n_shuffles = 1000,
 #' @param type Plot type: "weights", "correlation", "activation"
 #'
 #' @return ggplot object
-#' @export
+#' @keywords internal
 plot_assemblies <- function(assemblies, traces = NULL, type = "weights") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 required")

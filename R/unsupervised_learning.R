@@ -6,7 +6,7 @@
 #' @param centers Number of clusters
 #' @param ... Additional arguments to kmeans
 #' @return List with cluster assignments and centers
-#' @export
+#' @keywords internal
 kmeans_clustering <- function(data, centers = 3, ...) {
   km <- kmeans(as.matrix(data), centers = centers, ...)
   list(cluster = km$cluster, centers = km$centers)
@@ -19,7 +19,7 @@ kmeans_clustering <- function(data, centers = 3, ...) {
 #' @param data Matrix or data frame (cells x features)
 #' @param method Linkage method (default: "ward.D2")
 #' @return hclust object
-#' @export
+#' @keywords internal
 hierarchical_clustering <- function(data, method = "ward.D2") {
   d <- dist(as.matrix(data))
   hc <- hclust(d, method = method)
@@ -36,7 +36,7 @@ hierarchical_clustering <- function(data, method = "ward.D2") {
 #' @param n_components Number of output dimensions
 #' @param ... Additional arguments to umap
 #' @return Matrix of reduced dimensions
-#' @export
+#' @keywords internal
 umap_reduce <- function(data, n_neighbors = 15, min_dist = 0.1, n_components = 2, ...) {
   if (!requireNamespace("uwot", quietly = TRUE)) {
     stop("Package 'uwot' is required for UMAP. Install with install.packages('uwot')")
@@ -60,7 +60,7 @@ umap_reduce <- function(data, n_neighbors = 15, min_dist = 0.1, n_components = 2
 #' @param perplexity Perplexity parameter
 #' @param ... Additional arguments to Rtsne
 #' @return Matrix of reduced dimensions
-#' @export
+#' @keywords internal
 tsne_reduce <- function(data, dims = 2, perplexity = 30, ...) {
   if (!requireNamespace("Rtsne", quietly = TRUE)) {
     stop("Package 'Rtsne' is required for t-SNE. Install with install.packages('Rtsne')")
@@ -86,7 +86,7 @@ tsne_reduce <- function(data, dims = 2, perplexity = 30, ...) {
 #' @param install_missing Whether to install missing Python dependencies
 #' @param verbose Show progress messages
 #' @return Matrix of encoded representations
-#' @export
+#' @keywords internal
 autoencoder_reduce <- function(data, encoding_dim = 2, epochs = 20, install_missing = TRUE, verbose = FALSE) {
   if (!requireNamespace("reticulate", quietly = TRUE)) {
     stop("Package 'reticulate' is required for autoencoder reduction.")
@@ -120,7 +120,7 @@ autoencoder_reduce <- function(data, encoding_dim = 2, epochs = 20, install_miss
 #' @param threshold Threshold for anomaly detection (default: 0.05)
 #' @param ... Additional arguments
 #' @return Vector of anomaly scores
-#' @export
+#' @keywords internal
 anomaly_detection <- function(data, method = "mahalanobis", threshold = 0.05, ...) {
   x <- as.matrix(data)
   n_samples <- nrow(x)

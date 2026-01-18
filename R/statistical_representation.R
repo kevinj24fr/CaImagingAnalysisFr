@@ -18,7 +18,7 @@ NULL
 #' @param center Whether to center features (default: TRUE)
 #' @param ... Additional arguments
 #' @return List containing embeddings and PCA results
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' traces <- matrix(rnorm(100 * 500), nrow = 100)
@@ -63,7 +63,7 @@ pca_representation <- function(traces, embedding_dim = 64, scale = TRUE, center 
 #' @param min_duration Minimum spike duration in frames (default: 1)
 #' @param ... Additional arguments
 #' @return List containing spike predictions and thresholds used
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' traces <- matrix(rnorm(10 * 1000), nrow = 10)
@@ -104,7 +104,7 @@ threshold_spike_detection <- function(traces, threshold_sd = 2, min_duration = 1
 #' @param smooth_window Window size for moving average if using "smooth" (default: 5)
 #' @param ... Additional arguments
 #' @return List containing denoised traces and metrics
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' traces <- matrix(rnorm(10 * 1000), nrow = 10)
@@ -171,7 +171,7 @@ wavelet_denoise <- function(traces, noise_level = 0.1, method = "wavelet", smoot
 #' @param threshold_sd Number of local SDs above local mean (default: 2)
 #' @param ... Additional arguments
 #' @return List containing spike predictions
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' traces <- matrix(rnorm(10 * 1000), nrow = 10)
@@ -225,7 +225,7 @@ adaptive_threshold_detection <- function(traces, window_size = 50, threshold_sd 
 #' @param nstart Number of random starts for k-means (default: 10)
 #' @param ... Additional arguments
 #' @return List containing cluster assignments and embeddings
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' traces <- matrix(rnorm(100 * 500), nrow = 100)
@@ -280,7 +280,7 @@ pca_kmeans_clustering <- function(traces, n_clusters = 5, n_components = 32, nst
 #' @param max_lag Maximum lag for correlation (default: 100)
 #' @param ... Additional arguments
 #' @return ggplot object with correlation heatmaps or list of correlation matrices
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' traces <- matrix(rnorm(10 * 500), nrow = 10)
@@ -345,7 +345,7 @@ temporal_correlation_heatmap <- function(traces, cell_indices = 1:5, max_lag = 1
 #' @param methods Methods to compare (default: c("threshold", "adaptive", "mad"))
 #' @param ... Additional arguments passed to detection methods
 #' @return Data frame with performance comparison
-#' @export
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' traces <- matrix(rnorm(10 * 1000), nrow = 10)
@@ -420,49 +420,49 @@ benchmark_spike_methods <- function(traces, ground_truth = NULL, methods = c("th
 # These will warn users about the name change
 
 #' @rdname pca_representation
-#' @export
+#' @keywords internal
 self_supervised_learning <- function(...) {
   .Deprecated("pca_representation", msg = "self_supervised_learning() is deprecated. Use pca_representation() instead - this function uses PCA, not deep learning.")
   pca_representation(...)
 }
 
 #' @rdname threshold_spike_detection
-#' @export
+#' @keywords internal
 transformer_spike_inference <- function(...) {
   .Deprecated("threshold_spike_detection", msg = "transformer_spike_inference() is deprecated. Use threshold_spike_detection() instead - this function uses thresholding, not transformers.")
   threshold_spike_detection(...)
 }
 
 #' @rdname wavelet_denoise
-#' @export
+#' @keywords internal
 transformer_denoising <- function(...) {
   .Deprecated("wavelet_denoise", msg = "transformer_denoising() is deprecated. Use wavelet_denoise() instead - this function uses wavelets/smoothing, not transformers.")
   wavelet_denoise(...)
 }
 
 #' @rdname adaptive_threshold_detection
-#' @export
+#' @keywords internal
 transfer_learning_spike_inference <- function(...) {
   .Deprecated("adaptive_threshold_detection", msg = "transfer_learning_spike_inference() is deprecated. Use adaptive_threshold_detection() instead - this function uses adaptive thresholding, not transfer learning.")
   adaptive_threshold_detection(...)
 }
 
 #' @rdname pca_kmeans_clustering
-#' @export
+#' @keywords internal
 contrastive_clustering <- function(...) {
   .Deprecated("pca_kmeans_clustering", msg = "contrastive_clustering() is deprecated. Use pca_kmeans_clustering() instead - this function uses PCA + k-means, not contrastive learning.")
   pca_kmeans_clustering(...)
 }
 
 #' @rdname temporal_correlation_heatmap
-#' @export
+#' @keywords internal
 visualize_attention <- function(...) {
   .Deprecated("temporal_correlation_heatmap", msg = "visualize_attention() is deprecated. Use temporal_correlation_heatmap() instead - this function visualizes correlations, not attention weights.")
   temporal_correlation_heatmap(...)
 }
 
 #' @rdname benchmark_spike_methods
-#' @export
+#' @keywords internal
 compare_deep_models <- function(...) {
   .Deprecated("benchmark_spike_methods", msg = "compare_deep_models() is deprecated. Use benchmark_spike_methods() instead - this function compares statistical methods, not deep learning models.")
   benchmark_spike_methods(...)

@@ -332,6 +332,20 @@ reference:
   - MergeCaExperiments
   - ExportCommands
 
+- title: CaExperiment Advanced Methods
+  desc: Advanced analysis Run* methods
+  contents:
+  - RunHMM
+  - RunSLDS
+  - RunTensorDecomp
+  - RunChangepoints
+  - RunTDA
+  - RunRQA
+  - RunCausalDiscovery
+  - RunNeuralODE
+  - RunGPSmooth
+  - RunOTCompare
+
 - title: data.table Operations
   desc: High-performance trace operations
   contents:
@@ -460,6 +474,131 @@ reference:
   desc: Data validation utilities
   contents:
   - starts_with("validate_")
+
+- title: State Space Models
+  desc: Hidden Markov Models and Switching Linear Dynamical Systems
+  contents:
+  - fit_hmm
+  - predict_states
+  - viterbi_decode
+  - forward_backward
+  - fit_slds
+  - predict_slds
+  - smooth_slds
+  - plot_state_model
+
+- title: Tensor Decomposition
+  desc: Multi-way decomposition for neurons x time x trials
+  contents:
+  - cp_decompose
+  - tucker_decompose
+  - create_trial_tensor
+  - get_temporal_factors
+  - get_neuron_factors
+  - get_trial_factors
+  - reconstruct_tensor
+  - cv_tensor_rank
+  - plot_tensor_decomposition
+
+- title: Optimal Transport
+  desc: Wasserstein distances and neural manifold alignment
+  contents:
+  - wasserstein_distance
+  - gromov_wasserstein
+  - wasserstein_barycenter
+  - compare_representations_ot
+  - align_sessions_ot
+  - place_field_emd
+  - sinkhorn_distance
+  - ot_interpolation
+  - plot_ot_alignment
+
+- title: Topological Data Analysis
+  desc: Persistent homology and neural topology
+  contents:
+  - compute_persistent_homology
+  - persistence_wasserstein
+  - persistence_bottleneck
+  - persistence_landscape
+  - persistence_image
+  - compute_betti_curves
+  - analyze_neural_topology
+  - plot_persistence_diagram
+  - plot_betti_curves
+
+- title: Gaussian Process Regression
+  desc: Smooth interpolation with uncertainty quantification
+  contents:
+  - fit_gp
+  - predict_gp
+  - fit_gp_traces
+  - predict_gp_traces
+  - impute_missing_gp
+  - fit_sparse_gp
+
+- title: Changepoint Detection
+  desc: Detect abrupt changes in neural dynamics
+  contents:
+  - detect_changepoints
+  - pelt_changepoint
+  - binseg_changepoint
+  - cusum_changepoint
+  - bocpd
+  - detect_population_changepoints
+  - compare_changepoints
+  - plot_changepoints
+
+- title: Recurrence Quantification Analysis
+  desc: Characterize nonlinear dynamics and regime transitions
+  contents:
+  - recurrence_plot
+  - rqa_metrics
+  - cross_recurrence_plot
+  - cross_rqa_metrics
+  - windowed_rqa
+  - detect_regime_transitions
+  - plot_recurrence
+
+- title: Mixed-Effects Models
+  desc: Hierarchical statistical inference for nested experiments
+  contents:
+  - fit_lmm
+  - fit_glmm
+  - prepare_mixed_data
+  - test_condition_mixed
+  - compare_conditions_mixed
+  - compute_icc
+  - power_mixed
+
+- title: Causal Discovery
+  desc: Infer causal structure from neural recordings
+  contents:
+  - pc_algorithm
+  - fci_algorithm
+  - ges_algorithm
+  - discover_neural_causality
+  - plot_causal_graph
+
+- title: Neural ODEs
+  desc: Continuous-time latent dynamics modeling
+  contents:
+  - fit_neural_ode
+  - predict_neural_ode
+  - fit_latent_node
+  - generate_trajectories
+  - plot_node_phase_space
+
+- title: Conformal Prediction
+  desc: Distribution-free uncertainty quantification
+  contents:
+  - conformal_predictor
+  - conformal_predict
+  - conformal_decode
+  - conformal_classifier
+  - conformal_predict_set
+  - adaptive_conformal
+  - evaluate_conformal
+  - plot_conformal_bands
 
 - title: Utilities
   desc: Helper functions

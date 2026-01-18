@@ -479,6 +479,121 @@ export(plot_dose_response_pub)
 # Publication plots - Summary
 export(plot_analysis_summary)
 
+# State Space Models (HMM, SLDS)
+export(fit_hmm)
+export(predict_states)
+export(viterbi_decode)
+export(forward_backward)
+export(fit_slds)
+export(predict_slds)
+export(smooth_slds)
+export(plot_state_model)
+
+# Tensor Decomposition
+export(cp_decompose)
+export(tucker_decompose)
+export(create_trial_tensor)
+export(get_temporal_factors)
+export(get_neuron_factors)
+export(get_trial_factors)
+export(reconstruct_tensor)
+export(cv_tensor_rank)
+export(plot_tensor_decomposition)
+
+# Optimal Transport
+export(wasserstein_distance)
+export(gromov_wasserstein)
+export(wasserstein_barycenter)
+export(compare_representations_ot)
+export(align_sessions_ot)
+export(place_field_emd)
+export(sinkhorn_distance)
+export(ot_interpolation)
+export(plot_ot_alignment)
+
+# Topological Data Analysis
+export(compute_persistent_homology)
+export(persistence_wasserstein)
+export(persistence_bottleneck)
+export(persistence_landscape)
+export(persistence_image)
+export(compute_betti_curves)
+export(analyze_neural_topology)
+export(plot_persistence_diagram)
+export(plot_betti_curves)
+
+# Gaussian Process Regression
+export(fit_gp)
+export(predict_gp)
+export(fit_gp_traces)
+export(predict_gp_traces)
+export(impute_missing_gp)
+export(fit_sparse_gp)
+
+# Changepoint Detection
+export(detect_changepoints)
+export(pelt_changepoint)
+export(binseg_changepoint)
+export(cusum_changepoint)
+export(bocpd)
+export(detect_population_changepoints)
+export(compare_changepoints)
+export(plot_changepoints)
+
+# Recurrence Quantification Analysis
+export(recurrence_plot)
+export(rqa_metrics)
+export(cross_recurrence_plot)
+export(cross_rqa_metrics)
+export(windowed_rqa)
+export(detect_regime_transitions)
+export(plot_recurrence)
+
+# Mixed-Effects Models
+export(fit_lmm)
+export(fit_glmm)
+export(prepare_mixed_data)
+export(test_condition_mixed)
+export(compare_conditions_mixed)
+export(compute_icc)
+export(power_mixed)
+
+# Causal Discovery
+export(pc_algorithm)
+export(fci_algorithm)
+export(ges_algorithm)
+export(discover_neural_causality)
+export(plot_causal_graph)
+
+# Neural ODEs
+export(fit_neural_ode)
+export(predict_neural_ode)
+export(fit_latent_node)
+export(generate_trajectories)
+export(plot_node_phase_space)
+
+# Conformal Prediction
+export(conformal_predictor)
+export(conformal_predict)
+export(conformal_decode)
+export(conformal_classifier)
+export(conformal_predict_set)
+export(adaptive_conformal)
+export(evaluate_conformal)
+export(plot_conformal_bands)
+
+# Advanced CaExperiment Run* Methods
+export(RunHMM)
+export(RunSLDS)
+export(RunTensorDecomp)
+export(RunChangepoints)
+export(RunTDA)
+export(RunRQA)
+export(RunCausalDiscovery)
+export(RunNeuralODE)
+export(RunGPSmooth)
+export(RunOTCompare)
+
 # Rcpp exports (when compiled)
 if (FALSE) {
   useDynLib(CaImagingAnalysisFr, .registration = TRUE)

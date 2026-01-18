@@ -1388,6 +1388,311 @@ RunSequences <- function(object,
 }
 
 # ============================================================================
+# Advanced Analysis Run* Methods
+# ============================================================================
+
+#' Run Hidden Markov Model
+#'
+#' @param object CaExperiment object
+#' @param n_states Number of hidden states
+#' @param assay Source assay
+#' @param name Name for result
+#' @param ... Additional arguments to fit_hmm
+#'
+#' @return Modified CaExperiment object
+#' @export
+RunHMM <- function(object, n_states = 3, assay = NULL, name = "hmm", ...) {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  if (is.null(assay)) assay <- object$active_assay
+  traces <- GetTraces(object, assay = assay)
+
+  hmm_result <- fit_hmm(traces, n_states = n_states, ...)
+
+  object$reductions[[name]] <- hmm_result
+  object <- AddMetaData(object, rep(NA, ncells(object)), paste0("state_", name))
+
+  # Add state sequence to misc
+  object$misc[[paste0("hmm_", name)]] <- hmm_result
+
+  log_command(object, "RunHMM", list(n_states = n_states, source_assay = assay, name = name))
+}
+
+#' Run Switching Linear Dynamical System
+#'
+#' @param object CaExperiment object
+#' @param n_states Number of discrete states
+#' @param latent_dim Latent dimension
+#' @param assay Source assay
+#' @param name Name for result
+#' @param ... Additional arguments to fit_slds
+#'
+#' @return Modified CaExperiment object
+#' @export
+RunSLDS <- function(object, n_states = 2, latent_dim = 3, assay = NULL, name = "slds", ...) {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  if (is.null(assay)) assay <- object$active_assay
+  traces <- GetTraces(object, assay = assay)
+
+  slds_result <- fit_slds(traces, n_states = n_states, latent_dim = latent_dim, ...)
+
+  object$reductions[[name]] <- list(
+    embeddings = t(slds_result$latent_states),
+    discrete_states = slds_result$discrete_states,
+    method = "slds"
+  )
+  object$misc[[paste0("slds_", name)]] <- slds_result
+
+  log_command(object, "RunSLDS", list(n_states = n_states, latent_dim = latent_dim, name = name))
+}
+
+#' Run Tensor Decomposition
+#'
+#' @param object CaExperiment object
+#' @param trial_starts Trial start indices
+#' @param trial_length Length of each trial
+#' @param rank Decomposition rank
+#' @param method "cp" or "tucker"
+#' @param name Name for result
+#'
+#' @return Modified CaExperiment object
+#' @export
+RunTensorDecomp <- function(object, trial_starts, trial_length, rank = 5,
+                             method = c("cp", "tucker"), name = "tensor") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  method <- match.arg(method)
+  traces <- GetTraces(object)
+
+  # Create trial tensor
+  X <- create_trial_tensor(traces, trial_starts, trial_length)
+
+  # Decompose
+  result <- if (method == "cp") {
+    cp_decompose(X, rank = rank)
+  } else {
+    tucker_decompose(X, ranks = rank)
+  }
+
+  object$reductions[[name]] <- result
+  object <- AddMetaData(object, result$factors$neuron[, 1], paste0("tensor_loading_", name))
+
+  log_command(object, "RunTensorDecomp", list(method = method, rank = rank, name = name))
+}
+
+#' Run Changepoint Detection
+#'
+#' @param object CaExperiment object
+#' @param method Detection method
+#' @param type Type of change
+#' @param assay Source assay
+#' @param name Name for result
+#'
+#' @return Modified CaExperiment object
+#' @export
+RunChangepoints <- function(object, method = "pelt", type = "mean",
+                             assay = NULL, name = "changepoints") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  if (is.null(assay)) assay <- object$active_assay
+  traces <- GetTraces(object, assay = assay)
+
+  cp_result <- detect_population_changepoints(traces, method = method, aggregate = "pc1")
+
+  object$misc[[name]] <- cp_result
+
+  log_command(object, "RunChangepoints", list(method = method, type = type, name = name))
+}
+
+#' Run Topological Data Analysis
+#'
+#' @param object CaExperiment object
+#' @param reduction Name of reduction to use
+#' @param max_dim Maximum homology dimension
+#' @param name Name for result
+#'
+#' @return Modified CaExperiment object
+#' @export
+RunTDA <- function(object, reduction = "pca", max_dim = 1, name = "tda") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  embeddings <- GetEmbeddings(object, reduction)
+  ph_result <- compute_persistent_homology(embeddings, max_dim = max_dim)
+
+  object$misc[[name]] <- ph_result
+
+  log_command(object, "RunTDA", list(reduction = reduction, max_dim = max_dim, name = name))
+}
+
+#' Run Recurrence Quantification Analysis
+#'
+#' @param object CaExperiment object
+#' @param reduction Name of reduction to use
+#' @param embed_dim Embedding dimension
+#' @param name Name for result
+#'
+#' @return Modified CaExperiment object
+#' @export
+RunRQA <- function(object, reduction = "pca", embed_dim = 3, name = "rqa") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  embeddings <- GetEmbeddings(object, reduction)
+  rp <- recurrence_plot(embeddings, embed_dim = embed_dim)
+  rqa <- rqa_metrics(rp)
+
+  object$misc[[name]] <- list(recurrence_plot = rp, metrics = rqa)
+
+  log_command(object, "RunRQA", list(reduction = reduction, embed_dim = embed_dim, name = name))
+}
+
+#' Run Causal Discovery
+#'
+#' @param object CaExperiment object
+#' @param method "pc", "fci", or "ges"
+#' @param alpha Significance level
+#' @param assay Source assay
+#' @param name Name for result
+#'
+#' @return Modified CaExperiment object
+#' @export
+RunCausalDiscovery <- function(object, method = "pc", alpha = 0.01,
+                                assay = NULL, name = "causal") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  if (is.null(assay)) assay <- object$active_assay
+  traces <- GetTraces(object, assay = assay)
+
+  causal_result <- discover_neural_causality(traces, method = method, alpha = alpha)
+
+  object$graphs[[name]] <- causal_result$adjacency %||% causal_result$skeleton
+  object$misc[[paste0("causal_", name)]] <- causal_result
+
+  log_command(object, "RunCausalDiscovery", list(method = method, alpha = alpha, name = name))
+}
+
+#' Run Neural ODE
+#'
+#' @param object CaExperiment object
+#' @param latent_dim Latent dimension
+#' @param n_epochs Training epochs
+#' @param reduction Use existing reduction as input
+#' @param name Name for result
+#'
+#' @return Modified CaExperiment object
+#' @export
+RunNeuralODE <- function(object, latent_dim = 3, n_epochs = 50,
+                          reduction = NULL, name = "node") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  traces <- GetTraces(object)
+  time <- object$time
+
+  node_result <- fit_latent_node(traces, time, latent_dim = latent_dim, n_epochs = n_epochs)
+
+  object$reductions[[name]] <- list(
+    embeddings = node_result$pca$x[, 1:latent_dim],
+    method = "neural_ode",
+    model = node_result
+  )
+  object$misc[[paste0("node_", name)]] <- node_result
+
+  log_command(object, "RunNeuralODE", list(latent_dim = latent_dim, n_epochs = n_epochs, name = name))
+}
+
+#' Run Gaussian Process Smoothing
+#'
+#' @param object CaExperiment object
+#' @param kernel GP kernel type
+#' @param assay Source assay
+#' @param assay_name Name for smoothed assay
+#'
+#' @return Modified CaExperiment object
+#' @export
+RunGPSmooth <- function(object, kernel = "rbf", assay = NULL, assay_name = "gp_smooth") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  if (is.null(assay)) assay <- object$active_assay
+  traces <- GetTraces(object, assay = assay)
+  time <- object$time
+
+  gp_fit <- fit_gp_traces(time, traces, kernel = kernel)
+  pred <- predict_gp_traces(gp_fit, time, return_var = FALSE)
+
+  object$assays[[assay_name]] <- pred$mean
+  object$misc$gp_fit <- gp_fit
+
+  log_command(object, "RunGPSmooth", list(kernel = kernel, assay_name = assay_name))
+}
+
+#' Run Optimal Transport Comparison
+#'
+#' @param object CaExperiment object
+#' @param condition_var Metadata variable for conditions
+#' @param method "wasserstein" or "gromov_wasserstein"
+#' @param name Name for result
+#'
+#' @return Modified CaExperiment object
+#' @export
+RunOTCompare <- function(object, condition_var, method = "wasserstein", name = "ot") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  meta <- GetMetaData(object)
+  if (!condition_var %in% names(meta)) {
+    stop(sprintf("Condition variable '%s' not found in metadata", condition_var))
+  }
+
+  conditions <- unique(meta[[condition_var]])
+  traces <- GetTraces(object)
+
+  # Compute pairwise distances
+  distances <- matrix(0, length(conditions), length(conditions))
+  rownames(distances) <- colnames(distances) <- conditions
+
+  for (i in seq_along(conditions)) {
+    for (j in seq_along(conditions)) {
+      if (i < j) {
+        idx_i <- which(meta[[condition_var]] == conditions[i])
+        idx_j <- which(meta[[condition_var]] == conditions[j])
+
+        d <- compare_representations_ot(
+          traces[idx_i, , drop = FALSE],
+          traces[idx_j, , drop = FALSE],
+          method = method,
+          by = "population"
+        )
+        distances[i, j] <- d
+        distances[j, i] <- d
+      }
+    }
+  }
+
+  object$misc[[name]] <- list(distances = distances, conditions = conditions, method = method)
+
+  log_command(object, "RunOTCompare", list(condition_var = condition_var, method = method, name = name))
+}
+
+# ============================================================================
 # Utility Functions
 # ============================================================================
 

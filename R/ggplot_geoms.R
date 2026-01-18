@@ -513,7 +513,4 @@ plot_aligned_responses <- function(aligned_data, show_trials = FALSE,
   p
 }
 
-# Null coalesce if not defined
-if (!exists("%||%")) {
-  `%||%` <- function(x, y) if (is.null(x)) y else x
-}
+# Note: %||% operator defined in aaa_utils.R

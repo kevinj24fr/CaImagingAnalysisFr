@@ -221,7 +221,9 @@ conformal_predict <- function(object, newdata, ...) {
         upper[i] <- max(valid_y)
         y_pred[i] <- median(valid_y)
       } else {
-        y_pred[i] <- predict(object$model, newdata = as.data.frame(newdata[i, , drop = FALSE]))[[1]]
+        pred_raw <- predict(object$model, newdata = as.data.frame(newdata[i, , drop = FALSE]))
+        if (is.list(pred_raw)) pred_raw <- pred_raw$predictions %||% pred_raw[[1]]
+        y_pred[i] <- as.numeric(pred_raw)[1]
         lower[i] <- y_pred[i] - sd(object$y_calib)
         upper[i] <- y_pred[i] + sd(object$y_calib)
       }

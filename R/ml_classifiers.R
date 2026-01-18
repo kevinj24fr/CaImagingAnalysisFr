@@ -958,5 +958,4 @@ cv_decode_behavior <- function(traces, behavior, method = "ridge",
   )
 }
 
-# Null coalesce
-`%||%` <- function(x, y) if (is.null(x)) y else x
+# Note: %||% operator defined in aaa_utils.R

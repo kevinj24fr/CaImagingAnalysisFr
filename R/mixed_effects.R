@@ -362,7 +362,12 @@ compute_icc <- function(response, group) {
   # Fit null model with only random intercept
   fit <- fit_lmm(response ~ 1 + (1|group), data = data)
 
+  # Initialize to avoid undefined variable errors
+  icc <- NA
+  ci <- c(NA, NA)
+
   if (inherits(fit, "ca_lmm_manual")) {
+    # Manual implementation stores ICC directly
     icc <- fit$icc
 
     # Bootstrap CI
@@ -377,14 +382,15 @@ compute_icc <- function(response, group) {
         fit_lmm(response ~ 1 + (1|group), data = data_boot),
         error = function(e) NULL
       )
-      if (!is.null(fit_boot)) {
+      if (!is.null(fit_boot) && inherits(fit_boot, "ca_lmm_manual")) {
         icc_boot[b] <- fit_boot$icc
       }
     }
 
     ci <- quantile(icc_boot, c(0.025, 0.975), na.rm = TRUE)
 
-  } else if (requireNamespace("lme4", quietly = TRUE)) {
+  } else if (inherits(fit, "lmerMod") || inherits(fit, "glmerMod")) {
+    # lme4 fit - extract variance components
     vc <- as.data.frame(lme4::VarCorr(fit))
     sigma2_u <- vc$vcov[vc$grp == "group"]
     sigma2_e <- vc$vcov[vc$grp == "Residual"]
@@ -393,6 +399,20 @@ compute_icc <- function(response, group) {
     # Approximate CI
     se_icc <- sqrt(icc * (1 - icc) / length(unique(group)))
     ci <- c(icc - 1.96 * se_icc, icc + 1.96 * se_icc)
+
+  } else if (inherits(fit, "lme")) {
+    # nlme fit - extract variance components differently
+    vc <- nlme::VarCorr(fit)
+    sigma2_u <- as.numeric(vc["(Intercept)", "Variance"])
+    sigma2_e <- as.numeric(vc["Residual", "Variance"])
+    icc <- sigma2_u / (sigma2_u + sigma2_e)
+
+    # Approximate CI
+    se_icc <- sqrt(icc * (1 - icc) / length(unique(group)))
+    ci <- c(icc - 1.96 * se_icc, icc + 1.96 * se_icc)
+
+  } else {
+    warning("Unrecognized fit object class. Cannot compute ICC.")
   }
 
   list(icc = icc, ci = ci)
@@ -473,5 +493,4 @@ power_mixed <- function(n_cells = 20, n_groups = 5, effect_size = 0.5,
   )
 }
 
-# Helper for NULL default
-`%||%` <- function(a, b) if (is.null(a)) b else a
+# Note: %||% operator defined in utils.R

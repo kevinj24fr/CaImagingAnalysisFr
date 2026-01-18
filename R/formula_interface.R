@@ -368,7 +368,4 @@ print.analysis_pipeline <- function(x, ...) {
   invisible(x)
 }
 
-# Null coalesce if not already defined
-if (!exists("%||%")) {
-  `%||%` <- function(x, y) if (is.null(x)) y else x
-}
+# Note: %||% operator defined in aaa_utils.R

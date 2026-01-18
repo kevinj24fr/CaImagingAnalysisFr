@@ -621,9 +621,18 @@ slds_infer_discrete <- function(z, A_list, Q_list, Pi, pi0) {
     for (k in 1:n_states) {
       z_pred <- A_list[[k]] %*% z_prev
       resid <- z_curr - z_pred
-      # Multivariate normal log-likelihood
-      log_emit[k, t] <- -0.5 * (t(resid) %*% solve(Q_list[[k]]) %*% resid +
-                                   log(det(Q_list[[k]])) + latent_dim * log(2 * pi))
+      # Multivariate normal log-likelihood with numerical stability
+      Q_k <- Q_list[[k]] + 1e-6 * diag(latent_dim)  # Regularize for stability
+      det_Q <- tryCatch(det(Q_k), error = function(e) 1e-300)
+      if (det_Q <= 0) det_Q <- 1e-300
+      Q_inv <- tryCatch(solve(Q_k), error = function(e) {
+        # Fallback to pseudoinverse
+        s <- svd(Q_k)
+        d <- s$d; d[d > 1e-8] <- 1/d[d > 1e-8]; d[d <= 1e-8] <- 0
+        s$v %*% diag(d) %*% t(s$u)
+      })
+      log_emit[k, t] <- -0.5 * (t(resid) %*% Q_inv %*% resid +
+                                   log(det_Q) + latent_dim * log(2 * pi))
     }
   }
   log_emit[, 1] <- 0  # No dynamics constraint for first time point

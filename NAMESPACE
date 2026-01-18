@@ -408,6 +408,25 @@ export(plot_dose_response_pub)
 # Publication plots - Summary
 export(plot_analysis_summary)
 
+# Mixed-Effects Models
+export(fit_lmm)
+export(fit_glmm)
+export(prepare_mixed_data)
+export(test_condition_mixed)
+export(compare_conditions_mixed)
+export(compute_icc)
+export(power_mixed)
+
+# Conformal Prediction
+export(conformal_predictor)
+export(conformal_predict)
+export(conformal_decode)
+export(conformal_classifier)
+export(conformal_predict_set)
+export(adaptive_conformal)
+export(evaluate_conformal)
+export(plot_conformal_bands)
+
 # =============================================================================
 # CaExperiment Run* Methods (PRIMARY API - Use these!)
 # =============================================================================

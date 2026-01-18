@@ -344,6 +344,56 @@ reference:
   - plot_spike_raster
   - plot_aligned_responses
 
+- title: Publication Theme
+  desc: Publication-ready styling for Cell/Nature journals
+  contents:
+  - theme_publication
+  - pub_colors
+  - scale_fill_publication
+  - scale_color_publication
+  - scale_fill_publication_d
+  - format_pvalue
+  - save_pub_figure
+  - combine_panels
+  - add_panel_label
+
+- title: Publication Plots - Activity
+  desc: Neural activity rasters and population plots
+  contents:
+  - plot_neural_raster
+  - plot_spike_raster_pub
+  - plot_temporal_response
+  - plot_event_triggered
+
+- title: Publication Plots - State Space
+  desc: Trajectory and latent dynamics visualizations
+  contents:
+  - plot_gpfa_trajectory
+  - plot_dpca_components
+  - plot_flow_field
+
+- title: Publication Plots - Networks
+  desc: Connectivity and assembly visualizations
+  contents:
+  - plot_connectivity_matrix
+  - plot_circular_network
+  - plot_assembly_timeline
+
+- title: Publication Plots - Tuning
+  desc: Neural selectivity visualizations
+  contents:
+  - plot_tuning_polar
+  - plot_population_tuning
+  - plot_selectivity_distribution
+
+- title: Publication Plots - Pharmacology
+  desc: Drug response visualizations
+  contents:
+  - plot_response_waterfall
+  - plot_response_comparison
+  - plot_dose_response_pub
+  - plot_analysis_summary
+
 - title: Reporting and Export
   desc: Generate reports and export data
   contents:

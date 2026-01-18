@@ -1367,13 +1367,16 @@ RunTransients <- function(object,
   object$transients[[name]] <- transient_result
 
   # Add transient counts to metadata
-  if (!is.null(transient_result$events)) {
+  n_cells <- ncells(object)
+  counts <- rep(0, n_cells)
+  if (!is.null(transient_result$events) && nrow(transient_result$events) > 0) {
     event_counts <- table(transient_result$events$cell_id)
-    counts <- rep(0, ncells(object))
-    names(counts) <- CellIDs(object)
-    counts[names(event_counts)] <- as.numeric(event_counts)
-    object <- AddMetaData(object, counts, paste0("n_transients_", name))
+    # Use numeric cell IDs as indices
+    cell_indices <- as.integer(names(event_counts))
+    valid <- cell_indices >= 1 & cell_indices <= n_cells
+    counts[cell_indices[valid]] <- as.numeric(event_counts)[valid]
   }
+  object <- AddMetaData(object, counts, paste0("n_transients_", name))
 
   log_command(object, "RunTransients", list(
     source_assay = assay,

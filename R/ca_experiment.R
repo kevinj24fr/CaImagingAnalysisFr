@@ -1317,10 +1317,18 @@ RunAssemblies <- function(object,
 
   object$assemblies[[name]] <- assembly_result
 
-  # Add assembly membership to metadata
-  if (!is.null(assembly_result$membership)) {
-    object <- AddMetaData(object, assembly_result$membership,
-                          paste0("assembly_", name))
+  # Add assembly membership to metadata (convert list to per-cell vector)
+  if (!is.null(assembly_result$memberships) && length(assembly_result$memberships) > 0) {
+    # Create a vector showing primary assembly membership for each cell
+    n_cells <- ncells(object)
+    membership_vec <- rep(0, n_cells)  # 0 = no assembly
+    for (i in seq_along(assembly_result$memberships)) {
+      cells <- assembly_result$memberships[[i]]$cells
+      # Only assign if not already assigned (first assembly wins)
+      unassigned <- membership_vec[cells] == 0
+      membership_vec[cells[unassigned]] <- i
+    }
+    object <- AddMetaData(object, membership_vec, paste0("assembly_", name))
   }
 
   log_command(object, "RunAssemblies", list(

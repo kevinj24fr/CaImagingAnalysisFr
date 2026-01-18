@@ -1,3 +1,110 @@
+# CaImagingAnalysisFr 0.8.0
+
+## New Features - Modern Analysis Methods & Unified Object System
+
+### CaExperiment Unified Object (Seurat-style)
+A unified container for complete calcium imaging workflows with full provenance tracking.
+
+* `CaExperiment()` - Create unified analysis object from traces
+* Method chaining with `|>` pipe for fluent workflows
+* Multiple assays: raw, corrected, dF/F stored together
+* All analysis results in one object (spikes, reductions, graphs, assemblies, tuning)
+
+**Accessors:**
+* `GetTraces()`, `GetSpikes()`, `GetReduction()`, `GetEmbeddings()`
+* `GetGraph()`, `GetMetaData()`, `GetAssemblies()`, `GetTransients()`, `GetTuning()`
+* `GetCommands()` - Full command history
+
+**Dimension functions:**
+* `ncells()`, `nframes()`, `CellIDs()`, `Duration()`
+* `SubsetCells()` - Filter by metadata
+* `[` subsetting propagates to all derived data
+
+**Run* Pipeline Functions:**
+* `RunCorrection()`, `RunDFF()`, `RunSpikes()`
+* `RunPCA()`, `RunGPFA()`, `RunDPCA()`
+* `RunConnectivity()`, `RunGraphMetrics()`
+* `RunAssemblies()`, `RunTransients()`
+* `RunTuning()`, `RunTrajectories()`, `RunSequences()`
+
+**Utilities:**
+* `MergeCaExperiments()` - Combine experiments
+* `ExportCommands()` - Export pipeline as reproducible R script
+* `ValidateCaExperiment()` - Validate object integrity
+* `AddMetaData()` - Add cell-level annotations
+
+### GPFA (Gaussian Process Factor Analysis)
+Extract smooth low-dimensional neural trajectories from trial-structured data.
+
+* `fit_gpfa()` - Fit GPFA model with EM algorithm
+* `gpfa_project()` - Project new data onto learned latents
+* `gpfa_orthonormalize()` - Orthonormalize latent dimensions
+* `gpfa_cv()` - Cross-validation for dimensionality selection
+* `plot_gpfa()` - Visualize latent trajectories
+* `split_into_trials()` - Prepare trial-structured data
+
+### dPCA (Demixed Principal Component Analysis)
+Separate neural variance by task parameters (stimulus, time, decision).
+
+* `fit_dpca()` - Fit dPCA model with regularization
+* `dpca_project()` - Project onto demixed components
+* `dpca_decode()` - Decode task variables from components
+* `dpca_summary()` - Variance explained per marginalization
+* `plot_dpca()` - Component trajectories and decoding
+
+### Tuning Curve Analysis
+Characterize neural selectivity with parametric fits.
+
+* `fit_orientation_tuning()` - Von Mises fits for orientation selectivity
+* `fit_contrast_response()` - Naka-Rushton contrast response functions
+* `fit_place_field()` - 2D Gaussian place field fitting
+* `fit_tuning_curve()` - Generic tuning curve fitting
+* `compute_osi()`, `compute_dsi()`, `compute_gosi()` - Selectivity indices
+* `compute_spatial_information()` - Spatial information in bits/spike
+* `plot_tuning_curve()`, `tuning_summary()`
+
+### Publication-Ready Visualization
+Cell/Nature-quality figure generation with consistent styling.
+
+**Theme and Colors:**
+* `pub_colors()` - Curated color palettes (categorical, sequential, diverging)
+* `theme_publication()` - Clean publication theme
+* `scale_fill_publication()`, `scale_color_publication()` - Matching scales
+* `format_pvalue()` - Proper p-value formatting
+* `save_pub_figure()` - Export at publication resolution
+* `combine_panels()` - Multi-panel figure assembly
+
+**Neural Activity Plots:**
+* `plot_neural_raster()` - Activity heatmap with optimal cell ordering
+* `plot_spike_raster_pub()` - Spike raster with event markers
+
+**State Space Plots:**
+* `plot_gpfa_trajectory()` - 3D latent trajectories
+* `plot_dpca_components()` - Demixed component time courses
+* `plot_flow_field()` - Vector field visualization
+
+**Network Plots:**
+* `plot_connectivity_matrix()` - Ordered correlation matrices
+* `plot_circular_network()` - Chord diagram connectivity
+* `plot_assembly_timeline()` - Assembly activation over time
+
+**Tuning Plots:**
+* `plot_tuning_polar()` - Polar tuning curves
+* `plot_population_tuning()` - Population preference distribution
+* `plot_selectivity_distribution()` - OSI/DSI histograms
+
+**Pharmacology Plots:**
+* `plot_response_waterfall()` - Ranked response magnitudes
+* `plot_response_comparison()` - Condition comparisons with statistics
+* `plot_temporal_response()` - Time course with confidence bands
+* `plot_event_triggered()` - Event-triggered averages
+* `plot_dose_response_pub()` - Dose-response curves
+
+**Summary:**
+* `plot_analysis_summary()` - Multi-panel analysis overview
+
+---
+
 # CaImagingAnalysisFr 0.7.0
 
 ## New Features - Advanced Pharmacological Analysis

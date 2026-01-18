@@ -19,3 +19,4 @@ Granger causality matrix or pairwise result
 \description{
 Compute Granger causality between time series.
 }
+\keyword{internal}

@@ -29,3 +29,4 @@ Network plot
 \description{
 Create network visualization.
 }
+\keyword{internal}

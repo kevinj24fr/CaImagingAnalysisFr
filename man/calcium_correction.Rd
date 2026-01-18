@@ -14,7 +14,7 @@ calcium_correction(
 }
 \arguments{
 \item{raw_df}{A data frame containing calcium traces with columns named
-\verb{Cell_*} for cell traces and \verb{BG_*} for background traces}
+\verb{Cell_*} for cell traces and optionally \verb{BG_*} for background traces}
 
 \item{method}{Correction method: "modern" (default) or "legacy"}
 
@@ -33,9 +33,13 @@ on calcium imaging traces. This is the main correction function that
 consolidates both modern and legacy approaches.
 }
 \examples{
-# Basic usage
+# Basic usage with both cell and background columns
 raw <- generate_synthetic_data(3, 500)
 corrected <- calcium_correction(raw)
+
+# Usage with only cell columns (no background correction)
+cell_traces <- raw[, grep("^Cell_", names(raw))]
+corrected <- calcium_correction(cell_traces)
 
 # Custom parameters
 corrected <- calcium_correction(raw, span = 0.3, normalize = FALSE)

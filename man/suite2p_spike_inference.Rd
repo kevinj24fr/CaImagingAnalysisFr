@@ -17,3 +17,4 @@ List containing spike times and inferred calcium
 \description{
 Infer spikes using Suite2p algorithm (Pachitariu et al., 2017).
 }
+\keyword{internal}

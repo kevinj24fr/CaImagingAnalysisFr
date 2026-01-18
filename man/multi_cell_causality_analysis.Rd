@@ -29,3 +29,4 @@ List containing results from all causality methods
 \description{
 Perform comprehensive causality analysis across multiple cells.
 }
+\keyword{internal}

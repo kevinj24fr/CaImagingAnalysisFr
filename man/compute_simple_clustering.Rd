@@ -13,6 +13,6 @@ compute_simple_clustering(adjacency_matrix)
 Clustering coefficient
 }
 \description{
-Compute clustering coefficient without igraph.
+Compute clustering coefficient without igraph using vectorized operations.
 }
 \keyword{internal}

@@ -26,3 +26,4 @@ List containing stability measures and analysis
 \description{
 Analyze stability of network structure over time.
 }
+\keyword{internal}

@@ -32,3 +32,4 @@ List containing time-varying connectivity matrices and metadata
 \description{
 Calculate functional connectivity that varies over time using sliding windows.
 }
+\keyword{internal}

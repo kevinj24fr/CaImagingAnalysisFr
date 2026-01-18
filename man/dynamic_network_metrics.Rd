@@ -23,3 +23,4 @@ Data frame with time-varying network metrics
 \description{
 Calculate various metrics for dynamic networks.
 }
+\keyword{internal}

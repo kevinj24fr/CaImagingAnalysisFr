@@ -17,4 +17,3 @@ TRUE if valid, throws error otherwise
 \description{
 Validate trace vector
 }
-\keyword{internal}

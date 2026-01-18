@@ -19,4 +19,3 @@ TRUE if valid, throws error otherwise
 \description{
 Validate input data frame
 }
-\keyword{internal}

@@ -7,38 +7,68 @@
 calcium_pipeline(
   raw_data_path = NULL,
   output_dir = "results",
-  config = NULL,
+  n_cells = 10,
+  n_time = 500,
+  correction_method = "modern",
+  spike_method = "oasis",
+  include_network = TRUE,
   ...
 )
 }
 \arguments{
-\item{raw_data_path}{Path to raw data file}
+\item{raw_data_path}{Path to raw data file (CSV or RDS). If NULL, synthetic data is generated.}
 
-\item{output_dir}{Output directory for results}
+\item{output_dir}{Output directory for results (default: "results")}
 
-\item{config}{Configuration parameters}
+\item{n_cells}{Number of cells for synthetic data (default: 10)}
 
-\item{...}{Additional arguments}
+\item{n_time}{Number of time points for synthetic data (default: 500)}
+
+\item{correction_method}{Correction method: "modern" or "legacy" (default: "modern")}
+
+\item{spike_method}{Spike inference method (default: "oasis")}
+
+\item{include_network}{Whether to include network analysis (default: TRUE)}
+
+\item{...}{Additional arguments passed to pipeline steps}
 }
 \value{
-targets pipeline object
+List of targets for use with targets::tar_make()
 }
 \description{
 Defines a reproducible workflow for calcium imaging analysis using
 the \code{targets} package. This pipeline includes data generation,
-correction, spike inference, and visualization.
+correction, spike inference, network analysis, and visualization.
+}
+\details{
+This function generates a list of targets that can be used with the targets
+package for reproducible analysis. To run the pipeline:
+
+\enumerate{
+\item Create a _targets.R file in your project root
+\item Call \code{calcium_pipeline()} to get the target list
+\item Run \code{targets::tar_make()} to execute the pipeline
+}
 }
 \examples{
-# Basic pipeline
-pipeline <- calcium_pipeline()
+\dontrun{
+# In your _targets.R file:
+library(targets)
+library(CaImagingAnalysisFr)
 
-# Custom parameters
-pipeline <- calcium_pipeline(
-  raw_data_path = "path_to_custom_data.csv",
-  config = list(
-    correction_method = "legacy",
-    spike_method = "caiman"
+# Basic pipeline with synthetic data
+list(
+  calcium_pipeline()
+)
+
+# Pipeline with custom data
+list(
+  calcium_pipeline(
+    raw_data_path = "data/my_calcium_data.csv",
+    correction_method = "modern",
+    spike_method = "oasis"
   )
 )
+}
 
 }

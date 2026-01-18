@@ -575,19 +575,18 @@ slds_infer_latent <- function(y, s, A_list, C, d, Q_list, R) {
   n_time <- ncol(y)
   latent_dim <- ncol(C)
 
-  # Regularization for numerical stability
-  reg <- 1e-6
-
   z <- matrix(0, latent_dim, n_time)
   P <- array(0, dim = c(latent_dim, latent_dim, n_time))
 
-  # Regularize R for inversion
-  R_reg <- R + reg * diag(n_cells)
+  # Ensure R has reasonable minimum values and add strong regularization
+  R_diag <- diag(R)
+  R_diag <- pmax(R_diag, 0.01)  # Minimum variance of 0.01
+  R_reg <- diag(R_diag) + 0.001 * diag(n_cells)
   R_inv <- solve(R_reg)
 
   # Initialize
   CtRinv <- t(C) %*% R_inv
-  init_cov <- solve(CtRinv %*% C + diag(latent_dim))
+  init_cov <- solve(CtRinv %*% C + 0.1 * diag(latent_dim))
   z[, 1] <- init_cov %*% CtRinv %*% (y[, 1] - d)
   P[, , 1] <- diag(latent_dim)
 
@@ -604,7 +603,7 @@ slds_infer_latent <- function(y, s, A_list, C, d, Q_list, R) {
     # Update with regularized solve
     y_pred <- C %*% z_pred + d
     S <- C %*% P_pred %*% t(C) + R_reg
-    K <- P_pred %*% t(C) %*% solve(S + reg * diag(n_cells))
+    K <- P_pred %*% t(C) %*% solve(S + 0.001 * diag(n_cells))
 
     z[, t] <- z_pred + K %*% (y[, t] - y_pred)
     P[, , t] <- (diag(latent_dim) - K %*% C) %*% P_pred

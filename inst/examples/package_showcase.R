@@ -61,8 +61,9 @@ cat("---------------------------------------------------------------------------
 cat("   Creating CaExperiment and running analysis pipeline...\n\n")
 
 # The recommended way: pipe-based workflow
+# Note: RunCorrection is for neuropil subtraction (requires neuropil traces)
+# For synthetic data, we skip it and go straight to dF/F
 ca <- CaExperiment(traces, frame_rate = frame_rate) |>
-  RunCorrection(method = "modern") |>
   RunDFF(method = "rolling", window_size = 300) |>
   RunSpikes(method = "threshold", threshold_sd = 2.5) |>
   RunPCA(n_components = 15) |>

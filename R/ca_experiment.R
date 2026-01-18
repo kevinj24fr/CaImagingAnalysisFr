@@ -1234,32 +1234,45 @@ RunGraphMetrics <- function(object, graph = NULL, threshold = 0.3) {
   }
 
   conn_matrix <- GetGraph(object, graph)
+  n_cells <- nrow(conn_matrix)
 
-  # Compute graph metrics from graph_metrics function
-  metrics <- graph_metrics(conn_matrix, threshold = threshold)
+  # Binarize for degree calculations
+  adj_binary <- (abs(conn_matrix) > threshold) * 1
+  diag(adj_binary) <- 0
 
-  # Compute node strength (sum of absolute edge weights)
+  # Node-level metrics
+  degree <- rowSums(adj_binary)
   strength <- rowSums(abs(conn_matrix))
 
-  # Compute global transitivity (mean clustering coefficient)
-  transitivity <- mean(metrics$clustering, na.rm = TRUE)
+  # Local clustering coefficient for each node
+  local_clustering <- numeric(n_cells)
+  for (i in seq_len(n_cells)) {
+    neighbors <- which(adj_binary[i, ] > 0)
+    k <- length(neighbors)
+    if (k < 2) {
+      local_clustering[i] <- 0
+    } else {
+      # Count edges between neighbors
+      neighbor_edges <- sum(adj_binary[neighbors, neighbors]) / 2
+      max_edges <- k * (k - 1) / 2
+      local_clustering[i] <- neighbor_edges / max_edges
+    }
+  }
+
+  # Global metrics
+  density <- sum(adj_binary) / (n_cells * (n_cells - 1))
+  transitivity <- mean(local_clustering, na.rm = TRUE)
 
   # Add node-level metrics to metadata
-  object <- AddMetaData(object, metrics$degree, "graph_degree")
+  object <- AddMetaData(object, degree, "graph_degree")
   object <- AddMetaData(object, strength, "graph_strength")
-  object <- AddMetaData(object, metrics$clustering, "graph_clustering")
-  if (!is.null(metrics$betweenness)) {
-    object <- AddMetaData(object, metrics$betweenness, "graph_betweenness")
-  }
-  if (!is.null(metrics$closeness)) {
-    object <- AddMetaData(object, metrics$closeness, "graph_closeness")
-  }
+  object <- AddMetaData(object, local_clustering, "graph_clustering")
 
   # Store global metrics
   object$misc$graph_metrics <- list(
-    density = metrics$density,
+    density = density,
     transitivity = transitivity,
-    n_nodes = metrics$n_nodes
+    n_nodes = n_cells
   )
 
   log_command(object, "RunGraphMetrics", list(

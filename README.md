@@ -1,223 +1,145 @@
-# CaImagingAnalysisFr
+<p align="center">
+  <img src="man/figures/logo.png" alt="CaImagingAnalysisFr" width="200"/>
+</p>
 
-A comprehensive R package for calcium imaging analysis, from raw image processing to advanced pharmacological characterization.
+<h1 align="center">CaImagingAnalysisFr</h1>
 
-[![R-CMD-check](https://github.com/kevinj24fr/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kevinj24fr/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml)
-[![codecov](https://codecov.io/gh/kevinj24fr/CaImagingAnalysisFr/branch/main/graph/badge.svg)](https://codecov.io/gh/kevinj24fr/CaImagingAnalysisFr)
+<p align="center">
+  <strong>Complete calcium imaging analysis in R</strong><br>
+  <em>From raw pixels to publication-ready figures</em>
+</p>
 
-## Overview
+<p align="center">
+  <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/kevinj24fr/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a>
+  <a href="https://codecov.io/gh/kevinj24fr/CaImagingAnalysisFr"><img src="https://codecov.io/gh/kevinj24fr/CaImagingAnalysisFr/branch/main/graph/badge.svg" alt="codecov"></a>
+  <a href="https://kevinj24fr.github.io/CaImagingAnalysisFr/"><img src="https://img.shields.io/badge/docs-pkgdown-blue" alt="Documentation"></a>
+</p>
 
-CaImagingAnalysisFr provides a complete toolkit for analyzing calcium imaging data in R. The package covers the full analysis pipeline from raw image processing to statistical inference and is designed for both general neuroscience applications and specialized pharmacological studies (e.g., GBM cell cultures with drug treatments).
+---
 
-## Installation
+<br>
+
+<table>
+<tr>
+<td width="50%">
+
+### The Problem
+
+Calcium imaging analysis is fragmented across Python tools, MATLAB scripts, and scattered R packages. Each step requires different software, file formats, and expertise.
+
+</td>
+<td width="50%">
+
+### The Solution
+
+One R package. One workflow. Every analysis step from motion correction to publication figures, unified in a Seurat-style interface.
+
+</td>
+</tr>
+</table>
+
+<br>
+
+---
+
+## Install
 
 ```r
-# Install from GitHub
-# install.packages("remotes")
 remotes::install_github("kevinj24fr/CaImagingAnalysisFr")
 ```
 
-## Core Features
+---
 
-### Image Processing and Preprocessing
-- TIFF/HDF5/NWB file I/O
-- Motion correction with subpixel precision
-- Neuropil contamination correction
-- Background subtraction and dF/F computation
-
-### Cell Detection and Tracking
-- Multiple segmentation methods (threshold, watershed, k-means)
-- ROI quality control and curation
-- Cross-session cell registration using Hungarian algorithm matching
-
-### Signal Analysis
-- Spike inference (OASIS, Bayesian, threshold-based, ML ensemble)
-- Transient detection with kinetic characterization
-- Stimulus-aligned analysis (PETH, response metrics, statistical testing)
-
-### Network Analysis
-- Functional connectivity (correlation, partial correlation, Granger causality)
-- Graph metrics and community detection
-- Dynamic network analysis and stability metrics
-
-## Advanced Analysis Modules
-
-### Pharmacological Analysis
-Tools for in vitro/ex vivo drug studies:
-- Responder classification (activated/inhibited/non-responder)
-- Dose-response curve fitting (Hill equation)
-- Temporal drug response characterization
-- Recovery analysis after washout
-
-### Calcium Wave Analysis
-- Wave detection with propagation speed and direction
-- Initiation site identification
-- Wave participation metrics per cell
-
-### Information Theory
-- Mutual information between cell pairs
-- Transfer entropy for directed connectivity
-- Active information storage and entropy rate
-
-### Oscillation and Spectral Analysis
-- Power spectral density (Welch, multitaper)
-- Coherence and phase-locking analysis
-- Frequency band power quantification
-
-### State Space Analysis
-- Population trajectory visualization (PCA, UMAP, t-SNE)
-- Fixed point detection
-- Trajectory comparison (Procrustes, DTW, Frechet distance)
-
-### Neural Assemblies
-- Assembly detection (PCA, ICA, NMF, correlation-based)
-- Assembly activation tracking
-- Sequence detection and replay analysis
-
-### Population Dynamics (GPFA & dPCA)
-Modern latent variable methods for trial-structured data:
-- **GPFA**: Extract smooth low-dimensional trajectories with GP priors
-- **dPCA**: Demix variance by task parameters (stimulus, time, decision)
-- Cross-validation for dimensionality selection
-- Decoding from demixed components
-
-### Tuning Curve Analysis
-Characterize neural selectivity:
-- Orientation/direction tuning (von Mises fits, OSI/DSI)
-- Contrast response functions (Naka-Rushton)
-- Place field fitting (2D Gaussian)
-- Spatial information in bits/spike
-
-### Publication-Ready Visualization
-Cell/Nature-quality figures with consistent styling:
-- Neural rasters and spike plots
-- State space trajectories (GPFA, dPCA)
-- Connectivity matrices and circular network plots
-- Polar tuning curves and selectivity distributions
-- Pharmacological response comparisons
-
-## CaExperiment: Unified Analysis Object
-
-Seurat-style unified container for complete calcium imaging workflows:
-
-```r
-# Create and analyze in one pipeline
-ca <- CaExperiment(traces, frame_rate = 30) |>
-  RunCorrection() |>
-  RunDFF() |>
-  RunSpikes(method = "oasis") |>
-  RunPCA(n_components = 20) |>
-  RunConnectivity() |>
-  RunAssemblies()
-
-# Access any result
-GetTraces(ca, assay = "dff")
-GetSpikes(ca)
-GetReduction(ca, "pca")
-GetGraph(ca, "connectivity_correlation")
-
-# Full provenance tracking
-ExportCommands(ca, "my_pipeline.R")
-
-# Intelligent subsetting
-ca_subset <- ca[1:50, ]  # First 50 cells, propagates to all results
-```
-
-**Features:**
-- Multiple assays (raw, corrected, dF/F)
-- All analysis results stored in one object
-- Command logging for reproducibility
-- Metadata management with `AddMetaData()`
-- Subsetting that propagates to derived data
-
-## R-Native Performance Features
-
-### S7 Type System
-Type-safe classes for calcium imaging data:
-```r
-traces <- CalciumTraces(data = trace_matrix, frame_rate = 10)
-movie <- CalciumMovie(data = movie_array, frame_rate = 30)
-```
-
-### data.table Integration
-High-performance operations for large datasets:
-```r
-dt <- traces_to_dt(traces)
-dt_compute_dff(dt, baseline_frames = 1:100)
-dt_detect_events(dt, threshold = 2.5)
-```
-
-### Parallel Processing
-Multi-core analysis via future/furrr:
-```r
-setup_parallel(workers = 8)
-results <- parallel_spike_detection(traces, method = "oasis")
-```
-
-### Out-of-Core Processing
-Arrow/DuckDB backend for datasets exceeding RAM:
-```r
-save_traces_parquet(traces, "experiment.parquet")
-results <- query_traces("SELECT * FROM traces WHERE cell_id < 100")
-```
-
-### Rcpp Acceleration
-C++ implementations for computationally intensive operations with automatic R fallbacks.
-
-## Quick Start
+## One Object. Complete Analysis.
 
 ```r
 library(CaImagingAnalysisFr)
 
-# Load or generate data
-data <- generate_synthetic_data(n_cells = 50, n_time = 3000)
+experiment <- CaExperiment(traces, frame_rate = 30) |>
+  RunCorrection() |>
+  RunSpikes() |>
+  RunPCA() |>
+  RunConnectivity() |>
+  RunAssemblies()
 
-# Basic analysis pipeline
-corrected <- calcium_correction(data, method = "modern")
-spikes <- infer_spikes(corrected, method = "oasis")
-connectivity <- functional_connectivity(corrected)
-
-# Pharmacological analysis (for drug treatment experiments)
-responders <- classify_responders(baseline_traces, treatment_traces)
-report <- gbm_analysis_report(
-  baseline_traces = baseline,
-  treatment_traces = treatment,
-  positions = cell_positions,
-  frame_rate = 10
-)
+# Everything stored, everything tracked
+GetSpikes(experiment)
+GetGraph(experiment, "connectivity")
+ExportCommands(experiment, "pipeline.R")
 ```
 
-## Documentation
+---
 
-- Function reference: `help(package = "CaImagingAnalysisFr")`
-- Vignettes: `browseVignettes("CaImagingAnalysisFr")`
-- Package website: https://kevinj24fr.github.io/CaImagingAnalysisFr/
+<br>
 
-## Requirements
+<h2 align="center">Capabilities</h2>
 
-- R >= 4.1.0
-- Core dependencies: ggplot2, stats, MASS, igraph
-- Optional packages for extended functionality:
-  - S7, data.table, Rcpp (performance features)
-  - future, furrr (parallelization)
-  - arrow, duckdb (out-of-core processing)
-  - ranger, xgboost, e1071, glmnet (machine learning)
+<br>
 
-## Citation
+<table>
+<tr>
+<td align="center" width="25%">
+<h3>Signal</h3>
+<p>Motion correction<br>Neuropil subtraction<br>Spike inference<br>Transient detection</p>
+</td>
+<td align="center" width="25%">
+<h3>Network</h3>
+<p>Functional connectivity<br>Graph metrics<br>Community detection<br>Information flow</p>
+</td>
+<td align="center" width="25%">
+<h3>Population</h3>
+<p>GPFA trajectories<br>Demixed PCA<br>Neural assemblies<br>Sequence replay</p>
+</td>
+<td align="center" width="25%">
+<h3>Publication</h3>
+<p>Cell/Nature themes<br>Raster plots<br>Tuning curves<br>Network diagrams</p>
+</td>
+</tr>
+</table>
 
-```bibtex
-@software{CaImagingAnalysisFr,
-  title = {CaImagingAnalysisFr: Comprehensive Calcium Imaging Analysis in R},
-  author = {Kevin J and contributors},
-  year = {2026},
-  url = {https://github.com/kevinj24fr/CaImagingAnalysisFr}
-}
-```
+<br>
 
-## Contributing
+---
 
-Contributions are welcome. Please open an issue to discuss proposed changes or submit a pull request.
+<h2 align="center">Advanced Methods</h2>
 
-## License
+<br>
 
-MIT License. See [LICENSE](LICENSE) for details.
+<p align="center">
+<code>RunHMM</code> · <code>RunSLDS</code> · <code>RunTensorDecomp</code> · <code>RunChangepoints</code> · <code>RunTDA</code><br>
+<code>RunRQA</code> · <code>RunCausalDiscovery</code> · <code>RunNeuralODE</code> · <code>RunGPSmooth</code> · <code>RunOTCompare</code>
+</p>
+
+<br>
+
+---
+
+## Performance
+
+Built for real-world data sizes with native R performance optimizations.
+
+| Feature | Technology |
+|---------|------------|
+| Type safety | S7 classes |
+| Fast operations | data.table |
+| Parallelization | future/furrr |
+| Large datasets | Arrow/DuckDB |
+| Acceleration | Rcpp |
+
+---
+
+## Learn More
+
+<p align="center">
+<a href="https://kevinj24fr.github.io/CaImagingAnalysisFr/">Documentation</a> ·
+<a href="https://kevinj24fr.github.io/CaImagingAnalysisFr/reference/">Function Reference</a> ·
+<a href="https://kevinj24fr.github.io/CaImagingAnalysisFr/news/">Changelog</a>
+</p>
+
+---
+
+<br>
+
+<p align="center">
+<sub>MIT License · R ≥ 4.1.0 · <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr/issues">Report Issues</a></sub>
+</p>

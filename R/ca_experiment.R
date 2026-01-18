@@ -1582,7 +1582,8 @@ RunSLDS <- function(object, n_states = 2, latent_dim = 3, assay = NULL, name = "
 #'
 #' @return Modified CaExperiment object
 #' @export
-RunTensorDecomp <- function(object, trial_starts, trial_length, rank = 5,
+RunTensorDecomp <- function(object, trial_starts = NULL, trial_length = NULL,
+                             n_trials = 10, rank = 5,
                              method = c("cp", "tucker"), name = "tensor") {
   if (!inherits(object, "CaExperiment")) {
     stop("object must be a CaExperiment")
@@ -1590,6 +1591,13 @@ RunTensorDecomp <- function(object, trial_starts, trial_length, rank = 5,
 
   method <- match.arg(method)
   traces <- GetTraces(object)
+  n_time <- ncol(traces)
+
+  # Auto-generate trial structure if not provided
+  if (is.null(trial_starts) || is.null(trial_length)) {
+    trial_length <- floor(n_time / n_trials)
+    trial_starts <- seq(1, by = trial_length, length.out = n_trials)
+  }
 
   # Create trial tensor
   X <- create_trial_tensor(traces, trial_starts, trial_length)

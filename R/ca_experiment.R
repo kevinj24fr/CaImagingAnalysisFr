@@ -1051,12 +1051,20 @@ RunPCA <- function(object,
   }
 
   traces <- GetTraces(object, assay = assay)
+  n_cells <- nrow(traces)
+  n_frames <- ncol(traces)
 
-  # Run PCA (cells in rows, time in columns -> transpose for prcomp)
-  pca_result <- prcomp(t(traces), center = TRUE, scale. = scale, rank. = n_components)
+  # Limit components to valid range
+  max_components <- min(n_cells, n_frames) - 1
+  n_components <- min(n_components, max_components)
 
-  # Store embeddings (cell scores) - project cells into PC space
-  cell_embeddings <- traces %*% pca_result$rotation
+  # Run PCA on cells (cells as observations, time points as features)
+  # This gives us cell embeddings in PC space
+  pca_result <- prcomp(traces, center = TRUE, scale. = scale, rank. = n_components)
+
+  # pca_result$x contains cell embeddings (n_cells x n_components)
+  # pca_result$rotation contains loadings (n_frames x n_components)
+  cell_embeddings <- pca_result$x
 
   object$reductions[[name]] <- list(
     embeddings = cell_embeddings,

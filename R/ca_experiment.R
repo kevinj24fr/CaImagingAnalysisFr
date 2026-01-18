@@ -29,7 +29,7 @@ NULL
 #' @export
 #'
 #' @examples
-#' \dontrun
+#' \dontrun{
 #' # Create from trace matrix
 #' traces <- matrix(rnorm(100 * 1000), nrow = 100)
 #' ca <- CaExperiment(traces, frame_rate = 30)

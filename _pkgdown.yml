@@ -60,25 +60,15 @@ reference:
   - wavelet_denoise
 
 - title: Spike Inference
-  desc: Detect spikes and calcium events from traces
+  desc: Use RunSpikes() for CaExperiment workflow (standalone functions are internal)
   contents:
-  - infer_spikes
-  - infer_spikes_chunked
-  - oasis_spike_inference
-  - bayesian_spike_inference
-  - threshold_spike_detection
-  - adaptive_threshold_detection
-  - statistical_spike_inference
-  - ensemble_spike_detection
-  - probabilistic_spike_detection
+  - RunSpikes
+  - benchmark_spike_methods
 
 - title: Transient Detection
-  desc: Detect and characterize calcium transients
+  desc: Use RunTransients() for CaExperiment workflow (standalone functions are internal)
   contents:
-  - detect_transients
-  - summarize_transients_by_condition
-  - classify_transient_shapes
-  - plot_transient_shapes
+  - RunTransients
 
 - title: Stimulus-Aligned Analysis
   desc: Align data to events and compute response metrics
@@ -96,153 +86,40 @@ reference:
   - extract_registered_traces
 
 - title: Network Analysis
-  desc: Functional connectivity and graph analysis
+  desc: Use RunConnectivity() and RunGraphMetrics() for CaExperiment workflow
   contents:
-  - functional_connectivity
-  - graph_metrics
-  - community_detection
-  - dynamic_community_detection
-  - network_stability_analysis
-  - time_varying_connectivity
-  - dynamic_network_metrics
+  - RunConnectivity
+  - RunGraphMetrics
+  - network_visualization
 
 - title: Pharmacological Analysis
-  desc: Tools for drug treatment experiments
+  desc: Use RunTransients() for CaExperiment workflow (standalone functions are internal)
   contents:
-  - classify_responders
-  - subtype_by_response
-  - compare_conditions
-  - fit_dose_response
-  - plot_dose_response
-  - pharmacological_report
+  - RunTransients
 
-- title: Advanced Pharmacology (GBM)
-
-  desc: Specialized tools for GBM calcium imaging
+- title: Neural Assemblies and Sequences
+  desc: Use RunAssemblies() and RunSequences() for CaExperiment workflow
   contents:
-  - analyze_baseline
-  - compare_baseline
-  - compute_calcium_load
-  - analyze_temporal_response
-  - fit_response_kinetics
-  - analyze_recovery
-  - compute_excitability
-  - gbm_analysis_report
+  - RunAssemblies
+  - RunSequences
 
-- title: Calcium Wave Analysis
-  desc: Detect and characterize propagating calcium waves
+- title: Dimensionality Reduction
+  desc: Use Run* methods for CaExperiment workflow
   contents:
-  - detect_calcium_waves
-  - identify_initiation_sites
-  - compute_wave_participation
-  - detect_network_bursts
-  - compute_synchrony_index
+  - RunPCA
+  - RunGPFA
+  - RunDPCA
+  - RunTrajectories
 
-- title: Neural Assemblies
-  desc: Detect co-active cell groups
+- title: Tuning Analysis
+  desc: Use RunTuning() for CaExperiment workflow
   contents:
-  - detect_assemblies
-  - detect_assemblies_correlation
-  - compute_assembly_activation
-  - detect_assembly_events
-  - test_assembly_coactivation
-  - plot_assemblies
+  - RunTuning
 
-- title: Sequence Detection
-  desc: Find temporal activity patterns
+- title: Causal and Information Analysis
+  desc: Use RunCausalDiscovery() for CaExperiment workflow
   contents:
-  - detect_sequences
-  - detect_replay
-  - compute_reactivation_strength
-  - plot_sequences
-
-- title: State Space Analysis
-  desc: Population trajectory analysis
-  contents:
-  - compute_trajectories
-  - trajectory_velocity
-  - trajectory_curvature
-  - find_fixed_points
-  - compare_trajectories
-  - estimate_dimensionality
-  - plot_trajectory
-
-- title: GPFA (Gaussian Process Factor Analysis)
-  desc: Extract smooth latent trajectories from population activity
-  contents:
-  - fit_gpfa
-  - gpfa_project
-  - gpfa_orthonormalize
-  - gpfa_cv
-  - plot_gpfa
-  - split_into_trials
-
-- title: dPCA (Demixed PCA)
-  desc: Separate neural variance by task parameters
-  contents:
-  - fit_dpca
-  - dpca_project
-  - dpca_decode
-  - dpca_summary
-  - plot_dpca
-
-- title: Tuning Curve Analysis
-  desc: Fit and analyze neural tuning to stimulus features
-  contents:
-  - fit_orientation_tuning
-  - fit_contrast_response
-  - fit_place_field
-  - fit_tuning_curve
-  - compute_osi
-  - compute_dsi
-  - compute_gosi
-  - compute_spatial_information
-  - plot_tuning_curve
-  - tuning_summary
-
-- title: Information Theory
-  desc: Information-theoretic measures
-  contents:
-  - mutual_information
-  - transfer_entropy
-  - transfer_entropy_matrix
-  - test_transfer_entropy
-  - active_information_storage
-  - entropy_rate
-  - information_network
-  - partial_information
-  - plot_information_matrix
-
-- title: Oscillation Analysis
-  desc: Spectral and coherence analysis
-  contents:
-  - compute_power_spectrum
-  - detect_oscillations
-  - compute_band_power
-  - compute_coherence
-  - coherence_matrix
-  - phase_locking_value
-  - compare_spectra
-  - plot_spectrum
-
-- title: Variability Analysis
-  desc: Trial-to-trial variability measures
-  contents:
-  - compute_fano_factor
-  - compute_cv
-  - compute_noise_correlations
-  - compute_signal_correlations
-  - compute_reliability
-  - compute_response_precision
-  - decompose_variability
-  - compare_variability
-  - plot_variability
-
-- title: Spatial Analysis
-  desc: Distance-dependent analysis
-  contents:
-  - compute_spatial_correlation
-  - compare_spatial_correlation
+  - RunCausalDiscovery
 
 - title: Machine Learning
   desc: Classification and decoding
@@ -475,90 +352,6 @@ reference:
   contents:
   - starts_with("validate_")
 
-- title: State Space Models
-  desc: Hidden Markov Models and Switching Linear Dynamical Systems
-  contents:
-  - fit_hmm
-  - predict_states
-  - viterbi_decode
-  - forward_backward
-  - fit_slds
-  - predict_slds
-  - smooth_slds
-  - plot_state_model
-
-- title: Tensor Decomposition
-  desc: Multi-way decomposition for neurons x time x trials
-  contents:
-  - cp_decompose
-  - tucker_decompose
-  - create_trial_tensor
-  - get_temporal_factors
-  - get_neuron_factors
-  - get_trial_factors
-  - reconstruct_tensor
-  - cv_tensor_rank
-  - plot_tensor_decomposition
-
-- title: Optimal Transport
-  desc: Wasserstein distances and neural manifold alignment
-  contents:
-  - wasserstein_distance
-  - gromov_wasserstein
-  - wasserstein_barycenter
-  - compare_representations_ot
-  - align_sessions_ot
-  - place_field_emd
-  - sinkhorn_distance
-  - ot_interpolation
-  - plot_ot_alignment
-
-- title: Topological Data Analysis
-  desc: Persistent homology and neural topology
-  contents:
-  - compute_persistent_homology
-  - persistence_wasserstein
-  - persistence_bottleneck
-  - persistence_landscape
-  - persistence_image
-  - compute_betti_curves
-  - analyze_neural_topology
-  - plot_persistence_diagram
-  - plot_betti_curves
-
-- title: Gaussian Process Regression
-  desc: Smooth interpolation with uncertainty quantification
-  contents:
-  - fit_gp
-  - predict_gp
-  - fit_gp_traces
-  - predict_gp_traces
-  - impute_missing_gp
-  - fit_sparse_gp
-
-- title: Changepoint Detection
-  desc: Detect abrupt changes in neural dynamics
-  contents:
-  - detect_changepoints
-  - pelt_changepoint
-  - binseg_changepoint
-  - cusum_changepoint
-  - bocpd
-  - detect_population_changepoints
-  - compare_changepoints
-  - plot_changepoints
-
-- title: Recurrence Quantification Analysis
-  desc: Characterize nonlinear dynamics and regime transitions
-  contents:
-  - recurrence_plot
-  - rqa_metrics
-  - cross_recurrence_plot
-  - cross_rqa_metrics
-  - windowed_rqa
-  - detect_regime_transitions
-  - plot_recurrence
-
 - title: Mixed-Effects Models
   desc: Hierarchical statistical inference for nested experiments
   contents:
@@ -569,24 +362,6 @@ reference:
   - compare_conditions_mixed
   - compute_icc
   - power_mixed
-
-- title: Causal Discovery
-  desc: Infer causal structure from neural recordings
-  contents:
-  - pc_algorithm
-  - fci_algorithm
-  - ges_algorithm
-  - discover_neural_causality
-  - plot_causal_graph
-
-- title: Neural ODEs
-  desc: Continuous-time latent dynamics modeling
-  contents:
-  - fit_neural_ode
-  - predict_neural_ode
-  - fit_latent_node
-  - generate_trajectories
-  - plot_node_phase_space
 
 - title: Conformal Prediction
   desc: Distribution-free uncertainty quantification

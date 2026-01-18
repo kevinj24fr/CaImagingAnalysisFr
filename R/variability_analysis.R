@@ -16,7 +16,7 @@ NULL
 #' @param step Step size for sliding window
 #'
 #' @return List with Fano factors per cell
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -74,7 +74,7 @@ compute_fano_factor <- function(traces, window_size = NULL, step = NULL) {
 #' @param subtract_mean Subtract trial-averaged response
 #'
 #' @return Noise correlation matrix
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -129,7 +129,7 @@ compute_noise_correlations <- function(traces_list, subtract_mean = TRUE) {
 #' @param traces_list List of trace matrices (one per trial)
 #'
 #' @return Signal correlation matrix
-#' @export
+#' @keywords internal
 compute_signal_correlations <- function(traces_list) {
   n_trials <- length(traces_list)
   n_cells <- nrow(traces_list[[1]])
@@ -155,7 +155,7 @@ compute_signal_correlations <- function(traces_list) {
 #' @param by_trial If list of trials, compute CV across trials
 #'
 #' @return CV values per cell
-#' @export
+#' @keywords internal
 compute_cv <- function(traces, by_trial = FALSE) {
   if (is.list(traces) && by_trial) {
     # CV across trials at each time point
@@ -200,7 +200,7 @@ compute_cv <- function(traces, by_trial = FALSE) {
 #' @param method Reliability method: "correlation", "split_half"
 #'
 #' @return Reliability measure per cell
-#' @export
+#' @keywords internal
 compute_reliability <- function(traces_list, method = "correlation") {
   n_trials <- length(traces_list)
   n_cells <- nrow(traces_list[[1]])
@@ -256,7 +256,7 @@ compute_reliability <- function(traces_list, method = "correlation") {
 #' @param frame_rate Frame rate
 #'
 #' @return Precision measures
-#' @export
+#' @keywords internal
 compute_response_precision <- function(traces, events = NULL, frame_rate = 10) {
   n_cells <- nrow(traces)
 
@@ -292,7 +292,7 @@ compute_response_precision <- function(traces, events = NULL, frame_rate = 10) {
 #' @param n_components Number of components for factor analysis
 #'
 #' @return List with shared and private variance
-#' @export
+#' @keywords internal
 decompose_variability <- function(traces, n_components = 3) {
   n_cells <- nrow(traces)
   n_time <- ncol(traces)
@@ -349,7 +349,7 @@ decompose_variability <- function(traces, n_components = 3) {
 #' @param metric Variability metric: "fano", "cv", "variance"
 #'
 #' @return Statistical comparison results
-#' @export
+#' @keywords internal
 compare_variability <- function(traces1, traces2, metric = "fano") {
   n_cells <- nrow(traces1)
 
@@ -390,7 +390,7 @@ compare_variability <- function(traces1, traces2, metric = "fano") {
 #' @param type Plot type: "histogram", "scatter", "comparison"
 #'
 #' @return ggplot object
-#' @export
+#' @keywords internal
 plot_variability <- function(variability, type = "histogram") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 required")

@@ -18,7 +18,7 @@ NULL
 #' @param overlap Overlap fraction for Welch method
 #'
 #' @return List with frequencies and power values
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -125,7 +125,7 @@ compute_power_spectrum <- function(traces, frame_rate = 10,
 #' @param freq_range Frequency range to search (Hz)
 #'
 #' @return Data frame of detected oscillations
-#' @export
+#' @keywords internal
 detect_oscillations <- function(psd, min_prominence = 0.1,
                                  freq_range = c(0.01, 5)) {
   freqs <- psd$frequencies
@@ -205,7 +205,7 @@ detect_oscillations <- function(psd, min_prominence = 0.1,
 #' @param bands Named list of frequency bands (e.g., list(slow = c(0.01, 0.1)))
 #'
 #' @return Data frame with band powers per cell
-#' @export
+#' @keywords internal
 compute_band_power <- function(psd, bands = NULL) {
   if (is.null(bands)) {
     bands <- list(
@@ -238,7 +238,7 @@ compute_band_power <- function(psd, bands = NULL) {
 #' @param window_size Window for spectral estimation
 #'
 #' @return List with frequencies and coherence values
-#' @export
+#' @keywords internal
 compute_coherence <- function(trace1, trace2, frame_rate = 10,
                                window_size = 256) {
   n <- length(trace1)
@@ -293,7 +293,7 @@ compute_coherence <- function(trace1, trace2, frame_rate = 10,
 #' @param freq_band Frequency band for coherence (Hz)
 #'
 #' @return Coherence matrix
-#' @export
+#' @keywords internal
 coherence_matrix <- function(traces, frame_rate = 10,
                               freq_band = c(0.1, 0.5)) {
   n_cells <- nrow(traces)
@@ -327,7 +327,7 @@ coherence_matrix <- function(traces, frame_rate = 10,
 #' @param frame_rate Sampling rate
 #'
 #' @return Phase locking value (0-1)
-#' @export
+#' @keywords internal
 phase_locking_value <- function(trace1, trace2, freq_band = c(0.1, 0.5),
                                  frame_rate = 10) {
   # Bandpass filter
@@ -387,7 +387,7 @@ phase_locking_value <- function(trace1, trace2, freq_band = c(0.1, 0.5),
 #' @param n_perm Number of permutations
 #'
 #' @return List with frequency-specific p-values
-#' @export
+#' @keywords internal
 compare_spectra <- function(psd1, psd2, method = "permutation", n_perm = 1000) {
   power1 <- psd1$power
   power2 <- psd2$power
@@ -436,7 +436,7 @@ compare_spectra <- function(psd1, psd2, method = "permutation", n_perm = 1000) {
 #' @param freq_range Frequency range to display
 #'
 #' @return ggplot object
-#' @export
+#' @keywords internal
 plot_spectrum <- function(psd, log_scale = TRUE, show_cells = FALSE,
                           freq_range = NULL) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {

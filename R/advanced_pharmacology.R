@@ -23,7 +23,7 @@ NULL
 #' @param alpha Significance level for statistical method
 #'
 #' @return List with responder classification and statistics
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -180,7 +180,7 @@ extract_response_features <- function(traces_baseline, traces_treatment) {
 #' @param normalize Normalize traces before clustering
 #'
 #' @return List with subtype assignments and characteristics
-#' @export
+#' @keywords internal
 subtype_by_response <- function(traces, n_subtypes = 4, method = "kmeans",
                                  normalize = TRUE) {
   n_cells <- nrow(traces)
@@ -278,7 +278,7 @@ subtype_by_response <- function(traces, n_subtypes = 4, method = "kmeans",
 #' @param frame_rate Frame rate (for time conversion)
 #'
 #' @return List with baseline statistics
-#' @export
+#' @keywords internal
 analyze_baseline <- function(traces, method = "percentile", percentile = 10,
                               frame_rate = 10) {
   n_cells <- nrow(traces)
@@ -321,7 +321,7 @@ analyze_baseline <- function(traces, method = "percentile", percentile = 10,
 #' @param paired Are the measurements paired?
 #'
 #' @return Statistical comparison results
-#' @export
+#' @keywords internal
 compare_baseline <- function(baseline1, baseline2, paired = FALSE) {
   test_result <- wilcox.test(baseline1, baseline2, paired = paired)
 
@@ -348,7 +348,7 @@ compare_baseline <- function(baseline1, baseline2, paired = FALSE) {
 #' @param above_baseline Only count activity above baseline
 #'
 #' @return Calcium load per cell
-#' @export
+#' @keywords internal
 compute_calcium_load <- function(traces, baseline = NULL, frame_rate = 10,
                                   above_baseline = TRUE) {
   n_cells <- nrow(traces)
@@ -396,7 +396,7 @@ compute_calcium_load <- function(traces, baseline = NULL, frame_rate = 10,
 #' @param max_delay Maximum delay between cells (seconds)
 #'
 #' @return List with detected waves and propagation properties
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' \dontrun{
@@ -524,7 +524,7 @@ detect_calcium_waves <- function(traces, positions, frame_rate = 10,
 #' @param positions Cell positions matrix
 #'
 #' @return Data frame with initiation site statistics
-#' @export
+#' @keywords internal
 identify_initiation_sites <- function(waves, n_cells, positions = NULL) {
   if (waves$n_waves == 0) {
     return(data.frame(
@@ -564,7 +564,7 @@ identify_initiation_sites <- function(waves, n_cells, positions = NULL) {
 #' @param n_cells Total number of cells
 #'
 #' @return Participation statistics per cell
-#' @export
+#' @keywords internal
 compute_wave_participation <- function(waves, n_cells) {
   if (waves$n_waves == 0) {
     return(list(
@@ -599,7 +599,7 @@ compute_wave_participation <- function(waves, n_cells) {
 #' @param bin_size Time bin size in seconds for averaging
 #'
 #' @return List with temporal response characteristics
-#' @export
+#' @keywords internal
 analyze_temporal_response <- function(traces, drug_onset, frame_rate = 10,
                                        bin_size = 10) {
   n_cells <- nrow(traces)
@@ -671,7 +671,7 @@ analyze_temporal_response <- function(traces, drug_onset, frame_rate = 10,
 #' @param model_type Model type: "rise", "decay", "rise_decay"
 #'
 #' @return Fitted model parameters
-#' @export
+#' @keywords internal
 fit_response_kinetics <- function(time_vec, response, model_type = "rise_decay") {
   # Normalize response
   baseline <- mean(response[time_vec < 0])
@@ -756,7 +756,7 @@ fit_response_kinetics <- function(time_vec, response, model_type = "rise_decay")
 #' @param n_bins Number of distance bins
 #'
 #' @return List with distance-correlation relationship
-#' @export
+#' @keywords internal
 compute_spatial_correlation <- function(traces, positions, n_bins = 10) {
   n_cells <- nrow(traces)
 
@@ -809,7 +809,7 @@ compute_spatial_correlation <- function(traces, positions, n_bins = 10) {
 #' @param spatial_corr2 Spatial correlation for condition 2
 #'
 #' @return Statistical comparison
-#' @export
+#' @keywords internal
 compare_spatial_correlation <- function(spatial_corr1, spatial_corr2) {
   # Compare space constants
   if (!is.na(spatial_corr1$space_constant) && !is.na(spatial_corr2$space_constant)) {
@@ -846,7 +846,7 @@ compare_spatial_correlation <- function(spatial_corr1, spatial_corr2) {
 #' @param frame_rate Frame rate in Hz
 #'
 #' @return List with recovery statistics
-#' @export
+#' @keywords internal
 analyze_recovery <- function(traces, baseline_period, treatment_period,
                               recovery_period, frame_rate = 10) {
   n_cells <- nrow(traces)
@@ -918,7 +918,7 @@ analyze_recovery <- function(traces, baseline_period, treatment_period,
 #' @param frame_rate Frame rate in Hz
 #'
 #' @return List with excitability measures
-#' @export
+#' @keywords internal
 compute_excitability <- function(traces, frame_rate = 10) {
   n_cells <- nrow(traces)
   n_time <- ncol(traces)
@@ -988,7 +988,7 @@ compute_excitability <- function(traces, frame_rate = 10) {
 #' @param n_classes Number of shape classes
 #'
 #' @return List with shape classifications
-#' @export
+#' @keywords internal
 classify_transient_shapes <- function(traces, frame_rate = 10, n_classes = 4) {
   # Detect transients
   transients <- detect_transients(traces, frame_rate = frame_rate)
@@ -1100,7 +1100,7 @@ classify_transient_shapes <- function(traces, frame_rate = 10, n_classes = 4) {
 #' @param shape_analysis Shape analysis result
 #'
 #' @return ggplot object
-#' @export
+#' @keywords internal
 plot_transient_shapes <- function(shape_analysis) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 required")
@@ -1143,7 +1143,7 @@ plot_transient_shapes <- function(shape_analysis) {
 #' @param frame_rate Frame rate in Hz
 #'
 #' @return Comprehensive analysis results
-#' @export
+#' @keywords internal
 gbm_analysis_report <- function(baseline_traces, treatment_traces,
                                  recovery_traces = NULL, positions = NULL,
                                  frame_rate = 10) {
@@ -1249,7 +1249,7 @@ gbm_analysis_report <- function(baseline_traces, treatment_traces,
 #' @param x GBM analysis report
 #' @param ... Ignored
 #'
-#' @export
+#' @keywords internal
 print.gbm_analysis_report <- function(x, ...) {
   cat("GBM Calcium Imaging Analysis Report\n")
   cat("====================================\n\n")

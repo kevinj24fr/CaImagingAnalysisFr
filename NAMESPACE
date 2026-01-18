@@ -7,7 +7,7 @@ importFrom(utils, browseURL, count.fields, object.size, read.csv, write.csv)
 
 export(anomaly_detection)
 export(auto_optimize_parameters)
-export(autoencoder_reduce)
+# Internal: autoencoder_reduce - Use RunPCA() or RunGPFA() instead
 export(automated_preprocessing)
 export(batch_aware_analysis)
 export(batch_correction)
@@ -17,11 +17,11 @@ export(bayesian_hypothesis_testing)
 export(bayesian_model_comparison)
 export(bayesian_parameter_estimation)
 export(bayesian_predictive_checks)
-export(bayesian_spike_inference)
+# Internal: bayesian_spike_inference - Use RunSpikes() instead
 export(benchmark_performance)
 export(benchmark_segmentation_quality)
 export(caiman_segmentation)
-export(caiman_spike_inference)
+# Internal: caiman_spike_inference - Use RunSpikes() instead
 export(calcium_activity_heatmap)
 export(calcium_correction)
 export(calcium_correction_chunked)
@@ -31,9 +31,9 @@ export(create_targets_file)
 export(run_calcium_analysis)
 export(cellpose_segmentation)
 export(combat_correction)
-export(community_detection)
+# Internal: community_detection - Use RunGraphMetrics() instead
 export(comprehensive_statistical_analysis)
-export(convergent_cross_mapping)
+# Internal: convergent_cross_mapping - Use RunCausalDiscovery() instead
 export(create_dashboard_app)
 export(create_dashboard_global)
 export(create_experiment_metadata)
@@ -45,14 +45,14 @@ export(cross_batch_validation)
 export(curate_data)
 export(deep_harmonization)
 export(detect_batch_effects)
-export(dynamic_community_detection)
-export(dynamic_network_metrics)
+# Internal: dynamic_community_detection - Use RunGraphMetrics() instead
+# Internal: dynamic_network_metrics - Use RunGraphMetrics() instead
 export(empirical_mode_decomposition)
 export(export_analysis_pipeline)
 export(export_jupyter_notebook)
 export(export_processed_data)
 export(flag_outliers)
-export(functional_connectivity)
+# Internal: functional_connectivity - Use RunConnectivity() instead
 export(generate_analysis_report)
 export(generate_analysis_summary)
 export(generate_interactive_dashboard)
@@ -60,42 +60,41 @@ export(generate_qc_report)
 export(generate_synthetic_data)
 export(get_config)
 export(get_python_info)
-export(granger_causality)
-export(graph_metrics)
+# Internal: granger_causality - Use RunCausalDiscovery() instead
+# Internal: graph_metrics - Use RunGraphMetrics() instead
 export(hierarchical_bayesian_modeling)
-export(hierarchical_clustering)
-export(ica_decompose)
-export(independent_component_analysis)
-export(infer_spikes)
-export(infer_spikes_chunked)
+# Internal: hierarchical_clustering - Use RunAssemblies() instead
+# Internal: ica_decompose - Use RunPCA() or RunAssemblies() instead
+# Internal: independent_component_analysis - Use RunAssemblies() instead
+# Internal: infer_spikes, infer_spikes_chunked - Use RunSpikes() instead
 export(install_python_dependencies)
 export(install_specific_python_packages)
 export(interactive_calcium_plot)
 export(interactive_network_plot)
-export(kmeans_clustering)
+# Internal: kmeans_clustering - Use RunAssemblies() instead
 export(launch_interactive_viewer)
 export(launch_qc_shiny)
 export(manage_python_dependencies)
 export(manual_roi_editor)
 export(mnn_correction)
 export(monitor_memory_usage)
-export(multi_cell_causality_analysis)
+# Internal: multi_cell_causality_analysis - Use RunCausalDiscovery() instead
 export(multi_panel_calcium_plot)
 export(network_stability_analysis)
 export(network_visualization)
-export(nmf_decompose)
-export(nonnegative_matrix_factorization)
-export(oasis_spike_inference)
+# Internal: nmf_decompose - Use RunAssemblies() instead
+# Internal: nonnegative_matrix_factorization - Use RunAssemblies() instead
+# Internal: oasis_spike_inference - Use RunSpikes() instead
 export(optimize_correction_parameters)
 export(optimize_data_structure)
 export(optimize_spike_parameters)
-export(pcmci_causal_inference)
+# Internal: pcmci_causal_inference - Use RunCausalDiscovery() instead
 export(plot_bayesian_results)
 export(plot_cell_trace)
 export(plot_multiple_cells)
 export(plot_segmentation_overlay)
 export(posterior_summary)
-export(probabilistic_spike_detection)
+# Internal: probabilistic_spike_detection - Use RunSpikes() instead
 export(process_in_chunks)
 export(publication_calcium_plot)
 export(region_properties)
@@ -108,10 +107,10 @@ export(spike_confidence_intervals)
 export(standardize_data_format)
 export(stream_process_data)
 export(suite2p_segmentation)
-export(suite2p_spike_inference)
-export(time_varying_connectivity)
-export(tsne_reduce)
-export(umap_reduce)
+# Internal: suite2p_spike_inference - Use RunSpikes() instead
+# Internal: time_varying_connectivity - Use RunConnectivity() instead
+# Internal: tsne_reduce - Use RunPCA() for initial reduction
+# Internal: umap_reduce - Use RunPCA() for initial reduction
 export(uncertainty_quantification)
 export(validate_calcium_data)
 export(validate_calcium_trace)
@@ -159,30 +158,22 @@ export(compute_response_metrics)
 export(test_event_responses)
 export(synchronize_behavior)
 
-# Statistical representation learning (honest names)
-export(pca_representation)
-export(threshold_spike_detection)
+# Statistical representation learning - Use Run* methods instead
+# Internal: pca_representation - Use RunPCA()
+# Internal: threshold_spike_detection, adaptive_threshold_detection - Use RunSpikes()
+# Internal: pca_kmeans_clustering - Use RunAssemblies() or RunPCA() + clustering
 export(wavelet_denoise)
-export(adaptive_threshold_detection)
-export(pca_kmeans_clustering)
 export(temporal_correlation_heatmap)
 export(benchmark_spike_methods)
 
-# Statistical spike inference (honest names)
-export(statistical_spike_inference)
-export(rolling_stats_inference)
-export(convolutional_inference)
-export(correlation_weighted_inference)
+# Statistical spike inference - Use RunSpikes() instead
+# Internal: statistical_spike_inference, rolling_stats_inference
+# Internal: convolutional_inference, correlation_weighted_inference
 
-# Deprecated aliases for backwards compatibility
-export(self_supervised_learning)
-export(transformer_spike_inference)
-export(transformer_denoising)
-export(transfer_learning_spike_inference)
-export(contrastive_clustering)
-export(visualize_attention)
-export(compare_deep_models)
-export(deep_spike_inference)
+# Deprecated aliases - Use Run* methods instead
+# Internal: self_supervised_learning, transformer_spike_inference, transformer_denoising
+# Internal: transfer_learning_spike_inference, contrastive_clustering, visualize_attention
+# Internal: compare_deep_models, deep_spike_inference
 
 # S7 Classes
 export(CalciumMovie)
@@ -327,116 +318,54 @@ export(extract_trace_features)
 export(ensemble_spike_detection)
 export(cv_decode_behavior)
 
-# Neural assemblies
-export(detect_assemblies)
-export(detect_assemblies_correlation)
-export(compute_assembly_activation)
-export(detect_assembly_events)
-export(test_assembly_coactivation)
-export(plot_assemblies)
+# Neural assemblies - Use RunAssemblies() instead
+# Internal: detect_assemblies, detect_assemblies_correlation, compute_assembly_activation
+# Internal: detect_assembly_events, test_assembly_coactivation, plot_assemblies
 
-# Sequence detection
-export(detect_sequences)
-export(detect_replay)
-export(compute_reactivation_strength)
-export(plot_sequences)
+# Sequence detection - Use RunSequences() instead
+# Internal: detect_sequences, detect_replay, compute_reactivation_strength, plot_sequences
 
-# Pharmacological analysis
-export(detect_transients)
-export(summarize_transients_by_condition)
-export(compare_conditions)
-export(compute_synchrony_index)
-export(detect_network_bursts)
-export(fit_dose_response)
-export(plot_dose_response)
-export(pharmacological_report)
+# Pharmacological analysis - Use RunTransients() instead
+# Internal: detect_transients, summarize_transients_by_condition, compare_conditions
+# Internal: compute_synchrony_index, detect_network_bursts, fit_dose_response
+# Internal: plot_dose_response, pharmacological_report
 
-# State space analysis
-export(compute_trajectories)
-export(trajectory_velocity)
-export(find_fixed_points)
-export(trajectory_curvature)
-export(compare_trajectories)
-export(plot_trajectory)
-export(estimate_dimensionality)
+# State space analysis - Use RunTrajectories() instead
+# Internal: compute_trajectories, trajectory_velocity, find_fixed_points
+# Internal: trajectory_curvature, compare_trajectories, plot_trajectory, estimate_dimensionality
 
-# Information theory
-export(mutual_information)
-export(transfer_entropy)
-export(transfer_entropy_matrix)
-export(test_transfer_entropy)
-export(active_information_storage)
-export(entropy_rate)
-export(information_network)
-export(partial_information)
-export(plot_information_matrix)
+# Information theory - Use RunCausalDiscovery() with method="transfer_entropy" instead
+# Internal: mutual_information, transfer_entropy, transfer_entropy_matrix
+# Internal: test_transfer_entropy, active_information_storage, entropy_rate
+# Internal: information_network, partial_information, plot_information_matrix
 
-# Oscillation analysis
-export(compute_power_spectrum)
-export(detect_oscillations)
-export(compute_band_power)
-export(compute_coherence)
-export(coherence_matrix)
-export(phase_locking_value)
-export(compare_spectra)
-export(plot_spectrum)
+# Oscillation analysis - Use RunGPSmooth() for spectral analysis
+# Internal: compute_power_spectrum, detect_oscillations, compute_band_power
+# Internal: compute_coherence, coherence_matrix, phase_locking_value
+# Internal: compare_spectra, plot_spectrum
 
-# Variability analysis
-export(compute_fano_factor)
-export(compute_noise_correlations)
-export(compute_signal_correlations)
-export(compute_cv)
-export(compute_reliability)
-export(compute_response_precision)
-export(decompose_variability)
-export(compare_variability)
-export(plot_variability)
+# Variability analysis - Access via GetMetaData() after analysis
+# Internal: compute_fano_factor, compute_noise_correlations, compute_signal_correlations
+# Internal: compute_cv, compute_reliability, compute_response_precision
+# Internal: decompose_variability, compare_variability, plot_variability
 
-# Advanced pharmacology (GBM analysis)
-export(classify_responders)
-export(subtype_by_response)
-export(analyze_baseline)
-export(compare_baseline)
-export(compute_calcium_load)
-export(detect_calcium_waves)
-export(identify_initiation_sites)
-export(compute_wave_participation)
-export(analyze_temporal_response)
-export(fit_response_kinetics)
-export(compute_spatial_correlation)
-export(compare_spatial_correlation)
-export(analyze_recovery)
-export(compute_excitability)
-export(classify_transient_shapes)
-export(plot_transient_shapes)
-export(gbm_analysis_report)
+# Advanced pharmacology (GBM analysis) - Use RunTransients() instead
+# Internal: classify_responders, subtype_by_response, analyze_baseline, compare_baseline
+# Internal: compute_calcium_load, detect_calcium_waves, identify_initiation_sites
+# Internal: compute_wave_participation, analyze_temporal_response, fit_response_kinetics
+# Internal: compute_spatial_correlation, compare_spatial_correlation, analyze_recovery
+# Internal: compute_excitability, classify_transient_shapes, plot_transient_shapes
+# Internal: gbm_analysis_report
 
-# GPFA (Gaussian Process Factor Analysis)
-export(fit_gpfa)
-export(gpfa_project)
-export(gpfa_orthonormalize)
-export(gpfa_cv)
-export(plot_gpfa)
-export(split_into_trials)
+# GPFA (Gaussian Process Factor Analysis) - Use RunGPFA() instead
+# Internal: fit_gpfa, gpfa_project, gpfa_orthonormalize, gpfa_cv, plot_gpfa, split_into_trials
 
-# dPCA (Demixed Principal Component Analysis)
-export(fit_dpca)
-export(dpca_project)
-export(dpca_decode)
-export(dpca_summary)
-export(plot_dpca)
+# dPCA (Demixed Principal Component Analysis) - Use RunDPCA() instead
+# Internal: fit_dpca, dpca_project, dpca_decode, dpca_summary, plot_dpca
 
-# Tuning curve analysis
-export(fit_orientation_tuning)
-export(fit_contrast_response)
-export(fit_place_field)
-export(fit_tuning_curve)
-export(compute_osi)
-export(compute_dsi)
-export(compute_gosi)
-export(compute_spatial_information)
-export(plot_tuning_curve)
-export(tuning_summary)
+# Tuning curve analysis - Use RunTuning() instead
+# Internal: fit_orientation_tuning, fit_contrast_response, fit_place_field, fit_tuning_curve
+# Internal: compute_osi, compute_dsi, compute_gosi, compute_spatial_information, plot_tuning_curve, tuning_summary
 
 # Publication theme and visualization
 export(pub_colors)
@@ -479,110 +408,14 @@ export(plot_dose_response_pub)
 # Publication plots - Summary
 export(plot_analysis_summary)
 
-# State Space Models (HMM, SLDS)
-export(fit_hmm)
-export(predict_states)
-export(viterbi_decode)
-export(forward_backward)
-export(fit_slds)
-export(predict_slds)
-export(smooth_slds)
-export(plot_state_model)
-
-# Tensor Decomposition
-export(cp_decompose)
-export(tucker_decompose)
-export(create_trial_tensor)
-export(get_temporal_factors)
-export(get_neuron_factors)
-export(get_trial_factors)
-export(reconstruct_tensor)
-export(cv_tensor_rank)
-export(plot_tensor_decomposition)
-
-# Optimal Transport
-export(wasserstein_distance)
-export(gromov_wasserstein)
-export(wasserstein_barycenter)
-export(compare_representations_ot)
-export(align_sessions_ot)
-export(place_field_emd)
-export(sinkhorn_distance)
-export(ot_interpolation)
-export(plot_ot_alignment)
-
-# Topological Data Analysis
-export(compute_persistent_homology)
-export(persistence_wasserstein)
-export(persistence_bottleneck)
-export(persistence_landscape)
-export(persistence_image)
-export(compute_betti_curves)
-export(analyze_neural_topology)
-export(plot_persistence_diagram)
-export(plot_betti_curves)
-
-# Gaussian Process Regression
-export(fit_gp)
-export(predict_gp)
-export(fit_gp_traces)
-export(predict_gp_traces)
-export(impute_missing_gp)
-export(fit_sparse_gp)
-
-# Changepoint Detection
-export(detect_changepoints)
-export(pelt_changepoint)
-export(binseg_changepoint)
-export(cusum_changepoint)
-export(bocpd)
-export(detect_population_changepoints)
-export(compare_changepoints)
-export(plot_changepoints)
-
-# Recurrence Quantification Analysis
-export(recurrence_plot)
-export(rqa_metrics)
-export(cross_recurrence_plot)
-export(cross_rqa_metrics)
-export(windowed_rqa)
-export(detect_regime_transitions)
-export(plot_recurrence)
-
-# Mixed-Effects Models
-export(fit_lmm)
-export(fit_glmm)
-export(prepare_mixed_data)
-export(test_condition_mixed)
-export(compare_conditions_mixed)
-export(compute_icc)
-export(power_mixed)
-
-# Causal Discovery
-export(pc_algorithm)
-export(fci_algorithm)
-export(ges_algorithm)
-export(discover_neural_causality)
-export(plot_causal_graph)
-
-# Neural ODEs
-export(fit_neural_ode)
-export(predict_neural_ode)
-export(fit_latent_node)
-export(generate_trajectories)
-export(plot_node_phase_space)
-
-# Conformal Prediction
-export(conformal_predictor)
-export(conformal_predict)
-export(conformal_decode)
-export(conformal_classifier)
-export(conformal_predict_set)
-export(adaptive_conformal)
-export(evaluate_conformal)
-export(plot_conformal_bands)
-
-# Advanced CaExperiment Run* Methods
+# =============================================================================
+# CaExperiment Run* Methods (PRIMARY API - Use these!)
+# =============================================================================
+# All analysis should go through CaExperiment Run* methods for:
+# - Automatic result storage in appropriate slots
+# - Full provenance tracking via command logging
+# - Consistent workflow with pipe chaining
+# - Integrated metadata handling
 export(RunHMM)
 export(RunSLDS)
 export(RunTensorDecomp)

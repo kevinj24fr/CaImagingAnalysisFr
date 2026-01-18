@@ -88,6 +88,48 @@ Characterize neural selectivity:
 - Place field fitting (2D Gaussian)
 - Spatial information in bits/spike
 
+### Publication-Ready Visualization
+Cell/Nature-quality figures with consistent styling:
+- Neural rasters and spike plots
+- State space trajectories (GPFA, dPCA)
+- Connectivity matrices and circular network plots
+- Polar tuning curves and selectivity distributions
+- Pharmacological response comparisons
+
+## CaExperiment: Unified Analysis Object
+
+Seurat-style unified container for complete calcium imaging workflows:
+
+```r
+# Create and analyze in one pipeline
+ca <- CaExperiment(traces, frame_rate = 30) |>
+  RunCorrection() |>
+  RunDFF() |>
+  RunSpikes(method = "oasis") |>
+  RunPCA(n_components = 20) |>
+  RunConnectivity() |>
+  RunAssemblies()
+
+# Access any result
+GetTraces(ca, assay = "dff")
+GetSpikes(ca)
+GetReduction(ca, "pca")
+GetGraph(ca, "connectivity_correlation")
+
+# Full provenance tracking
+ExportCommands(ca, "my_pipeline.R")
+
+# Intelligent subsetting
+ca_subset <- ca[1:50, ]  # First 50 cells, propagates to all results
+```
+
+**Features:**
+- Multiple assays (raw, corrected, dF/F)
+- All analysis results stored in one object
+- Command logging for reproducibility
+- Metadata management with `AddMetaData()`
+- Subsetting that propagates to derived data
+
 ## R-Native Performance Features
 
 ### S7 Type System

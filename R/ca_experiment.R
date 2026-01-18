@@ -876,10 +876,45 @@ RunDFF <- function(object,
 
   traces <- GetTraces(object, assay = assay)
 
-  # Compute baseline and dF/F
-  dff <- calcium_correction(traces, method = method,
-                           window_size = window_size,
-                           baseline_percentile = percentile)
+ # Compute dF/F based on method
+  n_cells <- nrow(traces)
+  n_time <- ncol(traces)
+  dff <- matrix(0, nrow = n_cells, ncol = n_time)
+  rownames(dff) <- rownames(traces)
+  colnames(dff) <- colnames(traces)
+
+  for (i in seq_len(n_cells)) {
+    trace <- traces[i, ]
+
+    # Compute baseline based on method
+    baseline <- switch(method,
+      rolling = {
+        # Rolling minimum baseline
+        half_win <- window_size %/% 2
+        bl <- numeric(n_time)
+        for (t in seq_len(n_time)) {
+          start <- max(1, t - half_win)
+          end <- min(n_time, t + half_win)
+          bl[t] <- quantile(trace[start:end], percentile, na.rm = TRUE)
+        }
+        bl
+      },
+      percentile = {
+        # Global percentile baseline
+        rep(quantile(trace, percentile, na.rm = TRUE), n_time)
+      },
+      mode = {
+        # Mode-based baseline (histogram peak)
+        h <- hist(trace, breaks = 50, plot = FALSE)
+        mode_val <- h$mids[which.max(h$counts)]
+        rep(mode_val, n_time)
+      }
+    )
+
+    # Compute dF/F, avoiding division by zero
+    baseline[baseline < 1e-10] <- 1e-10
+    dff[i, ] <- (trace - baseline) / baseline
+  }
 
   object$assays[[assay_name]] <- dff
   object$active_assay <- assay_name

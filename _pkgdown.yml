@@ -20,145 +20,11 @@ navbar:
       href: https://github.com/kevinj24fr/CaImagingAnalysisFr
 
 reference:
-- title: Image I/O and Preprocessing
-  desc: Read/write imaging data and preprocessing operations
-  contents:
-  - read_tiff_stack
-  - write_tiff_stack
-  - read_calcium_imaging
-  - extract_traces_from_rois
-
-- title: Motion Correction
-  desc: Correct for sample movement during recording
-  contents:
-  - motion_correct
-  - phase_correlation
-  - shift_image
-  - assess_motion_correction
-  - starts_with("motion_correct_")
-  - starts_with("shift_image_")
-  - starts_with("phase_correlation_")
-
-- title: Cell Segmentation
-  desc: Detect and segment individual cells
-  contents:
-  - segment_cells
-  - cellpose_segmentation
-  - suite2p_segmentation
-  - caiman_segmentation
-  - region_properties
-  - roi_quality_control
-
-- title: Signal Processing
-  desc: Background correction, dF/F computation, and filtering
-  contents:
-  - calcium_correction
-  - calcium_correction_chunked
-  - neuropil_correct
-  - extract_neuropil_traces
-  - estimate_neuropil_coefficient
-  - wavelet_denoise
-
-- title: Spike Inference
-  desc: Use RunSpikes() for CaExperiment workflow (standalone functions are internal)
-  contents:
-  - RunSpikes
-  - benchmark_spike_methods
-
-- title: Transient Detection
-  desc: Use RunTransients() for CaExperiment workflow (standalone functions are internal)
-  contents:
-  - RunTransients
-
-- title: Stimulus-Aligned Analysis
-  desc: Align data to events and compute response metrics
-  contents:
-  - align_to_events
-  - compute_response_metrics
-  - test_event_responses
-  - synchronize_behavior
-
-- title: Cell Registration
-  desc: Match cells across recording sessions
-  contents:
-  - register_cells
-  - compute_roi_centroids
-  - extract_registered_traces
-
-- title: Network Analysis
-  desc: Use RunConnectivity() and RunGraphMetrics() for CaExperiment workflow
-  contents:
-  - RunConnectivity
-  - RunGraphMetrics
-  - network_visualization
-
-- title: Pharmacological Analysis
-  desc: Use RunTransients() for CaExperiment workflow (standalone functions are internal)
-  contents:
-  - RunTransients
-
-- title: Neural Assemblies and Sequences
-  desc: Use RunAssemblies() and RunSequences() for CaExperiment workflow
-  contents:
-  - RunAssemblies
-  - RunSequences
-
-- title: Dimensionality Reduction
-  desc: Use Run* methods for CaExperiment workflow
-  contents:
-  - RunPCA
-  - RunGPFA
-  - RunDPCA
-  - RunTrajectories
-
-- title: Tuning Analysis
-  desc: Use RunTuning() for CaExperiment workflow
-  contents:
-  - RunTuning
-
-- title: Causal and Information Analysis
-  desc: Use RunCausalDiscovery() for CaExperiment workflow
-  contents:
-  - RunCausalDiscovery
-
-- title: Machine Learning
-  desc: Classification and decoding
-  contents:
-  - classify_cell_types
-  - predict_cell_types
-  - decode_behavior
-  - predict_decoder
-  - cv_decode_behavior
-  - train_event_classifier
-  - detect_events_ml
-  - extract_trace_features
-  - create_lagged_features
-
-- title: Batch Correction
-  desc: Handle batch effects across experiments
-  contents:
-  - batch_correction
-  - combat_correction
-  - mnn_correction
-  - detect_batch_effects
-  - batch_quality_control
-  - cross_batch_validation
-
-- title: S7 Classes
-  desc: Type-safe calcium imaging objects
-  contents:
-  - CalciumMovie
-  - CalciumTraces
-  - SpikeTrains
-  - ROISet
-  - ExperimentSession
-  - as_calcium_traces
-  - as_calcium_movie
-  - as_roi_set
-  - is_calcium_object
-
+# =============================================================================
+# CaExperiment - The Primary API
+# =============================================================================
 - title: CaExperiment Object
-  desc: Seurat-style unified analysis container
+  desc: Seurat-style unified analysis container - the recommended way to use this package
   contents:
   - CaExperiment
   - is_ca_experiment
@@ -166,7 +32,7 @@ reference:
   - ValidateCaExperiment
 
 - title: CaExperiment Accessors
-  desc: Data extraction from CaExperiment
+  desc: Extract data from CaExperiment objects
   contents:
   - GetTraces
   - GetSpikes
@@ -190,8 +56,8 @@ reference:
   - Duration
   - SubsetCells
 
-- title: CaExperiment Pipeline
-  desc: Run* analysis workflow functions
+- title: CaExperiment Run* Methods
+  desc: Primary analysis workflow - all analysis should use these methods
   contents:
   - RunCorrection
   - RunDFF
@@ -210,7 +76,7 @@ reference:
   - ExportCommands
 
 - title: CaExperiment Advanced Methods
-  desc: Advanced analysis Run* methods
+  desc: Advanced statistical analysis methods
   contents:
   - RunHMM
   - RunSLDS
@@ -223,11 +89,92 @@ reference:
   - RunGPSmooth
   - RunOTCompare
 
+# =============================================================================
+# Data I/O and Preprocessing
+# =============================================================================
+- title: Image I/O
+  desc: Read and write imaging data
+  contents:
+  - read_tiff_stack
+  - write_tiff_stack
+  - read_calcium_imaging
+  - extract_traces_from_rois
+
+- title: Motion Correction
+  desc: Correct for sample movement during recording
+  contents:
+  - motion_correct
+  - phase_correlation
+  - shift_image
+  - assess_motion_correction
+
+- title: Cell Segmentation
+  desc: Detect and segment individual cells
+  contents:
+  - segment_cells
+  - cellpose_segmentation
+  - suite2p_segmentation
+  - caiman_segmentation
+  - region_properties
+  - roi_quality_control
+
+- title: Signal Processing
+  desc: Background correction and filtering
+  contents:
+  - calcium_correction
+  - calcium_correction_chunked
+  - neuropil_correct
+  - extract_neuropil_traces
+  - estimate_neuropil_coefficient
+  - wavelet_denoise
+
+- title: Cell Registration
+  desc: Match cells across recording sessions
+  contents:
+  - register_cells
+  - compute_roi_centroids
+  - extract_registered_traces
+
+- title: Stimulus Alignment
+  desc: Align data to events and compute response metrics
+  contents:
+  - align_to_events
+  - compute_response_metrics
+  - test_event_responses
+  - synchronize_behavior
+
+# =============================================================================
+# S7 Type System
+# =============================================================================
+- title: S7 Classes
+  desc: Type-safe calcium imaging objects
+  contents:
+  - CalciumMovie
+  - CalciumTraces
+  - SpikeTrains
+  - ROISet
+  - ExperimentSession
+  - as_calcium_traces
+  - as_calcium_movie
+  - as_roi_set
+  - is_calcium_object
+
+# =============================================================================
+# Performance Features
+# =============================================================================
 - title: data.table Operations
   desc: High-performance trace operations
   contents:
-  - starts_with("dt_")
   - traces_to_dt
+  - dt_to_traces
+  - dt_compute_dff
+  - dt_zscore
+  - dt_detect_events
+  - dt_cell_summary
+  - dt_pairwise_cor
+  - dt_bin_traces
+  - dt_transform
+  - dt_smooth
 
 - title: Parallel Processing
   desc: Multi-core analysis
@@ -235,7 +182,12 @@ reference:
   - setup_parallel
   - shutdown_parallel
   - parallel_info
-  - starts_with("parallel_")
+  - parallel_apply_traces
+  - parallel_motion_correct
+  - parallel_spike_detection
+  - parallel_extract_traces
+  - parallel_cross_correlation
+  - parallel_batch_process
 
 - title: Arrow/DuckDB Backend
   desc: Out-of-core data processing
@@ -251,6 +203,23 @@ reference:
   - arrow_cell_summary
   - convert_trace_format
 
+- title: Rcpp Acceleration
+  desc: C++ accelerated functions
+  contents:
+  - shift_image_fast
+  - phase_correlation_fast
+  - connected_components_fast
+  - distance_transform_fast
+  - gaussian_blur_fast
+  - extract_trace_fast
+  - local_correlation_fast
+  - motion_correct_fast
+  - median_filter_fast
+  - threshold_image_fast
+
+# =============================================================================
+# Formula Interface
+# =============================================================================
 - title: Formula Interface
   desc: Formula-based analysis
   contents:
@@ -260,8 +229,78 @@ reference:
   - define_pipeline
   - run_pipeline
 
-- title: Visualization
-  desc: Plotting functions
+# =============================================================================
+# Machine Learning
+# =============================================================================
+- title: Machine Learning
+  desc: Classification and decoding
+  contents:
+  - classify_cell_types
+  - predict_cell_types
+  - decode_behavior
+  - predict_decoder
+  - cv_decode_behavior
+  - train_event_classifier
+  - detect_events_ml
+  - extract_trace_features
+  - create_lagged_features
+  - ensemble_spike_detection
+
+# =============================================================================
+# Batch Effects
+# =============================================================================
+- title: Batch Correction
+  desc: Handle batch effects across experiments
+  contents:
+  - batch_correction
+  - combat_correction
+  - mnn_correction
+  - detect_batch_effects
+  - batch_quality_control
+  - cross_batch_validation
+
+# =============================================================================
+# Statistical Methods
+# =============================================================================
+- title: Mixed-Effects Models
+  desc: Hierarchical statistical inference
+  contents:
+  - fit_lmm
+  - fit_glmm
+  - prepare_mixed_data
+  - test_condition_mixed
+  - compare_conditions_mixed
+  - compute_icc
+  - power_mixed
+
+- title: Conformal Prediction
+  desc: Distribution-free uncertainty quantification
+  contents:
+  - conformal_predictor
+  - conformal_predict
+  - conformal_decode
+  - conformal_classifier
+  - conformal_predict_set
+  - adaptive_conformal
+  - evaluate_conformal
+  - plot_conformal_bands
+
+- title: Bayesian Methods
+  desc: Bayesian inference and modeling
+  contents:
+  - bayesian_hypothesis_testing
+  - bayesian_model_comparison
+  - bayesian_parameter_estimation
+  - bayesian_predictive_checks
+  - hierarchical_bayesian_modeling
+  - plot_bayesian_results
+  - posterior_summary
+
+# =============================================================================
+# Visualization
+# =============================================================================
+- title: Basic Plotting
+  desc: Core plotting functions
   contents:
   - plot_cell_trace
   - plot_multiple_cells
@@ -286,57 +325,46 @@ reference:
   - plot_correlation_matrix
   - plot_spike_raster
   - plot_aligned_responses
+  - GeomSpikeTrain
 
 - title: Publication Theme
-  desc: Publication-ready styling for Cell/Nature journals
+  desc: Publication-ready styling
   contents:
   - theme_publication
   - pub_colors
   - scale_fill_publication
   - scale_color_publication
+  - scale_colour_publication
   - scale_fill_publication_d
   - format_pvalue
   - save_pub_figure
   - combine_panels
   - add_panel_label
 
-- title: Publication Plots - Activity
-  desc: Neural activity rasters and population plots
+- title: Publication Plots
+  desc: Ready-to-publish figures
   contents:
   - plot_neural_raster
   - plot_spike_raster_pub
   - plot_temporal_response
   - plot_event_triggered
-
-- title: Publication Plots - State Space
-  desc: Trajectory and latent dynamics visualizations
-  contents:
   - plot_gpfa_trajectory
   - plot_dpca_components
   - plot_flow_field
-
-- title: Publication Plots - Networks
-  desc: Connectivity and assembly visualizations
-  contents:
   - plot_connectivity_matrix
   - plot_circular_network
   - plot_assembly_timeline
-
-- title: Publication Plots - Tuning
-  desc: Neural selectivity visualizations
-  contents:
   - plot_tuning_polar
   - plot_population_tuning
   - plot_selectivity_distribution
-
-- title: Publication Plots - Pharmacology
-  desc: Drug response visualizations
-  contents:
   - plot_response_waterfall
   - plot_response_comparison
   - plot_dose_response_pub
   - plot_analysis_summary
 
+# =============================================================================
+# Reporting
+# =============================================================================
 - title: Reporting and Export
   desc: Generate reports and export data
   contents:
@@ -346,35 +374,38 @@ reference:
   - export_processed_data
   - export_analysis_pipeline
   - save_publication_figure
+  - create_dashboard_app
+  - create_dashboard_global
+  - create_notebook_rmd
+  - create_pipeline_script
+  - create_report_rmd
+  - export_jupyter_notebook
 
+# =============================================================================
+# Validation
+# =============================================================================
 - title: Validation
   desc: Data validation utilities
   contents:
-  - starts_with("validate_")
+  - validate_calcium_data
+  - validate_calcium_trace
+  - validate_calcium_traces_matrix
+  - validate_character
+  - validate_character_vector
+  - validate_data_frame
+  - validate_logical
+  - validate_numeric_param
+  - validate_positive_integer
+  - validate_positive_numeric
+  - validate_probability
+  - validate_quality_control
+  - validate_spike_detection
+  - validate_temporal_consistency
+  - validate_trace
 
-- title: Mixed-Effects Models
-  desc: Hierarchical statistical inference for nested experiments
-  contents:
-  - fit_lmm
-  - fit_glmm
-  - prepare_mixed_data
-  - test_condition_mixed
-  - compare_conditions_mixed
-  - compute_icc
-  - power_mixed
-
-- title: Conformal Prediction
-  desc: Distribution-free uncertainty quantification
-  contents:
-  - conformal_predictor
-  - conformal_predict
-  - conformal_decode
-  - conformal_classifier
-  - conformal_predict_set
-  - adaptive_conformal
-  - evaluate_conformal
-  - plot_conformal_bands
-
+# =============================================================================
+# Utilities
+# =============================================================================
 - title: Utilities
   desc: Helper functions
   contents:
@@ -382,3 +413,30 @@ reference:
   - create_synthetic_data
   - get_config
   - benchmark_performance
+  - benchmark_spike_methods
+  - anomaly_detection
+  - auto_optimize_parameters
+  - automated_preprocessing
+  - flag_outliers
+  - process_in_chunks
+  - stream_process_data
+  - optimize_data_structure
+  - monitor_memory_usage
+
+- title: Python Integration
+  desc: Python dependency management
+  contents:
+  - install_python_dependencies
+  - install_specific_python_packages
+  - manage_python_dependencies
+  - get_python_info
+
+- title: Interactive Tools
+  desc: Interactive viewers and editors
+  contents:
+  - launch_interactive_viewer
+  - launch_qc_shiny
+  - manual_roi_editor
+  - interactive_calcium_plot
+  - interactive_network_plot
+  - generate_interactive_dashboard

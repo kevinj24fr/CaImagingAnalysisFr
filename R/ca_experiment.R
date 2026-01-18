@@ -1189,8 +1189,9 @@ RunConnectivity <- function(object,
 
   traces <- GetTraces(object, assay = assay)
 
-  # Run connectivity analysis
-  conn_result <- functional_connectivity(t(traces), method = method, ...)
+  # Run connectivity analysis (traces is cells x frames)
+  # functional_connectivity expects this format and handles transposition internally
+  conn_result <- functional_connectivity(traces, method = method, ...)
 
   # Extract connectivity matrix
   if (is.list(conn_result)) {

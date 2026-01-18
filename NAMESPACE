@@ -195,6 +195,59 @@ export(as_calcium_movie)
 export(as_roi_set)
 export(is_calcium_object)
 
+# CaExperiment Unified Object System (Seurat-style)
+export(CaExperiment)
+export(is_ca_experiment)
+export(as_ca_experiment)
+export(ValidateCaExperiment)
+
+# CaExperiment Accessors
+export(GetTraces)
+export(GetSpikes)
+export(GetReduction)
+export(GetEmbeddings)
+export(GetGraph)
+export(GetMetaData)
+export(GetAssemblies)
+export(GetTransients)
+export(GetTuning)
+export(GetCommands)
+
+# CaExperiment Setters
+export(SetActiveAssay)
+export(AddMetaData)
+
+# CaExperiment Dimension Functions
+export(ncells)
+export(nframes)
+export(CellIDs)
+export(Duration)
+export(SubsetCells)
+
+# CaExperiment Run* Pipeline Functions
+export(RunCorrection)
+export(RunDFF)
+export(RunSpikes)
+export(RunPCA)
+export(RunGPFA)
+export(RunDPCA)
+export(RunConnectivity)
+export(RunGraphMetrics)
+export(RunAssemblies)
+export(RunTransients)
+export(RunTuning)
+export(RunTrajectories)
+export(RunSequences)
+
+# CaExperiment Utilities
+export(MergeCaExperiments)
+export(ExportCommands)
+
+# S3 methods for CaExperiment
+S3method(print, CaExperiment)
+S3method(summary, CaExperiment)
+S3method("[", CaExperiment)
+
 # data.table operations
 export(traces_to_dt)
 export(dt_to_traces)

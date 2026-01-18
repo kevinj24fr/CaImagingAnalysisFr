@@ -280,6 +280,58 @@ reference:
   - as_roi_set
   - is_calcium_object
 
+- title: CaExperiment Object
+  desc: Seurat-style unified analysis container
+  contents:
+  - CaExperiment
+  - is_ca_experiment
+  - as_ca_experiment
+  - ValidateCaExperiment
+
+- title: CaExperiment Accessors
+  desc: Data extraction from CaExperiment
+  contents:
+  - GetTraces
+  - GetSpikes
+  - GetReduction
+  - GetEmbeddings
+  - GetGraph
+  - GetMetaData
+  - GetAssemblies
+  - GetTransients
+  - GetTuning
+  - GetCommands
+  - SetActiveAssay
+  - AddMetaData
+
+- title: CaExperiment Dimensions
+  desc: Object size and identity functions
+  contents:
+  - ncells
+  - nframes
+  - CellIDs
+  - Duration
+  - SubsetCells
+
+- title: CaExperiment Pipeline
+  desc: Run* analysis workflow functions
+  contents:
+  - RunCorrection
+  - RunDFF
+  - RunSpikes
+  - RunPCA
+  - RunGPFA
+  - RunDPCA
+  - RunConnectivity
+  - RunGraphMetrics
+  - RunAssemblies
+  - RunTransients
+  - RunTuning
+  - RunTrajectories
+  - RunSequences
+  - MergeCaExperiments
+  - ExportCommands
+
 - title: data.table Operations
   desc: High-performance trace operations
   contents:

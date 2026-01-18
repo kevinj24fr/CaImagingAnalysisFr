@@ -88,14 +88,14 @@ cat("---------------------------------------------------------------------------
 dff_traces <- GetTraces(ca, assay = "dff")
 cat(sprintf("   dF/F traces: %d x %d\n", nrow(dff_traces), ncol(dff_traces)))
 
-# Get spikes
+# Get spikes (returns binary matrix: cells x frames)
 spikes <- GetSpikes(ca)
-total_spikes <- sum(spikes$spike_predictions)
+total_spikes <- sum(spikes)
 cat(sprintf("   Total spikes detected: %d\n", total_spikes))
 
 # Get PCA reduction
 pca <- GetReduction(ca, "pca")
-var_explained <- sum(pca$sdev[1:3]^2) / sum(pca$sdev^2) * 100
+var_explained <- sum(pca$variance_explained[1:3]) * 100
 cat(sprintf("   PCA variance (3 PCs): %.1f%%\n", var_explained))
 
 # Get connectivity graph

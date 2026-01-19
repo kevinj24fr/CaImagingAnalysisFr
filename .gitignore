@@ -40,8 +40,6 @@ __pycache__/
 venv/
 
 # Documentation build
-docs/
-!docs/reference/
 inst/doc/
 
 # Test artifacts

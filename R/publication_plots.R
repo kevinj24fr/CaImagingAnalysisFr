@@ -15,21 +15,25 @@ NULL
 #' Creates a publication-quality raster plot showing population activity
 #' with optional behavioral state annotations and event markers.
 #'
-#' @param traces Trace matrix (cells x time) or CalciumTraces object
-#' @param frame_rate Frame rate in Hz
+#' @param traces Trace matrix (cells x time), CalciumTraces object, or CaExperiment object
+#' @param frame_rate Frame rate in Hz (auto-extracted from CaExperiment)
 #' @param states Optional data frame with columns: start, end, state
 #' @param events Optional vector of event times (in seconds)
 #' @param sort_by How to sort cells: "none", "activity", "peak_time", "correlation"
 #' @param normalize Normalize each cell: "zscore", "minmax", "none"
 #' @param show_colorbar Show color scale bar
 #' @param time_range Time range to plot (c(start, end) in seconds)
+#' @param assay Assay to use when traces is a CaExperiment (default: "dff")
 #'
 #' @return A ggplot object
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Basic raster
+#' # Basic raster from CaExperiment
+#' plot_neural_raster(ca)
+#'
+#' # Basic raster from matrix
 #' plot_neural_raster(traces, frame_rate = 10)
 #'
 #' # With behavioral states
@@ -37,12 +41,19 @@ NULL
 #'                      state = c("baseline", "stimulus", "recovery"))
 #' plot_neural_raster(traces, frame_rate = 10, states = states)
 #' }
-plot_neural_raster <- function(traces, frame_rate = 10, states = NULL,
+plot_neural_raster <- function(traces, frame_rate = NULL, states = NULL,
                                events = NULL, sort_by = "activity",
                                normalize = "zscore", show_colorbar = TRUE,
-                               time_range = NULL) {
+                               time_range = NULL, assay = "dff") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package required")
+  }
+
+  # Handle CaExperiment objects
+  if (inherits(traces, "CaExperiment")) {
+    ca <- traces
+    frame_rate <- ca$frame_rate %||% 10
+    traces <- GetTraces(ca, assay = assay)
   }
 
   # Handle S7 objects
@@ -50,6 +61,9 @@ plot_neural_raster <- function(traces, frame_rate = 10, states = NULL,
     frame_rate <- traces@frame_rate
     traces <- traces@data
   }
+
+  # Default frame_rate if still NULL
+  if (is.null(frame_rate)) frame_rate <- 10
 
   traces <- as.matrix(traces)
   n_cells <- nrow(traces)
@@ -141,21 +155,32 @@ plot_neural_raster <- function(traces, frame_rate = 10, states = NULL,
 #'
 #' Publication-quality spike raster with trial structure.
 #'
-#' @param spikes Spike matrix (cells x time) or list of spike times
-#' @param frame_rate Frame rate
+#' @param spikes Spike matrix (cells x time), CaExperiment object, or list of spike times
+#' @param frame_rate Frame rate (auto-extracted from CaExperiment)
 #' @param trial_starts Vector of trial start times (seconds)
 #' @param trial_duration Duration of each trial (seconds)
 #' @param color_by Color points by: "cell", "trial", "uniform"
 #' @param point_size Size of spike markers
+#' @param method Spike method to use when spikes is a CaExperiment (default: first available)
 #'
 #' @return A ggplot object
 #' @export
-plot_spike_raster_pub <- function(spikes, frame_rate = 10, trial_starts = NULL,
+plot_spike_raster_pub <- function(spikes, frame_rate = NULL, trial_starts = NULL,
                                   trial_duration = NULL, color_by = "cell",
-                                  point_size = 0.5) {
+                                  point_size = 0.5, method = NULL) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package required")
   }
+
+  # Handle CaExperiment objects
+  if (inherits(spikes, "CaExperiment")) {
+    ca <- spikes
+    frame_rate <- ca$frame_rate %||% 10
+    spikes <- GetSpikes(ca, method = method)
+  }
+
+  # Default frame_rate if still NULL
+  if (is.null(frame_rate)) frame_rate <- 10
 
   # Convert matrix to spike times
   if (is.matrix(spikes)) {
@@ -172,7 +197,7 @@ plot_spike_raster_pub <- function(spikes, frame_rate = 10, trial_starts = NULL,
       }
     }))
   } else {
-    stop("spikes must be a matrix")
+    stop("spikes must be a matrix or CaExperiment object")
   }
 
   if (is.null(spike_data) || nrow(spike_data) == 0) {
@@ -190,25 +215,31 @@ plot_spike_raster_pub <- function(spikes, frame_rate = 10, trial_starts = NULL,
       spike_data$trial_time[in_trial] <- spike_data$time[in_trial] - trial_starts[i]
     }
     spike_data <- spike_data[!is.na(spike_data$trial), ]
-    x_var <- "trial_time"
+    use_trial_time <- TRUE
     x_lab <- "Time from trial onset (s)"
   } else {
-    x_var <- "time"
+    use_trial_time <- FALSE
     x_lab <- "Time (s)"
   }
 
-  # Build plot
-  p <- ggplot2::ggplot(spike_data, ggplot2::aes_string(x = x_var, y = "cell"))
+  # Build plot using modern aes() with .data pronoun
+  if (use_trial_time) {
+    p <- ggplot2::ggplot(spike_data, ggplot2::aes(x = .data$trial_time, y = .data$cell))
+  } else {
+    p <- ggplot2::ggplot(spike_data, ggplot2::aes(x = .data$time, y = .data$cell))
+  }
 
   if (color_by == "cell") {
-    p <- p + ggplot2::geom_point(ggplot2::aes(color = factor(cell)),
+    n_unique_cells <- length(unique(spike_data$cell))
+    p <- p + ggplot2::geom_point(ggplot2::aes(color = factor(.data$cell)),
                                   size = point_size, shape = "|") +
-      scale_color_publication() +
+      scale_color_publication(n = n_unique_cells) +
       ggplot2::theme(legend.position = "none")
   } else if (color_by == "trial" && !is.null(trial_starts)) {
-    p <- p + ggplot2::geom_point(ggplot2::aes(color = factor(trial)),
+    n_unique_trials <- length(unique(spike_data$trial))
+    p <- p + ggplot2::geom_point(ggplot2::aes(color = factor(.data$trial)),
                                   size = point_size, shape = "|") +
-      scale_color_publication()
+      scale_color_publication(n = n_unique_trials)
   } else {
     p <- p + ggplot2::geom_point(size = point_size, shape = "|", color = "#377EB8")
   }
@@ -226,24 +257,35 @@ plot_spike_raster_pub <- function(spikes, frame_rate = 10, trial_starts = NULL,
 #'
 #' Publication-quality visualization of GPFA latent trajectories.
 #'
-#' @param gpfa_result Result from fit_gpfa()
+#' @param gpfa_result Result from fit_gpfa() or CaExperiment object
 #' @param dims Which dimensions to plot (2 or 3)
 #' @param trials Which trials to include (NULL for all)
 #' @param conditions Condition labels for coloring
 #' @param condition_colors Named vector of colors
 #' @param show_variance Show explained variance in axis labels
-#' @param arrow_interval Add directional arrows every N points (0 = none
+#' @param arrow_interval Add directional arrows every N points (0 = none)
 #' @param start_marker Shape for trajectory start
 #' @param end_marker Shape for trajectory end
+#' @param reduction Name of reduction to use when gpfa_result is a CaExperiment (default: "gpfa")
 #'
 #' @return A ggplot object
 #' @export
 plot_gpfa_trajectory <- function(gpfa_result, dims = c(1, 2), trials = NULL,
                                   conditions = NULL, condition_colors = NULL,
                                   show_variance = TRUE, arrow_interval = 0,
-                                  start_marker = 16, end_marker = 17) {
+                                  start_marker = 16, end_marker = 17,
+                                  reduction = "gpfa") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package required")
+  }
+
+  # Handle CaExperiment objects
+  if (inherits(gpfa_result, "CaExperiment")) {
+    ca <- gpfa_result
+    gpfa_result <- GetReduction(ca, reduction)
+    if (is.null(gpfa_result)) {
+      stop("No GPFA reduction found. Run RunGPFA() first.")
+    }
   }
 
   trajectories <- gpfa_result$trajectories
@@ -515,20 +557,30 @@ plot_flow_field <- function(trajectories, dims = c(1, 2), n_grid = 15,
 #'
 #' Publication-quality heatmap for functional connectivity matrices.
 #'
-#' @param connectivity Connectivity matrix (from functional_connectivity)
+#' @param connectivity Connectivity matrix, CaExperiment object, or functional_connectivity result
 #' @param order_cells How to order cells: "none", "hierarchical", "community"
 #' @param communities Optional community assignments for annotation
 #' @param show_diagonal Show diagonal values
 #' @param symmetric For asymmetric matrices, show full or just triangle
 #' @param title Plot title
+#' @param graph Name of graph to use when connectivity is a CaExperiment (default: first available)
 #'
 #' @return A ggplot object
 #' @export
 plot_connectivity_matrix <- function(connectivity, order_cells = "hierarchical",
                                       communities = NULL, show_diagonal = FALSE,
-                                      symmetric = TRUE, title = NULL) {
+                                      symmetric = TRUE, title = NULL, graph = NULL) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package required")
+  }
+
+  # Handle CaExperiment objects
+  if (inherits(connectivity, "CaExperiment")) {
+    ca <- connectivity
+    connectivity <- GetGraph(ca, graph)
+    if (is.null(connectivity)) {
+      stop("No connectivity graph found. Run RunConnectivity() first.")
+    }
   }
 
   # Extract matrix if it's a list result
@@ -604,19 +656,29 @@ plot_connectivity_matrix <- function(connectivity, order_cells = "hierarchical",
 #'
 #' Visualize network connectivity in a circular layout.
 #'
-#' @param connectivity Connectivity matrix
+#' @param connectivity Connectivity matrix, CaExperiment object, or functional_connectivity result
 #' @param threshold Only show connections above this threshold
 #' @param communities Community assignments for grouping
 #' @param show_labels Show cell labels
 #' @param edge_alpha Transparency of edges
+#' @param graph Name of graph to use when connectivity is a CaExperiment (default: first available)
 #'
 #' @return A ggplot object
 #' @export
 plot_circular_network <- function(connectivity, threshold = 0.3,
                                    communities = NULL, show_labels = FALSE,
-                                   edge_alpha = 0.5) {
+                                   edge_alpha = 0.5, graph = NULL) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package required")
+  }
+
+  # Handle CaExperiment objects
+  if (inherits(connectivity, "CaExperiment")) {
+    ca <- connectivity
+    connectivity <- GetGraph(ca, graph)
+    if (is.null(connectivity)) {
+      stop("No connectivity graph found. Run RunConnectivity() first.")
+    }
   }
 
   # Extract matrix
@@ -711,20 +773,34 @@ plot_circular_network <- function(connectivity, threshold = 0.3,
 #'
 #' Visualize assembly activations over time.
 #'
-#' @param assembly_result Result from detect_assemblies()
-#' @param frame_rate Frame rate
+#' @param assembly_result Result from detect_assemblies() or CaExperiment object
+#' @param frame_rate Frame rate (auto-extracted from CaExperiment)
 #' @param time_range Optional time range to plot
 #' @param show_events Mark individual activation events
 #' @param threshold Activation threshold for event detection
+#' @param name Name of assembly result when assembly_result is a CaExperiment (default: "default")
 #'
 #' @return A ggplot object
 #' @export
-plot_assembly_timeline <- function(assembly_result, frame_rate = 10,
+plot_assembly_timeline <- function(assembly_result, frame_rate = NULL,
                                     time_range = NULL, show_events = TRUE,
-                                    threshold = 2) {
+                                    threshold = 2, name = "default") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package required")
   }
+
+  # Handle CaExperiment objects
+  if (inherits(assembly_result, "CaExperiment")) {
+    ca <- assembly_result
+    frame_rate <- ca$frame_rate %||% 10
+    assembly_result <- GetAssemblies(ca, name)
+    if (is.null(assembly_result)) {
+      stop("No assembly results found. Run RunAssemblies() first.")
+    }
+  }
+
+  # Default frame_rate if still NULL
+  if (is.null(frame_rate)) frame_rate <- 10
 
   # Extract activation time series
   if (!is.null(assembly_result$activations)) {
@@ -1063,7 +1139,7 @@ plot_response_comparison <- function(response_data, x = "condition", y = "respon
 
   if (is.null(fill)) fill <- x
 
-  p <- ggplot2::ggplot(response_data, ggplot2::aes_string(x = x, y = y, fill = fill)) +
+  p <- ggplot2::ggplot(response_data, ggplot2::aes(x = .data[[x]], y = .data[[y]], fill = .data[[fill]])) +
     ggplot2::geom_violin(alpha = 0.7, scale = "width", trim = TRUE) +
     scale_fill_publication_d() +
     theme_publication() +
@@ -1401,22 +1477,43 @@ plot_dose_response_pub <- function(dose_response, show_individual = TRUE,
 #'
 #' Multi-panel figure summarizing key analysis results.
 #'
-#' @param traces Original trace data
-#' @param spikes Spike detection results
-#' @param connectivity Connectivity results
-#' @param assemblies Assembly detection results
-#' @param frame_rate Frame rate
+#' @param traces Original trace data, CaExperiment object, or trace matrix
+#' @param spikes Spike detection results (auto-extracted from CaExperiment)
+#' @param connectivity Connectivity results (auto-extracted from CaExperiment)
+#' @param assemblies Assembly detection results (auto-extracted from CaExperiment)
+#' @param frame_rate Frame rate (auto-extracted from CaExperiment)
+#' @param assay Assay to use when traces is a CaExperiment (default: "dff")
 #'
 #' @return A patchwork object
 #' @export
 plot_analysis_summary <- function(traces, spikes = NULL, connectivity = NULL,
-                                   assemblies = NULL, frame_rate = 10) {
+                                   assemblies = NULL, frame_rate = NULL, assay = "dff") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package required")
   }
   if (!requireNamespace("patchwork", quietly = TRUE)) {
     stop("patchwork package required")
   }
+
+  # Handle CaExperiment objects
+  if (inherits(traces, "CaExperiment")) {
+    ca <- traces
+    frame_rate <- ca$frame_rate %||% 10
+    traces <- GetTraces(ca, assay = assay)
+    # Auto-extract available results
+    if (is.null(spikes) && length(ca$spikes) > 0) {
+      spikes <- GetSpikes(ca)
+    }
+    if (is.null(connectivity) && length(ca$graphs) > 0) {
+      connectivity <- GetGraph(ca)
+    }
+    if (is.null(assemblies) && length(ca$assemblies) > 0) {
+      assemblies <- GetAssemblies(ca)
+    }
+  }
+
+  # Default frame_rate if still NULL
+  if (is.null(frame_rate)) frame_rate <- 10
 
   plots <- list()
 
@@ -1428,7 +1525,7 @@ plot_analysis_summary <- function(traces, spikes = NULL, connectivity = NULL,
   # Panel B: Mean activity trace
   time_vec <- seq(0, (ncol(traces) - 1) / frame_rate, length.out = ncol(traces))
   mean_trace <- data.frame(time = time_vec, activity = colMeans(traces))
-  plots$B <- ggplot2::ggplot(mean_trace, ggplot2::aes(x = time, y = activity)) +
+  plots$B <- ggplot2::ggplot(mean_trace, ggplot2::aes(x = .data$time, y = .data$activity)) +
     ggplot2::geom_line(color = "#377EB8", linewidth = 0.6) +
     theme_publication() +
     ggplot2::labs(x = "Time (s)", y = "Mean activity", title = "Population Average")

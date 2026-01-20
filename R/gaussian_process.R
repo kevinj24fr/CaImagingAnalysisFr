@@ -322,16 +322,26 @@ plot_gp <- function(x, n_points = 200, conf_level = 0.95, ...) {
 #' @param traces Matrix of traces (cells x time)
 #' @param kernel Kernel type
 #' @param share_hyperparams Share hyperparameters across cells
+#' @param length_scale Fixed length scale (NULL for automatic optimization)
+#' @param ... Additional arguments to fit_gp
 #'
 #' @return List of GP fits
 #' @export
-fit_gp_traces <- function(time, traces, kernel = "rbf", share_hyperparams = TRUE) {
+fit_gp_traces <- function(time, traces, kernel = "rbf", share_hyperparams = TRUE,
+                          length_scale = NULL, ...) {
   n_cells <- nrow(traces)
 
-  if (share_hyperparams) {
+  # If length_scale is provided, use it directly
+  if (!is.null(length_scale)) {
+    gp_list <- lapply(seq_len(n_cells), function(i) {
+      fit_gp(time, traces[i, ], kernel = kernel,
+             length_scale = length_scale,
+             optimize = TRUE, ...)
+    })
+  } else if (share_hyperparams) {
     # Fit one GP to get shared hyperparams
     sample_trace <- traces[1, ]
-    gp_sample <- fit_gp(time, sample_trace, kernel = kernel, optimize = TRUE)
+    gp_sample <- fit_gp(time, sample_trace, kernel = kernel, optimize = TRUE, ...)
 
     # Apply to all traces
     gp_list <- lapply(seq_len(n_cells), function(i) {
@@ -343,7 +353,7 @@ fit_gp_traces <- function(time, traces, kernel = "rbf", share_hyperparams = TRUE
     })
   } else {
     gp_list <- lapply(seq_len(n_cells), function(i) {
-      fit_gp(time, traces[i, ], kernel = kernel, optimize = TRUE)
+      fit_gp(time, traces[i, ], kernel = kernel, optimize = TRUE, ...)
     })
   }
 
@@ -352,7 +362,8 @@ fit_gp_traces <- function(time, traces, kernel = "rbf", share_hyperparams = TRUE
       gp_list = gp_list,
       time = time,
       n_cells = n_cells,
-      kernel = kernel
+      kernel = kernel,
+      length_scale = length_scale
     ),
     class = "gp_traces"
   )

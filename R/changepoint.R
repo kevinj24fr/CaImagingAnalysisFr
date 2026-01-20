@@ -354,14 +354,32 @@ print.changepoint_result <- function(x, ...) {
 
 #' Plot Changepoint Results
 #'
-#' @param x Changepoint result
-#' @param data Original data
+#' @param x Changepoint result or CaExperiment object
+#' @param data Original data (auto-extracted from CaExperiment)
+#' @param name Name of changepoint result when x is a CaExperiment (default: "changepoints")
+#' @param assay Assay to use when x is a CaExperiment (default: "dff")
 #' @param ... Additional arguments
 #'
 #' @export
-plot_changepoints <- function(x, data, ...) {
+plot_changepoints <- function(x, data = NULL, name = "changepoints", assay = "dff", ...) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 required")
+  }
+
+  # Handle CaExperiment objects
+  if (inherits(x, "CaExperiment")) {
+    ca <- x
+    x <- ca$misc[[name]]
+    if (is.null(x)) {
+      stop("No changepoint results found. Run RunChangepoints() first.")
+    }
+    if (is.null(data)) {
+      data <- GetTraces(ca, assay = assay)
+    }
+  }
+
+  if (is.null(data)) {
+    stop("data must be provided when x is not a CaExperiment")
   }
 
   if (is.matrix(data)) {
@@ -381,9 +399,9 @@ plot_changepoints <- function(x, data, ...) {
     df$segment_mean[seg$start:seg$end] <- seg$mean
   }
 
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = time, y = value)) +
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$time, y = .data$value)) +
     ggplot2::geom_line(alpha = 0.5) +
-    ggplot2::geom_line(ggplot2::aes(y = segment_mean), color = "red", linewidth = 1)
+    ggplot2::geom_line(ggplot2::aes(y = .data$segment_mean), color = "red", linewidth = 1)
 
   if (x$n_changepoints > 0) {
     p <- p + ggplot2::geom_vline(xintercept = x$changepoints,

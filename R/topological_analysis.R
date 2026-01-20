@@ -253,14 +253,24 @@ print.persistent_homology <- function(x, ...) {
 
 #' Plot Persistence Diagram
 #'
-#' @param x Persistent homology result
+#' @param x Persistent homology result or CaExperiment object
 #' @param diagonal Show diagonal line
+#' @param name Name of TDA result when x is a CaExperiment (default: "tda")
 #' @param ... Additional arguments
 #'
 #' @export
-plot_persistence_diagram <- function(x, diagonal = TRUE, ...) {
+plot_persistence_diagram <- function(x, diagonal = TRUE, name = "tda", ...) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 required")
+  }
+
+  # Handle CaExperiment objects
+  if (inherits(x, "CaExperiment")) {
+    ca <- x
+    x <- ca$misc[[name]]
+    if (is.null(x)) {
+      stop("No TDA results found. Run RunTDA() first.")
+    }
   }
 
   diagram <- x$diagram

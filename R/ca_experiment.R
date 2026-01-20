@@ -525,6 +525,112 @@ GetCommands <- function(object, n = NULL) {
   commands
 }
 
+#' Get Connectivity (alias for GetGraph)
+#'
+#' @param object CaExperiment object
+#' @param name Name of connectivity graph (default: first available)
+#'
+#' @return Connectivity matrix
+#' @export
+GetConnectivity <- function(object, name = NULL) {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  if (length(object$graphs) == 0) {
+    stop("No connectivity data available. Run RunConnectivity() first.")
+  }
+
+  if (is.null(name)) {
+    name <- names(object$graphs)[1]
+  }
+
+  object$graphs[[name]]
+}
+
+#' Get HMM Results
+#'
+#' @param object CaExperiment object
+#' @param name Name of HMM result (default: "hmm_hmm")
+#'
+#' @return HMM fit object
+#' @export
+GetHMM <- function(object, name = "hmm_hmm") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  result <- object$misc[[name]]
+  if (is.null(result)) {
+    stop("No HMM results found. Run RunHMM() first.")
+  }
+
+  result
+}
+
+#' Get Changepoint Results
+#'
+#' @param object CaExperiment object
+#' @param name Name of changepoint result (default: "changepoints")
+#'
+#' @return Changepoint detection result
+#' @export
+GetChangepoints <- function(object, name = "changepoints") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  result <- object$misc[[name]]
+  if (is.null(result)) {
+    stop("No changepoint results found. Run RunChangepoints() first.")
+  }
+
+  result
+}
+
+#' Get TDA Results
+#'
+#' @param object CaExperiment object
+#' @param name Name of TDA result (default: "tda")
+#'
+#' @return Persistent homology result
+#' @export
+GetTDA <- function(object, name = "tda") {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  result <- object$misc[[name]]
+  if (is.null(result)) {
+    stop("No TDA results found. Run RunTDA() first.")
+  }
+
+  result
+}
+
+#' Get Sequence Detection Results
+#'
+#' @param object CaExperiment object
+#' @param name Name of sequence result (default: "default")
+#'
+#' @return Sequence detection result
+#' @export
+GetSequences <- function(object, name = NULL) {
+  if (!inherits(object, "CaExperiment")) {
+    stop("object must be a CaExperiment")
+  }
+
+  if (length(object$sequences) == 0) {
+    stop("No sequence data available. Run RunSequences() first.")
+  }
+
+  if (is.null(name)) {
+    name <- names(object$sequences)[1]
+  }
+
+  object$sequences[[name]]
+}
+
 # ============================================================================
 # Setter Functions
 # ============================================================================
@@ -1088,7 +1194,8 @@ RunPCA <- function(object,
 #'
 #' @param object CaExperiment object
 #' @param n_latents Number of latent dimensions
-#' @param trial_ids Vector of trial identifiers
+#' @param trial_ids Vector of trial identifiers (length = n_frames), indicating which trial each frame belongs to
+#' @param bin_width Temporal bin width for GPFA (default 20)
 #' @param assay Source assay
 #' @param name Name for reduction
 #' @param ... Additional arguments to fit_gpfa
@@ -1098,6 +1205,7 @@ RunPCA <- function(object,
 RunGPFA <- function(object,
                     n_latents = 3,
                     trial_ids = NULL,
+                    bin_width = 20,
                     assay = NULL,
                     name = "gpfa",
                     ...) {
@@ -1111,14 +1219,28 @@ RunGPFA <- function(object,
 
   traces <- GetTraces(object, assay = assay)
 
+  # Convert traces to trials format for fit_gpfa
+  if (!is.null(trial_ids)) {
+    # trial_ids is a vector of length n_frames indicating which trial each frame belongs to
+    unique_trials <- unique(trial_ids)
+    trials <- lapply(unique_trials, function(tid) {
+      idx <- which(trial_ids == tid)
+      traces[, idx, drop = FALSE]
+    })
+  } else {
+    # Treat entire trace as single trial
+    trials <- list(traces)
+  }
+
   # Run GPFA
-  gpfa_result <- fit_gpfa(traces, n_latents = n_latents,
-                          trial_ids = trial_ids, ...)
+  gpfa_result <- fit_gpfa(trials, n_latents = n_latents,
+                          bin_width = bin_width, ...)
 
   object$reductions[[name]] <- gpfa_result
 
   log_command(object, "RunGPFA", list(
     n_latents = n_latents,
+    bin_width = bin_width,
     source_assay = assay,
     name = name
   ))
@@ -1440,35 +1562,65 @@ RunTuning <- function(object,
 
 #' Run State Space Trajectories
 #'
+#' Compute state space trajectories from neural activity data.
+#'
 #' @param object CaExperiment object
-#' @param reduction Name of reduction to use for trajectories
-#' @param dims Dimensions to use
-#' @param smooth Smoothing parameter
+#' @param method Dimensionality reduction method: "pca", "umap", "tsne", or "fa".
+#'   If NULL, uses existing reduction specified by `reduction` parameter.
+#' @param n_components Number of dimensions for trajectory (default 3)
+#' @param reduction Name of existing reduction to use (alternative to method)
+#' @param dims Dimensions to use from existing reduction (default 1:3)
+#' @param assay Source assay when computing from scratch with method
 #' @param name Name for trajectory result
+#' @param ... Additional arguments passed to compute_trajectories
 #'
 #' @return Modified CaExperiment object
 #' @export
 RunTrajectories <- function(object,
-                            reduction = "pca",
+                            method = NULL,
+                            n_components = 3,
+                            reduction = NULL,
                             dims = 1:3,
-                            smooth = 5,
-                            name = "default") {
+                            assay = NULL,
+                            name = "default",
+                            ...) {
   if (!inherits(object, "CaExperiment")) {
     stop("object must be a CaExperiment")
   }
 
-  # Get embeddings
-  embeddings <- GetEmbeddings(object, reduction, dims = dims)
-
-  # Compute trajectories
-  traj_result <- compute_trajectories(embeddings, smooth = smooth)
+  if (!is.null(method)) {
+    # Compute trajectories from traces using specified method
+    if (is.null(assay)) {
+      assay <- object$active_assay
+    }
+    traces <- GetTraces(object, assay = assay)
+    traj_result <- compute_trajectories(traces, method = method, n_dims = n_components, ...)
+  } else {
+    # Use existing reduction
+    if (is.null(reduction)) {
+      reduction <- "pca"  # Default to PCA
+    }
+    embeddings <- GetEmbeddings(object, reduction, dims = dims)
+    # Create trajectory structure from existing embeddings
+    traj_result <- structure(
+      list(
+        coords = embeddings,
+        method = reduction,
+        n_dims = length(dims),
+        n_cells = nrow(GetTraces(object)),
+        n_time = ncol(GetTraces(object)),
+        time = seq_len(ncol(GetTraces(object)))
+      ),
+      class = "state_trajectory"
+    )
+  }
 
   object$trajectories[[name]] <- traj_result
 
   log_command(object, "RunTrajectories", list(
-    reduction = reduction,
+    method = method %||% reduction,
+    n_components = n_components,
     dims = paste(dims, collapse = ","),
-    smooth = smooth,
     name = name
   ))
 }
@@ -1667,50 +1819,75 @@ RunTDA <- function(object, reduction = "pca", max_dim = 1, name = "tda") {
 #'
 #' @param object CaExperiment object
 #' @param reduction Name of reduction to use
-#' @param embed_dim Embedding dimension
+#' @param embed_dim Embedding dimension (alias: embedding_dim)
+#' @param embed_delay Time delay for embedding (alias: delay)
+#' @param embedding_dim Alias for embed_dim
+#' @param delay Alias for embed_delay
 #' @param name Name for result
+#' @param ... Additional arguments to recurrence_plot
 #'
 #' @return Modified CaExperiment object
 #' @export
-RunRQA <- function(object, reduction = "pca", embed_dim = 3, name = "rqa") {
+RunRQA <- function(object, reduction = "pca", embed_dim = 3, embed_delay = 1,
+                   embedding_dim = NULL, delay = NULL, name = "rqa", ...) {
   if (!inherits(object, "CaExperiment")) {
     stop("object must be a CaExperiment")
   }
 
+  # Handle parameter aliases
+  if (!is.null(embedding_dim)) embed_dim <- embedding_dim
+  if (!is.null(delay)) embed_delay <- delay
+
   embeddings <- GetEmbeddings(object, reduction)
-  rp <- recurrence_plot(embeddings, embed_dim = embed_dim)
+  rp <- recurrence_plot(embeddings, embed_dim = embed_dim, embed_delay = embed_delay, ...)
   rqa <- rqa_metrics(rp)
 
   object$misc[[name]] <- list(recurrence_plot = rp, metrics = rqa)
 
-  log_command(object, "RunRQA", list(reduction = reduction, embed_dim = embed_dim, name = name))
+  log_command(object, "RunRQA", list(reduction = reduction, embed_dim = embed_dim, embed_delay = embed_delay, name = name))
 }
 
 #' Run Causal Discovery
 #'
+#' Infer causal relationships between neurons using various methods.
+#'
 #' @param object CaExperiment object
-#' @param method "pc", "fci", or "ges"
-#' @param alpha Significance level
+#' @param method Causal discovery method: "pc", "fci", "ges", or "gc" (Granger causality)
+#' @param alpha Significance level for independence tests (PC/FCI) or p-value threshold (GC)
+#' @param max_lag Maximum lag for Granger causality (only used when method = "gc")
 #' @param assay Source assay
 #' @param name Name for result
 #'
 #' @return Modified CaExperiment object
 #' @export
 RunCausalDiscovery <- function(object, method = "pc", alpha = 0.01,
-                                assay = NULL, name = "causal") {
+                                max_lag = 5, assay = NULL, name = "causal") {
   if (!inherits(object, "CaExperiment")) {
     stop("object must be a CaExperiment")
   }
 
+  method <- match.arg(method, c("pc", "fci", "ges", "gc", "granger"))
+
   if (is.null(assay)) assay <- object$active_assay
   traces <- GetTraces(object, assay = assay)
 
-  causal_result <- discover_neural_causality(traces, method = method, alpha = alpha)
+  if (method %in% c("gc", "granger")) {
+    # Use Granger causality from network_analysis.R
+    gc_matrix <- granger_causality(traces, max_lag = max_lag)
+    causal_result <- list(
+      adjacency = gc_matrix,
+      method = "granger",
+      max_lag = max_lag
+    )
+  } else {
+    # Use constraint-based methods from causal_discovery.R
+    causal_result <- discover_neural_causality(traces, method = method, alpha = alpha)
+  }
 
   object$graphs[[name]] <- causal_result$adjacency %||% causal_result$skeleton
   object$misc[[paste0("causal_", name)]] <- causal_result
 
-  log_command(object, "RunCausalDiscovery", list(method = method, alpha = alpha, name = name))
+  log_command(object, "RunCausalDiscovery", list(method = method, alpha = alpha, max_lag = max_lag, name = name))
 }
 
 #' Run Neural ODE
@@ -1746,14 +1923,19 @@ RunNeuralODE <- function(object, latent_dim = 3, n_epochs = 50,
 
 #' Run Gaussian Process Smoothing
 #'
+#' Smooth neural traces using Gaussian Process regression.
+#'
 #' @param object CaExperiment object
-#' @param kernel GP kernel type
+#' @param kernel GP kernel type: "rbf", "matern32", "matern52", or "periodic"
+#' @param length_scale Length scale parameter for kernel (NULL for automatic optimization)
 #' @param assay Source assay
 #' @param assay_name Name for smoothed assay
+#' @param ... Additional arguments to fit_gp_traces
 #'
 #' @return Modified CaExperiment object
 #' @export
-RunGPSmooth <- function(object, kernel = "rbf", assay = NULL, assay_name = "gp_smooth") {
+RunGPSmooth <- function(object, kernel = "rbf", length_scale = NULL,
+                        assay = NULL, assay_name = "gp_smooth", ...) {
   if (!inherits(object, "CaExperiment")) {
     stop("object must be a CaExperiment")
   }
@@ -1762,13 +1944,13 @@ RunGPSmooth <- function(object, kernel = "rbf", assay = NULL, assay_name = "gp_s
   traces <- GetTraces(object, assay = assay)
   time <- object$time
 
-  gp_fit <- fit_gp_traces(time, traces, kernel = kernel)
+  gp_fit <- fit_gp_traces(time, traces, kernel = kernel, length_scale = length_scale, ...)
   pred <- predict_gp_traces(gp_fit, time, return_var = FALSE)
 
   object$assays[[assay_name]] <- pred$mean
   object$misc$gp_fit <- gp_fit
 
-  log_command(object, "RunGPSmooth", list(kernel = kernel, assay_name = assay_name))
+  log_command(object, "RunGPSmooth", list(kernel = kernel, length_scale = length_scale, assay_name = assay_name))
 }
 
 #' Run Optimal Transport Comparison

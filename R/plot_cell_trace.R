@@ -209,24 +209,31 @@ plot_cell_trace_vector <- function(trace, spikes, colors = NULL, verbose = FALSE
 }
 
 #' Plot Multiple Cell Traces
-#' 
+#'
 #' Creates a faceted plot showing multiple cell traces simultaneously.
-#' 
-#' @param corrected_df Output of [calcium_correction()]
-#' @param cells Vector of cell names to plot (default: all cells)
+#'
+#' @param corrected_df Output of [calcium_correction()] or CaExperiment object
+#' @param cells Vector of cell names/indices to plot (default: first 6 cells)
 #' @param ncol Number of columns in the faceted plot (default: 3)
 #' @param method Spike inference method
 #' @param show_spikes Whether to show detected spikes
 #' @param show_deconvolved Whether to show deconvolved signal
 #' @param verbose Whether to show progress messages
-#' 
+#' @param assay Assay to use when corrected_df is a CaExperiment (default: "dff")
+#'
 #' @return ggplot object
-#' 
+#'
 #' @examples
+#' \dontrun{
+#' # From CaExperiment
+#' plot_multiple_cells(ca, cells = 1:6)
+#'
+#' # From corrected data frame
 #' raw <- generate_synthetic_data(6, 500)
 #' corrected <- calcium_correction(raw)
 #' p <- plot_multiple_cells(corrected, ncol = 2)
-#' 
+#' }
+#'
 #' @export
 plot_multiple_cells <- function(corrected_df,
                                cells = NULL,
@@ -234,44 +241,109 @@ plot_multiple_cells <- function(corrected_df,
                                method = "oasis",
                                show_spikes = TRUE,
                                show_deconvolved = TRUE,
-                               verbose = FALSE) {
-  
+                               verbose = FALSE,
+                               assay = "dff") {
+
   # Validate ncol parameter
   if (!is.numeric(ncol) || length(ncol) != 1 || ncol <= 0) {
     stop("ncol must be a positive numeric value")
   }
-  
+
+  # Handle CaExperiment objects
+  if (inherits(corrected_df, "CaExperiment")) {
+    ca <- corrected_df
+    traces <- GetTraces(ca, assay = assay)
+    frame_rate <- ca$frame_rate %||% 10
+
+    # Get cells
+    if (is.null(cells)) {
+      cells <- 1:min(6, nrow(traces))
+    } else if (is.numeric(cells)) {
+      cells <- cells[cells <= nrow(traces)]
+    }
+
+    # Get spikes if available
+    spikes_mat <- if (show_spikes && length(ca$spikes) > 0) GetSpikes(ca) else NULL
+
+    # Create time vector
+    time_vec <- seq(0, (ncol(traces) - 1) / frame_rate, length.out = ncol(traces))
+
+    # Create plots for each cell
+    plot_list <- lapply(cells, function(cell_idx) {
+      trace_data <- data.frame(
+        time = time_vec,
+        Signal = traces[cell_idx, ]
+      )
+
+      p <- ggplot2::ggplot(trace_data, ggplot2::aes(x = .data$time, y = .data$Signal)) +
+        ggplot2::geom_line(color = "#377EB8", linewidth = 0.5) +
+        ggplot2::labs(title = paste("Cell", cell_idx), x = "Time (s)", y = "Signal") +
+        ggplot2::theme_minimal()
+
+      # Add spikes if available
+      if (!is.null(spikes_mat)) {
+        spike_times <- which(spikes_mat[cell_idx, ] > 0)
+        if (length(spike_times) > 0) {
+          spike_data <- data.frame(
+            time = time_vec[spike_times],
+            Signal = traces[cell_idx, spike_times]
+          )
+          p <- p + ggplot2::geom_point(
+            data = spike_data,
+            ggplot2::aes(x = .data$time, y = .data$Signal),
+            color = "#E41A1C", size = 1.5, alpha = 0.8
+          )
+        }
+      }
+
+      return(p)
+    })
+
+    # Combine plots using patchwork if available
+    if (requireNamespace("patchwork", quietly = TRUE)) {
+      combined_plot <- Reduce(`+`, plot_list) +
+        patchwork::plot_layout(ncol = ncol)
+      return(combined_plot)
+    } else if (requireNamespace("gridExtra", quietly = TRUE)) {
+      return(gridExtra::grid.arrange(grobs = plot_list, ncol = ncol))
+    } else {
+      warning("Neither patchwork nor gridExtra available. Returning list of plots.")
+      return(plot_list)
+    }
+  }
+
+  # Original behavior for corrected_df format
   # Get cell columns if not specified
   if (is.null(cells)) {
     config <- get_config()
     cells <- names(corrected_df)[grepl(config$cell_pattern, names(corrected_df))]
   }
-  
+
   # Validate cells
   missing_cells <- setdiff(cells, names(corrected_df))
   if (length(missing_cells) > 0) {
     stop("Cells not found in data: ", paste(missing_cells, collapse = ", "))
   }
-  
+
   if (verbose) {
     message("Creating multi-cell plot for ", length(cells), " cells")
   }
-  
+
   # Create plots for each cell
   plot_list <- lapply(cells, function(cell) {
     plot_cell_trace(
-      corrected_df, 
-      cell, 
+      corrected_df,
+      cell,
       method = method,
       show_spikes = show_spikes,
       show_deconvolved = show_deconvolved,
       verbose = verbose
     ) + ggplot2::labs(title = cell)
   })
-  
+
   # Combine plots using patchwork if available
   if (requireNamespace("patchwork", quietly = TRUE)) {
-    combined_plot <- Reduce(`+`, plot_list) + 
+    combined_plot <- Reduce(`+`, plot_list) +
       patchwork::plot_layout(ncol = ncol)
     return(combined_plot)
   } else {

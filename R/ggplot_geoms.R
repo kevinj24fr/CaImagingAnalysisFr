@@ -340,16 +340,24 @@ plot_traces <- function(data, y_var = "value", color_var = NULL,
 
 #' Plot correlation matrix
 #'
-#' @param cor_matrix Correlation matrix
+#' @param cor_matrix Correlation matrix or CaExperiment object
 #' @param title Plot title
 #' @param cluster Hierarchically cluster cells
+#' @param assay Assay to use when cor_matrix is a CaExperiment (default: "dff")
 #'
 #' @return ggplot2 object
 #' @export
 plot_correlation_matrix <- function(cor_matrix, title = "Pairwise Correlations",
-                                    cluster = TRUE) {
+                                    cluster = TRUE, assay = "dff") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package required")
+  }
+
+  # Handle CaExperiment objects
+  if (inherits(cor_matrix, "CaExperiment")) {
+    ca <- cor_matrix
+    traces <- GetTraces(ca, assay = assay)
+    cor_matrix <- cor(t(traces), use = "pairwise.complete.obs")
   }
 
   if (cluster) {

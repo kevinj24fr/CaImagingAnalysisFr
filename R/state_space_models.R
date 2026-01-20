@@ -721,14 +721,28 @@ print.slds_fit <- function(x, ...) {
 
 #' Plot HMM or SLDS Results
 #'
-#' @param x HMM or SLDS fit object
-#' @param trace Optional trace to overlay
+#' @param x HMM or SLDS fit object or CaExperiment object
+#' @param trace Optional trace to overlay (auto-extracted from CaExperiment)
+#' @param name Name of HMM result when x is a CaExperiment (default: "hmm_hmm")
+#' @param assay Assay to use when x is a CaExperiment (default: "dff")
 #' @param ... Additional arguments
 #'
 #' @export
-plot_state_model <- function(x, trace = NULL, ...) {
+plot_state_model <- function(x, trace = NULL, name = "hmm_hmm", assay = "dff", ...) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 required for plotting")
+  }
+
+  # Handle CaExperiment objects
+  if (inherits(x, "CaExperiment")) {
+    ca <- x
+    x <- ca$misc[[name]]
+    if (is.null(x)) {
+      stop("No HMM/SLDS results found. Run RunHMM() or RunSLDS() first.")
+    }
+    if (is.null(trace)) {
+      trace <- GetTraces(ca, assay = assay)
+    }
   }
 
   if (inherits(x, "hmm_fit")) {
@@ -741,13 +755,13 @@ plot_state_model <- function(x, trace = NULL, ...) {
     if (!is.null(trace)) {
       df$value <- if (is.matrix(trace)) colMeans(trace) else trace
 
-      p <- ggplot2::ggplot(df, ggplot2::aes(x = time)) +
-        ggplot2::geom_line(ggplot2::aes(y = value), alpha = 0.7) +
-        ggplot2::geom_point(ggplot2::aes(y = value, color = state), size = 0.5) +
+      p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$time)) +
+        ggplot2::geom_line(ggplot2::aes(y = .data$value), alpha = 0.7) +
+        ggplot2::geom_point(ggplot2::aes(y = .data$value, color = .data$state), size = 0.5) +
         ggplot2::labs(title = "HMM State Sequence", x = "Time", y = "Activity") +
         ggplot2::theme_minimal()
     } else {
-      p <- ggplot2::ggplot(df, ggplot2::aes(x = time, y = 1, fill = state)) +
+      p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$time, y = 1, fill = .data$state)) +
         ggplot2::geom_tile() +
         ggplot2::labs(title = "HMM State Sequence", x = "Time", y = "") +
         ggplot2::theme_minimal() +
@@ -763,9 +777,9 @@ plot_state_model <- function(x, trace = NULL, ...) {
       state = factor(rep(x$discrete_states, x$latent_dim))
     )
 
-    p <- ggplot2::ggplot(df, ggplot2::aes(x = time, y = value, color = state)) +
+    p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$time, y = .data$value, color = .data$state)) +
       ggplot2::geom_line(alpha = 0.8) +
-      ggplot2::facet_wrap(~paste("Latent", dim), scales = "free_y", ncol = 1) +
+      ggplot2::facet_wrap(~paste("Latent", .data$dim), scales = "free_y", ncol = 1) +
       ggplot2::labs(title = "SLDS Latent Trajectories", x = "Time", y = "Latent State") +
       ggplot2::theme_minimal()
   }

@@ -10,7 +10,6 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/kevinj24fr/CaImagingAnalysisFr/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a>
   <a href="https://codecov.io/gh/kevinj24fr/CaImagingAnalysisFr"><img src="https://codecov.io/gh/kevinj24fr/CaImagingAnalysisFr/branch/main/graph/badge.svg" alt="codecov"></a>
   <a href="https://kevinj24fr.github.io/CaImagingAnalysisFr/"><img src="https://img.shields.io/badge/docs-pkgdown-blue" alt="Documentation"></a>
 </p>

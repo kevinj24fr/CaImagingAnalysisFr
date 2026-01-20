@@ -1,381 +1,431 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="CaImagingAnalysisFr: an R package for calcium imaging analysis with a Seurat-style object API, preprocessing, latent models, connectivity, and visualization." />
-  <meta name="theme-color" content="#0f172a" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="CaImagingAnalysisFr — an R package for calcium imaging analysis: preprocessing, event/spike inference, latent models, connectivity, and publication-grade plots." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0b1224" />
 
-  <!-- OpenGraph -->
   <meta property="og:title" content="CaImagingAnalysisFr" />
-  <meta property="og:description" content="R package for calcium imaging analysis with a Seurat-style object API, preprocessing, latent models, connectivity, and visualization." />
+  <meta property="og:description" content="R package for calcium imaging analysis — traces → events → models → networks → figures." />
   <meta property="og:type" content="website" />
 
-  <title>CaImagingAnalysisFr - R Package for Calcium Imaging Analysis</title>
+  <title>CaImagingAnalysisFr</title>
 
   <style>
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --bg: #0b1224;
-      --bg-card: #121c33;
-      --bg-card-2: #0f172a;
-      --text: #e6edf7;
-      --text-muted: #9fb0c8;
-      --border: #23304a;
-      --success: #10b981;
-      --code-bg: #0d1117;
-      --shadow: 0 10px 30px rgba(0,0,0,0.35);
-      --radius: 14px;
-      --radius-sm: 10px;
-      --maxw: 1120px;
+    :root{
+      --bg0:#070b18;
+      --bg1:#0b1224;
+      --card:#0f1a33;
+      --card2:#0b142b;
+      --text:#e8eef9;
+      --muted:#a8b4cc;
+      --muted2:#8795b2;
+      --border:rgba(255,255,255,.10);
+      --border2:rgba(255,255,255,.07);
+      --accent:#60a5fa;
+      --accent2:#a78bfa;
+      --good:#10b981;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --shadow2: 0 10px 28px rgba(0,0,0,.35);
+      --r12:12px;
+      --r16:16px;
+      --r20:20px;
+      --max:1120px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: radial-gradient(1200px 600px at 20% 0%, rgba(96,165,250,0.12), transparent 60%),
-                  radial-gradient(900px 500px at 80% 10%, rgba(167,139,250,0.10), transparent 55%),
-                  var(--bg);
+    *{ box-sizing:border-box; margin:0; padding:0; }
+    html{ scroll-behavior:smooth; }
+    body{
+      font-family: var(--sans);
       color: var(--text);
-      line-height: 1.65;
+      background:
+        radial-gradient(900px 500px at 12% 0%, rgba(96,165,250,.16), transparent 60%),
+        radial-gradient(900px 500px at 82% 8%, rgba(167,139,250,.12), transparent 60%),
+        radial-gradient(700px 400px at 50% 110%, rgba(16,185,129,.08), transparent 55%),
+        linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 55%, #060916 100%);
+      line-height:1.65;
     }
 
-    a { color: inherit; }
-    .container { max-width: var(--maxw); margin: 0 auto; padding: 0 1.25rem; }
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ color: var(--accent); }
 
-    /* Top nav */
-    .nav {
+    .wrap{ max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+
+    /* Topbar */
+    .topbar{
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
+      background: rgba(7,11,24,.62);
+      border-bottom: 1px solid var(--border2);
       backdrop-filter: blur(10px);
-      background: rgba(11, 18, 36, 0.75);
-      border-bottom: 1px solid rgba(35,48,74,0.8);
     }
-    .nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.9rem 0;
-      gap: 1rem;
+    .topbar .wrap{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 20px;
+      gap: 14px;
     }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      text-decoration: none;
-      font-weight: 650;
-      letter-spacing: 0.2px;
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: .2px;
       white-space: nowrap;
     }
-    .logo {
-      width: 30px;
-      height: 30px;
-      border-radius: 9px;
-      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
-      box-shadow: 0 8px 20px rgba(96,165,250,0.18);
-      border: 1px solid rgba(255,255,255,0.08);
+    .logo{
+      width: 30px; height: 30px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 10px 25px rgba(96,165,250,.20);
+      border: 1px solid rgba(255,255,255,.10);
+      flex: 0 0 auto;
     }
-    .nav-links {
-      display: flex;
-      gap: 0.75rem;
+
+    .nav{
+      display:flex;
+      gap: 10px;
       flex-wrap: wrap;
-      justify-content: flex-end;
+      justify-content:flex-end;
+      align-items:center;
     }
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.92rem;
-      padding: 0.35rem 0.55rem;
+    .nav a{
+      color: var(--muted);
+      font-size: .92rem;
+      padding: 7px 10px;
       border-radius: 10px;
       border: 1px solid transparent;
     }
-    .nav-links a:hover {
+    .nav a:hover{
       color: var(--text);
-      background: rgba(18,28,51,0.7);
-      border-color: rgba(35,48,74,0.9);
+      background: rgba(15,26,51,.55);
+      border-color: var(--border2);
     }
 
-    header {
-      padding: 4.0rem 0 2.5rem 0;
-      border-bottom: 1px solid rgba(35,48,74,0.7);
+    /* Hero */
+    header{
+      padding: 64px 0 34px;
+      border-bottom: 1px solid var(--border2);
     }
-    h1 {
-      font-size: clamp(2.1rem, 3.6vw, 3.2rem);
-      line-height: 1.1;
-      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 1rem;
+    .hero{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 18px;
+      align-items:start;
+    }
+    @media (max-width: 900px){
+      .hero{ grid-template-columns: 1fr; }
+    }
+
+    h1{
+      font-size: clamp(2.1rem, 3.4vw, 3.1rem);
+      line-height: 1.08;
+      margin-bottom: 14px;
       letter-spacing: -0.6px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
-    .tagline {
-      font-size: clamp(1.05rem, 1.5vw, 1.25rem);
-      color: var(--text-muted);
-      margin-bottom: 1.6rem;
-      max-width: 68ch;
-    }
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 1.4rem;
-      align-items: start;
-    }
-    @media (max-width: 860px) {
-      .hero-grid { grid-template-columns: 1fr; }
+    .lead{
+      color: var(--muted);
+      max-width: 70ch;
+      font-size: 1.05rem;
+      margin-bottom: 18px;
     }
 
-    .badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    .badge {
-      background: rgba(18,28,51,0.7);
-      border: 1px solid rgba(35,48,74,0.9);
-      padding: 0.45rem 0.85rem;
-      border-radius: 9999px;
-      font-size: 0.88rem;
-      color: var(--text-muted);
+    .badges{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .badge{
+      font-size: .88rem;
+      color: var(--muted);
+      background: rgba(15,26,51,.60);
+      border: 1px solid var(--border2);
+      padding: 6px 10px;
+      border-radius: 999px;
     }
 
-    .hero-card {
-      background: linear-gradient(180deg, rgba(18,28,51,0.85), rgba(15,23,42,0.75));
-      border: 1px solid rgba(35,48,74,0.9);
-      border-radius: var(--radius);
-      padding: 1.1rem;
-      box-shadow: var(--shadow);
+    .cta{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
     }
-    .hero-card h3 {
-      font-size: 1.02rem;
-      margin-bottom: 0.6rem;
-      color: #60a5fa;
-    }
-    .hero-card p, .hero-card li { color: var(--text-muted); font-size: 0.95rem; }
-    .hero-card ul { margin-left: 1.1rem; margin-top: 0.3rem; }
-
-    .cta-row { margin-top: 1.4rem; display: flex; gap: 0.7rem; flex-wrap: wrap; }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      background: var(--primary);
-      color: white;
-      padding: 0.78rem 1.15rem;
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 11px 14px;
       border-radius: 12px;
-      text-decoration: none;
-      font-weight: 600;
-      border: 1px solid rgba(255,255,255,0.08);
-      transition: transform 0.12s, background 0.12s;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(135deg, rgba(37,99,235,.95), rgba(167,139,250,.70));
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 12px 35px rgba(37,99,235,.18);
     }
-    .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-    .btn-outline {
-      background: rgba(18,28,51,0.35);
-      border: 1px solid rgba(35,48,74,0.9);
+    .btn:hover{ filter: brightness(1.06); color: white; }
+    .btn.secondary{
+      background: rgba(15,26,51,.55);
+      border-color: var(--border2);
+      box-shadow: none;
+      color: var(--text);
+      font-weight: 650;
+    }
+    .btn.secondary:hover{
+      background: rgba(15,26,51,.80);
       color: var(--text);
     }
-    .btn-outline:hover { background: rgba(18,28,51,0.8); }
+    .btn .dot{
+      width: 8px; height: 8px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.75);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.12);
+    }
 
-    section { padding: 3.0rem 0; }
-    .section-title {
-      font-size: 1.4rem;
-      margin-bottom: 0.8rem;
-      color: #60a5fa;
+    .heroCard{
+      border-radius: var(--r20);
+      background: linear-gradient(180deg, rgba(15,26,51,.82), rgba(11,20,43,.70));
+      border: 1px solid var(--border2);
+      box-shadow: var(--shadow2);
+      padding: 16px 16px 14px;
+    }
+    .heroCard h3{
+      color: var(--accent);
+      font-size: 1.02rem;
+      margin-bottom: 8px;
+      letter-spacing: .1px;
+    }
+    .heroCard p, .heroCard li{
+      color: var(--muted);
+      font-size: .95rem;
+    }
+    .heroCard ul{
+      margin-top: 8px;
+      margin-left: 18px;
+    }
+    .fine{
+      margin-top: 10px;
+      color: var(--muted2);
+      font-size: .88rem;
+    }
+
+    /* Sections */
+    section{ padding: 42px 0; }
+    .title{
+      font-size: 1.35rem;
+      margin-bottom: 8px;
+      color: var(--accent);
       letter-spacing: -0.2px;
     }
-    .section-sub {
-      color: var(--text-muted);
-      margin-bottom: 1.5rem;
-      max-width: 80ch;
+    .sub{
+      color: var(--muted);
+      margin-bottom: 16px;
+      max-width: 82ch;
     }
 
-    /* Feature cards */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.1rem;
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
     }
-    .feature {
-      background: rgba(18,28,51,0.7);
-      border: 1px solid rgba(35,48,74,0.9);
-      border-radius: var(--radius);
-      padding: 1.2rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    .card{
+      grid-column: span 6;
+      border-radius: var(--r16);
+      background: rgba(15,26,51,.60);
+      border: 1px solid var(--border2);
+      padding: 16px;
+      box-shadow: var(--shadow2);
     }
-    .feature h3 { color: #60a5fa; margin-bottom: 0.55rem; font-size: 1.05rem; }
-    .feature p { color: var(--text-muted); font-size: 0.95rem; }
-
-    /* Code blocks + copy button */
-    .code-wrap {
-      position: relative;
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid rgba(35,48,74,0.9);
-      background: var(--code-bg);
+    @media (max-width: 900px){
+      .card{ grid-column: span 12; }
     }
-    pre {
-      margin: 0;
-      padding: 1.1rem 1.1rem 1.1rem 1.1rem;
-      overflow-x: auto;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.92rem;
-      line-height: 1.55;
-    }
-    code { color: #7dd3fc; }
-    .copy-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(18,28,51,0.75);
+    .card h3{
+      font-size: 1.02rem;
+      margin-bottom: 8px;
       color: var(--text);
-      border: 1px solid rgba(35,48,74,0.9);
+      letter-spacing: -0.15px;
+    }
+    .card p{ color: var(--muted); font-size: .95rem; }
+
+    .klist{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .pill{
+      font-family: var(--mono);
+      font-size: .88rem;
+      color: rgba(167,139,250,.95);
+      background: rgba(11,18,36,.62);
+      border: 1px solid rgba(167,139,250,.20);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    /* Code blocks */
+    .codeWrap{
+      position: relative;
+      border-radius: var(--r16);
+      overflow: hidden;
+      border: 1px solid var(--border2);
+      background: #0b1020;
+      box-shadow: var(--shadow2);
+    }
+    pre{
+      margin:0;
+      padding: 14px 14px 16px;
+      overflow-x:auto;
+      font-family: var(--mono);
+      font-size: .92rem;
+      line-height: 1.55;
+      color: #dbeafe;
+      background:
+        radial-gradient(600px 240px at 10% 0%, rgba(96,165,250,.10), transparent 60%),
+        radial-gradient(600px 240px at 90% 10%, rgba(167,139,250,.08), transparent 60%),
+        #0b1020;
+    }
+    code{ font-family: var(--mono); color: #7dd3fc; }
+    .copy{
+      position:absolute;
+      top: 10px; right: 10px;
+      background: rgba(15,26,51,.70);
+      border: 1px solid var(--border2);
+      color: var(--text);
       border-radius: 10px;
-      padding: 0.35rem 0.55rem;
+      padding: 6px 10px;
+      font-size: .84rem;
       cursor: pointer;
-      font-size: 0.85rem;
+      user-select:none;
     }
-    .copy-btn:hover { background: rgba(18,28,51,0.95); }
+    .copy:hover{ background: rgba(15,26,51,.92); }
 
-    /* Two-column blocks */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.2rem;
+    /* Footer */
+    footer{
+      border-top: 1px solid var(--border2);
+      padding: 22px 0 30px;
+      color: var(--muted);
     }
-    @media (max-width: 860px) {
-      .grid-2 { grid-template-columns: 1fr; }
+    .foot{
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items:flex-start;
     }
-    .card {
-      background: rgba(18,28,51,0.7);
-      border: 1px solid rgba(35,48,74,0.9);
-      border-radius: var(--radius);
-      padding: 1.2rem;
-    }
-    .card h3 { color: #60a5fa; margin-bottom: 0.55rem; font-size: 1.05rem; }
-    .card p, .card li { color: var(--text-muted); font-size: 0.95rem; }
-    .card ul { margin-left: 1.1rem; margin-top: 0.35rem; }
-    .small { font-size: 0.9rem; color: var(--text-muted); }
-
-    /* Function list */
-    .func-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 0.45rem 0.8rem;
-      margin-top: 0.9rem;
-    }
-    .func {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      color: #a78bfa;
-      font-size: 0.9rem;
-      padding: 0.25rem 0.45rem;
-      border-radius: 10px;
-      border: 1px solid rgba(35,48,74,0.75);
-      background: rgba(15,23,42,0.35);
-      width: fit-content;
-    }
-
-    footer {
-      padding: 2rem 0;
-      border-top: 1px solid rgba(35,48,74,0.7);
-      color: var(--text-muted);
-    }
-    footer a { color: #60a5fa; text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
+    .foot a{ color: var(--muted); }
+    .foot a:hover{ color: var(--accent); }
+    .small{ font-size: .88rem; color: var(--muted2); }
 
     /* Accessibility */
-    :focus-visible { outline: 2px solid rgba(96,165,250,0.8); outline-offset: 2px; border-radius: 8px; }
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      .btn { transition: none; }
-      .btn:hover { transform: none; }
+    :focus-visible{
+      outline: 2px solid rgba(96,165,250,.75);
+      outline-offset: 2px;
+      border-radius: 10px;
+    }
+    @media (prefers-reduced-motion: reduce){
+      html{ scroll-behavior:auto; }
     }
   </style>
 </head>
 
 <body>
-  <div class="nav">
-    <div class="container nav-inner">
-      <a class="brand" href="#top" aria-label="CaImagingAnalysisFr Home">
+  <div class="topbar">
+    <div class="wrap">
+      <a class="brand" href="#top" aria-label="CaImagingAnalysisFr home">
         <span class="logo" aria-hidden="true"></span>
         <span>CaImagingAnalysisFr</span>
       </a>
-      <div class="nav-links" role="navigation" aria-label="Page navigation">
+
+      <nav class="nav" aria-label="Primary">
         <a href="#install">Install</a>
-        <a href="#quickstart">Quick Start</a>
-        <a href="#features">Features</a>
-        <a href="#functions">Functions</a>
-        <a href="#citation">Cite</a>
-      </div>
+        <a href="#quickstart">Quick start</a>
+        <a href="#scope">Scope</a>
+        <a href="#api">API</a>
+        <a href="#cite">Cite</a>
+        <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr" rel="noopener">GitHub</a>
+      </nav>
     </div>
   </div>
 
   <header id="top">
-    <div class="container hero-grid">
+    <div class="wrap hero">
       <div>
-        <h1>CaImagingAnalysisFr</h1>
-        <p class="tagline">
-          R package for calcium imaging analysis with a Seurat-style object API, preprocessing, latent models, connectivity, and visualization.
+        <h1>Calcium imaging analysis in R, end-to-end.</h1>
+        <p class="lead">
+          CaImagingAnalysisFr is a structured R toolkit for calcium imaging pipelines:
+          traces → preprocessing → event/spike inference → latent structure → connectivity → figures.
         </p>
 
-        <div class="badges" aria-label="Project highlights">
+        <div class="badges" aria-label="Highlights">
           <span class="badge">Seurat-style object API</span>
-          <span class="badge">Reproducible command history</span>
-          <span class="badge">Preprocessing → models → plots</span>
-          <span class="badge">HMM / SLDS / TDA (where implemented)</span>
+          <span class="badge">Provenance / commands</span>
+          <span class="badge">Models + networks + plots</span>
+          <span class="badge">Designed for real pipelines</span>
         </div>
 
-        <div class="cta-row">
-          <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr" class="btn">View on GitHub</a>
-          <a href="#install" class="btn btn-outline">Installation</a>
-          <a href="#citation" class="btn btn-outline">Citation</a>
+        <div class="cta">
+          <a class="btn" href="https://github.com/kevinj24fr/CaImagingAnalysisFr" rel="noopener">
+            <span class="dot" aria-hidden="true"></span>
+            View repository
+          </a>
+          <a class="btn secondary" href="#install">Install</a>
+          <a class="btn secondary" href="#quickstart">Run example</a>
         </div>
 
-        <p class="small" style="margin-top: 1rem;">
-          This page is intentionally conservative: it describes what the package aims to cover, but you should back claims with exported functions/vignettes in the repo.
+        <p class="fine">
+          No framework. No heavy JS. One page that loads fast and looks like a real product.
         </p>
       </div>
 
-      <div class="hero-card">
-        <h3>What this is (and isn’t)</h3>
-        <p>
-          A single entry point for calcium imaging workflows. It’s built around a
-          <strong>CaExperiment</strong> container to standardize traces, metadata, results, and provenance.
-        </p>
+      <aside class="heroCard">
+        <h3>What you get</h3>
+        <p>One container (<code>CaExperiment</code>) that keeps data + results + metadata consistent across steps.</p>
         <ul>
           <li><strong>Inputs:</strong> traces (cells × time), frame rate, metadata</li>
-          <li><strong>Outputs:</strong> dF/F, spikes/events, latent embeddings, graphs, plots</li>
-          <li><strong>Goal:</strong> consistent pipelines + clean accessors</li>
+          <li><strong>Outputs:</strong> dF/F, events/spikes, embeddings, graphs, plots</li>
+          <li><strong>Pattern:</strong> <code>Run*</code> methods + <code>Get*</code> accessors</li>
         </ul>
-      </div>
+        <p class="fine">
+          If a function isn’t exported/stable yet, don’t advertise it. This page stays clean and defensible.
+        </p>
+      </aside>
     </div>
   </header>
 
-  <section id="install">
-    <div class="container">
-      <h2 class="section-title">Installation</h2>
-      <p class="section-sub">Install directly from GitHub. If you rely on system libraries (e.g., for HMM/SLDS backends), document them in the repo README.</p>
+  <main>
+    <section id="install">
+      <div class="wrap">
+        <div class="title">Installation</div>
+        <div class="sub">Install directly from GitHub.</div>
 
-      <div class="code-wrap">
-        <button class="copy-btn" data-copy-target="install-code" aria-label="Copy installation code">Copy</button>
-        <pre id="install-code"><code># Install from GitHub
-install.packages("devtools")
+        <div class="codeWrap" role="group" aria-label="Installation code">
+          <button class="copy" data-copy="installCode" aria-label="Copy installation code">Copy</button>
+          <pre id="installCode"><code>install.packages("devtools")
 devtools::install_github("kevinj24fr/CaImagingAnalysisFr")</code></pre>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="quickstart">
-    <div class="container">
-      <h2 class="section-title">Quick Start</h2>
-      <p class="section-sub">
-        Minimal pipeline example. Keep this aligned with your exported API (don’t advertise functions that aren’t stable/exported).
-      </p>
+    <section id="quickstart">
+      <div class="wrap">
+        <div class="title">Quick start</div>
+        <div class="sub">Minimal pipeline. Keep this aligned with your actual exported API.</div>
 
-      <div class="code-wrap">
-        <button class="copy-btn" data-copy-target="qs-code" aria-label="Copy quick start code">Copy</button>
-        <pre id="qs-code"><code>library(CaImagingAnalysisFr)
+        <div class="codeWrap" role="group" aria-label="Quick start code">
+          <button class="copy" data-copy="qsCode" aria-label="Copy quick start code">Copy</button>
+          <pre id="qsCode"><code>library(CaImagingAnalysisFr)
 
-# Create CaExperiment and run a typical pipeline
 ca <- CaExperiment(traces, frame_rate = 30) |>
   RunDFF(method = "rolling", window_size = 300) |>
   RunSpikes(method = "threshold", threshold_sd = 2.5) |>
@@ -383,186 +433,167 @@ ca <- CaExperiment(traces, frame_rate = 30) |>
   RunConnectivity(method = "correlation") |>
   RunGraphMetrics()
 
-# Access results
-dff_traces <- GetTraces(ca, assay = "dff")
-spikes     <- GetSpikes(ca)
-pca        <- GetReduction(ca, "pca")
-conn       <- GetGraph(ca, "connectivity_correlation")
-
-# Optional advanced analysis (if available in your build)
-# ca <- RunHMM(ca, n_states = 3)
-# ca <- RunSLDS(ca, n_states = 2, latent_dim = 3)
-# ca <- RunTDA(ca)</code></pre>
-      </div>
-    </div>
-  </section>
-
-  <section id="features">
-    <div class="container">
-      <h2 class="section-title">Core Capabilities</h2>
-      <p class="section-sub">
-        The package is organized around a common object model and composable “Run*()” steps with explicit accessors.
-      </p>
-
-      <div class="features">
-        <div class="feature">
-          <h3>CaExperiment Object</h3>
-          <p>Unified Seurat-style container for traces, metadata, results, and command/provenance tracking.</p>
-        </div>
-        <div class="feature">
-          <h3>Preprocessing</h3>
-          <p>Typical steps: neuropil subtraction, dF/F, event/spike inference (method-dependent), QC, and normalization.</p>
-        </div>
-        <div class="feature">
-          <h3>Dimensionality Reduction</h3>
-          <p>Common reductions (e.g., PCA/GPFA-style embeddings) for population trajectories and state structure.</p>
-        </div>
-        <div class="feature">
-          <h3>Network Analysis</h3>
-          <p>Functional connectivity estimates, graph metrics, community detection, and network visualization.</p>
-        </div>
-        <div class="feature">
-          <h3>State Space Models</h3>
-          <p>State segmentation via HMM / switching models, plus changepoint-style methods (where implemented).</p>
-        </div>
-        <div class="feature">
-          <h3>Advanced Methods</h3>
-          <p>TDA / recurrence-style summaries / optimal transport-style comparisons (where implemented and documented).</p>
+dff   <- GetTraces(ca, assay = "dff")
+spk   <- GetSpikes(ca)
+pca   <- GetReduction(ca, "pca")
+graph <- GetGraph(ca, "connectivity_correlation")</code></pre>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="functions">
-    <div class="container">
-      <h2 class="section-title">Key Functions</h2>
-      <p class="section-sub">
-        If you want this to be bulletproof, auto-generate this list from your NAMESPACE exports during CI and paste it here.
-      </p>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3>CaExperiment “Run*()” methods</h3>
-          <div class="func-list" aria-label="Run methods">
-            <span class="func">RunDFF()</span>
-            <span class="func">RunSpikes()</span>
-            <span class="func">RunPCA()</span>
-            <span class="func">RunGPFA()</span>
-            <span class="func">RunConnectivity()</span>
-            <span class="func">RunGraphMetrics()</span>
-            <span class="func">RunAssemblies()</span>
-            <span class="func">RunTransients()</span>
-            <span class="func">RunHMM()</span>
-            <span class="func">RunSLDS()</span>
-            <span class="func">RunTDA()</span>
-            <span class="func">RunTensorDecomp()</span>
-            <span class="func">RunChangepoints()</span>
-            <span class="func">RunRQA()</span>
-            <span class="func">RunCausalDiscovery()</span>
-          </div>
+    <section id="scope">
+      <div class="wrap">
+        <div class="title">Scope</div>
+        <div class="sub">
+          Structured workflow coverage. You can tighten/expand this list without changing the layout.
         </div>
 
-        <div class="card">
-          <h3>Accessors + plotting</h3>
-          <p class="small">Prefer stable accessors over direct slot access. Keep plot functions explicit about inputs/units.</p>
-
-          <h4 style="margin-top: 0.9rem; color: var(--text-muted); font-size: 0.95rem;">Accessors</h4>
-          <div class="func-list" aria-label="Accessors">
-            <span class="func">GetTraces()</span>
-            <span class="func">GetSpikes()</span>
-            <span class="func">GetReduction()</span>
-            <span class="func">GetGraph()</span>
-            <span class="func">GetAssemblies()</span>
-            <span class="func">GetTransients()</span>
-            <span class="func">GetMetaData()</span>
-            <span class="func">GetCommands()</span>
+        <div class="grid">
+          <div class="card">
+            <h3>Preprocessing</h3>
+            <p>Standardization steps: baseline / dF/F, denoising, event/spike inference, QC summaries.</p>
+            <div class="klist">
+              <span class="pill">RunDFF()</span>
+              <span class="pill">RunSpikes()</span>
+              <span class="pill">RunTransients()</span>
+            </div>
           </div>
 
-          <h4 style="margin-top: 0.9rem; color: var(--text-muted); font-size: 0.95rem;">Visualization</h4>
-          <div class="func-list" aria-label="Visualization">
-            <span class="func">plot_neural_raster()</span>
-            <span class="func">plot_correlation_matrix()</span>
-            <span class="func">plot_assemblies()</span>
-            <span class="func">plot_gpfa_trajectory()</span>
-            <span class="func">plot_connectivity_matrix()</span>
-            <span class="func">plot_circular_network()</span>
-            <span class="func">plot_tuning_curve()</span>
-            <span class="func">plot_dose_response()</span>
+          <div class="card">
+            <h3>Latent structure</h3>
+            <p>Embeddings and low-dimensional trajectories for population dynamics and state structure.</p>
+            <div class="klist">
+              <span class="pill">RunPCA()</span>
+              <span class="pill">RunGPFA()</span>
+              <span class="pill">RunTensorDecomp()</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Networks</h3>
+            <p>Functional connectivity estimates, graph metrics, modular structure, visualization helpers.</p>
+            <div class="klist">
+              <span class="pill">RunConnectivity()</span>
+              <span class="pill">RunGraphMetrics()</span>
+              <span class="pill">plot_connectivity_matrix()</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>State-space / segmentation</h3>
+            <p>State inference and regime changes via discrete/continuous switching models (where implemented).</p>
+            <div class="klist">
+              <span class="pill">RunHMM()</span>
+              <span class="pill">RunSLDS()</span>
+              <span class="pill">RunChangepoints()</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="citation">
-    <div class="container">
-      <h2 class="section-title">Citation</h2>
-      <p class="section-sub">
-        If you want people to cite this, add a real <code>CITATION.cff</code> file in the repo root. Until then, provide a minimal fallback.
-      </p>
+    <section id="api">
+      <div class="wrap">
+        <div class="title">API shape</div>
+        <div class="sub">This is the only “contract” users care about: predictable verbs and stable accessors.</div>
 
-      <div class="card">
-        <h3>Recommended (add to repo)</h3>
-        <p class="small">
-          Create a <code>CITATION.cff</code> so GitHub renders a “Cite this repository” widget automatically.
-        </p>
+        <div class="grid">
+          <div class="card">
+            <h3>Run* methods</h3>
+            <p>Composable, pipeline-friendly steps that add results back into the object.</p>
+            <div class="klist">
+              <span class="pill">RunDFF()</span>
+              <span class="pill">RunSpikes()</span>
+              <span class="pill">RunPCA()</span>
+              <span class="pill">RunConnectivity()</span>
+              <span class="pill">RunGraphMetrics()</span>
+            </div>
+          </div>
 
-        <h3 style="margin-top: 1.1rem;">Fallback</h3>
-        <p class="small">
-          If you do not have a DOI yet, cite the GitHub repository + commit hash used for analysis.
-        </p>
+          <div class="card">
+            <h3>Get* accessors</h3>
+            <p>Stable, explicit access to results without slot spelunking.</p>
+            <div class="klist">
+              <span class="pill">GetTraces()</span>
+              <span class="pill">GetSpikes()</span>
+              <span class="pill">GetReduction()</span>
+              <span class="pill">GetGraph()</span>
+              <span class="pill">GetCommands()</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section id="cite">
+      <div class="wrap">
+        <div class="title">Citation</div>
+        <div class="sub">
+          If you add <code>CITATION.cff</code> to the repository root, GitHub will render a proper “Cite this repository” panel automatically.
+          Until then: cite the repo + commit hash.
+        </div>
+
+        <div class="codeWrap" role="group" aria-label="Citation snippet">
+          <button class="copy" data-copy="citeCode" aria-label="Copy citation text">Copy</button>
+          <pre id="citeCode"><code>CaImagingAnalysisFr (GitHub repository).
+https://github.com/kevinj24fr/CaImagingAnalysisFr
+Cite the exact commit hash used for analysis.</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <footer>
-    <div class="container">
-      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
-        <div>
-          <div style="font-weight:650; color: var(--text);">CaImagingAnalysisFr</div>
-          <div class="small">MIT License</div>
-        </div>
-        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-          <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr">GitHub</a>
-          <a href="#install">Install</a>
-          <a href="#quickstart">Quick Start</a>
-          <a href="#citation">Cite</a>
-        </div>
+    <div class="wrap foot">
+      <div>
+        <div style="font-weight:700; color: var(--text);">CaImagingAnalysisFr</div>
+        <div class="small">MIT License</div>
       </div>
-      <div class="small" style="margin-top: 1rem;">
-        Tip: if you want this page to be defensible, auto-generate API + examples from vignettes and link them here.
+      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+        <a href="#install">Install</a>
+        <a href="#quickstart">Quick start</a>
+        <a href="#scope">Scope</a>
+        <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr" rel="noopener">GitHub</a>
       </div>
+    </div>
+    <div class="wrap small" style="margin-top: 12px;">
+      Built as a single static file. No dependencies. Minimal JS only for copy buttons.
     </div>
   </footer>
 
   <script>
-    // Copy-to-clipboard for code blocks (no deps)
-    (function () {
-      const buttons = document.querySelectorAll(".copy-btn");
-      buttons.forEach((btn) => {
-        btn.addEventListener("click", async () => {
-          const targetId = btn.getAttribute("data-copy-target");
-          const pre = document.getElementById(targetId);
-          if (!pre) return;
+    // Tiny copy-to-clipboard for code blocks.
+    (function(){
+      var buttons = document.querySelectorAll(".copy");
+      buttons.forEach(function(btn){
+        btn.addEventListener("click", function(){
+          var id = btn.getAttribute("data-copy");
+          var node = document.getElementById(id);
+          if(!node) return;
+          var text = node.innerText;
 
-          const text = pre.innerText;
-          try {
-            await navigator.clipboard.writeText(text);
-            const old = btn.textContent;
-            btn.textContent = "Copied";
-            setTimeout(() => (btn.textContent = old), 900);
-          } catch (e) {
-            // Fallback: select text (older browsers)
-            const range = document.createRange();
-            range.selectNodeContents(pre);
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-            btn.textContent = "Select & copy";
-            setTimeout(() => (btn.textContent = "Copy"), 900);
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function(){
+              var old = btn.textContent;
+              btn.textContent = "Copied";
+              setTimeout(function(){ btn.textContent = old; }, 900);
+            }).catch(function(){ fallbackSelect(node, btn); });
+          } else {
+            fallbackSelect(node, btn);
           }
         });
       });
+
+      function fallbackSelect(node, btn){
+        var range = document.createRange();
+        range.selectNodeContents(node);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        var old = btn.textContent;
+        btn.textContent = "Select & copy";
+        setTimeout(function(){ btn.textContent = old; }, 900);
+      }
     })();
   </script>
 </body>

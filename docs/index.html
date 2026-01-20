@@ -1,204 +1,449 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CaImagingAnalysisFr - R Package for Calcium Imaging Analysis</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --bg: #0f172a;
-            --bg-card: #1e293b;
-            --text: #e2e8f0;
-            --text-muted: #94a3b8;
-            --border: #334155;
-            --success: #10b981;
-            --code-bg: #0d1117;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
-        header {
-            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg) 100%);
-            padding: 4rem 0;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-        }
-        h1 {
-            font-size: 3rem;
-            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-        }
-        .tagline { font-size: 1.25rem; color: var(--text-muted); margin-bottom: 2rem; }
-        .badges { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-        .badge {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-        }
-        .install-section {
-            background: var(--bg-card);
-            padding: 3rem 0;
-            margin: 2rem 0;
-        }
-        pre {
-            background: var(--code-bg);
-            border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            overflow-x: auto;
-            font-family: 'Fira Code', 'Consolas', monospace;
-            font-size: 0.9rem;
-        }
-        code { color: #7dd3fc; }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            padding: 3rem 0;
-        }
-        .feature {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-        }
-        .feature h3 {
-            color: #60a5fa;
-            margin-bottom: 0.75rem;
-            font-size: 1.1rem;
-        }
-        .feature p { color: var(--text-muted); font-size: 0.9rem; }
-        .btn {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            text-decoration: none;
-            font-weight: 500;
-            margin: 0.5rem;
-            transition: background 0.2s;
-        }
-        .btn:hover { background: var(--primary-dark); }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-        }
-        .btn-outline:hover { background: var(--bg-card); }
-        .quick-start { padding: 3rem 0; }
-        .quick-start h2 { margin-bottom: 1.5rem; color: #60a5fa; }
-        footer {
-            text-align: center;
-            padding: 2rem;
-            border-top: 1px solid var(--border);
-            color: var(--text-muted);
-        }
-        .func-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 0.5rem;
-            margin: 1rem 0;
-        }
-        .func { font-family: monospace; color: #a78bfa; font-size: 0.85rem; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CaImagingAnalysisFr: an R package for calcium imaging analysis with a Seurat-style object API, preprocessing, latent models, connectivity, and visualization." />
+  <meta name="theme-color" content="#0f172a" />
+
+  <!-- OpenGraph -->
+  <meta property="og:title" content="CaImagingAnalysisFr" />
+  <meta property="og:description" content="R package for calcium imaging analysis with a Seurat-style object API, preprocessing, latent models, connectivity, and visualization." />
+  <meta property="og:type" content="website" />
+
+  <title>CaImagingAnalysisFr - R Package for Calcium Imaging Analysis</title>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #0b1224;
+      --bg-card: #121c33;
+      --bg-card-2: #0f172a;
+      --text: #e6edf7;
+      --text-muted: #9fb0c8;
+      --border: #23304a;
+      --success: #10b981;
+      --code-bg: #0d1117;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --maxw: 1120px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, rgba(96,165,250,0.12), transparent 60%),
+                  radial-gradient(900px 500px at 80% 10%, rgba(167,139,250,0.10), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    a { color: inherit; }
+    .container { max-width: var(--maxw); margin: 0 auto; padding: 0 1.25rem; }
+
+    /* Top nav */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: rgba(11, 18, 36, 0.75);
+      border-bottom: 1px solid rgba(35,48,74,0.8);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 0;
+      gap: 1rem;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      text-decoration: none;
+      font-weight: 650;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    .logo {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      box-shadow: 0 8px 20px rgba(96,165,250,0.18);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      padding: 0.35rem 0.55rem;
+      border-radius: 10px;
+      border: 1px solid transparent;
+    }
+    .nav-links a:hover {
+      color: var(--text);
+      background: rgba(18,28,51,0.7);
+      border-color: rgba(35,48,74,0.9);
+    }
+
+    header {
+      padding: 4.0rem 0 2.5rem 0;
+      border-bottom: 1px solid rgba(35,48,74,0.7);
+    }
+    h1 {
+      font-size: clamp(2.1rem, 3.6vw, 3.2rem);
+      line-height: 1.1;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+      letter-spacing: -0.6px;
+    }
+    .tagline {
+      font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+      color: var(--text-muted);
+      margin-bottom: 1.6rem;
+      max-width: 68ch;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 1.4rem;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .hero-grid { grid-template-columns: 1fr; }
+    }
+
+    .badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .badge {
+      background: rgba(18,28,51,0.7);
+      border: 1px solid rgba(35,48,74,0.9);
+      padding: 0.45rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .hero-card {
+      background: linear-gradient(180deg, rgba(18,28,51,0.85), rgba(15,23,42,0.75));
+      border: 1px solid rgba(35,48,74,0.9);
+      border-radius: var(--radius);
+      padding: 1.1rem;
+      box-shadow: var(--shadow);
+    }
+    .hero-card h3 {
+      font-size: 1.02rem;
+      margin-bottom: 0.6rem;
+      color: #60a5fa;
+    }
+    .hero-card p, .hero-card li { color: var(--text-muted); font-size: 0.95rem; }
+    .hero-card ul { margin-left: 1.1rem; margin-top: 0.3rem; }
+
+    .cta-row { margin-top: 1.4rem; display: flex; gap: 0.7rem; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: var(--primary);
+      color: white;
+      padding: 0.78rem 1.15rem;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: transform 0.12s, background 0.12s;
+    }
+    .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-outline {
+      background: rgba(18,28,51,0.35);
+      border: 1px solid rgba(35,48,74,0.9);
+      color: var(--text);
+    }
+    .btn-outline:hover { background: rgba(18,28,51,0.8); }
+
+    section { padding: 3.0rem 0; }
+    .section-title {
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+      color: #60a5fa;
+      letter-spacing: -0.2px;
+    }
+    .section-sub {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      max-width: 80ch;
+    }
+
+    /* Feature cards */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.1rem;
+    }
+    .feature {
+      background: rgba(18,28,51,0.7);
+      border: 1px solid rgba(35,48,74,0.9);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    .feature h3 { color: #60a5fa; margin-bottom: 0.55rem; font-size: 1.05rem; }
+    .feature p { color: var(--text-muted); font-size: 0.95rem; }
+
+    /* Code blocks + copy button */
+    .code-wrap {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid rgba(35,48,74,0.9);
+      background: var(--code-bg);
+    }
+    pre {
+      margin: 0;
+      padding: 1.1rem 1.1rem 1.1rem 1.1rem;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+    code { color: #7dd3fc; }
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(18,28,51,0.75);
+      color: var(--text);
+      border: 1px solid rgba(35,48,74,0.9);
+      border-radius: 10px;
+      padding: 0.35rem 0.55rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .copy-btn:hover { background: rgba(18,28,51,0.95); }
+
+    /* Two-column blocks */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+    @media (max-width: 860px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: rgba(18,28,51,0.7);
+      border: 1px solid rgba(35,48,74,0.9);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+    }
+    .card h3 { color: #60a5fa; margin-bottom: 0.55rem; font-size: 1.05rem; }
+    .card p, .card li { color: var(--text-muted); font-size: 0.95rem; }
+    .card ul { margin-left: 1.1rem; margin-top: 0.35rem; }
+    .small { font-size: 0.9rem; color: var(--text-muted); }
+
+    /* Function list */
+    .func-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 0.45rem 0.8rem;
+      margin-top: 0.9rem;
+    }
+    .func {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      color: #a78bfa;
+      font-size: 0.9rem;
+      padding: 0.25rem 0.45rem;
+      border-radius: 10px;
+      border: 1px solid rgba(35,48,74,0.75);
+      background: rgba(15,23,42,0.35);
+      width: fit-content;
+    }
+
+    footer {
+      padding: 2rem 0;
+      border-top: 1px solid rgba(35,48,74,0.7);
+      color: var(--text-muted);
+    }
+    footer a { color: #60a5fa; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* Accessibility */
+    :focus-visible { outline: 2px solid rgba(96,165,250,0.8); outline-offset: 2px; border-radius: 8px; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .btn { transition: none; }
+      .btn:hover { transform: none; }
+    }
+  </style>
 </head>
+
 <body>
-    <header>
-        <div class="container">
-            <h1>CaImagingAnalysisFr</h1>
-            <p class="tagline">A Comprehensive R Package for Calcium Imaging Analysis</p>
-            <div class="badges">
-                <span class="badge">Seurat-style API</span>
-                <span class="badge">500+ Functions</span>
-                <span class="badge">Publication-Ready Plots</span>
-                <span class="badge">HMM / SLDS / TDA</span>
-            </div>
-            <div style="margin-top: 2rem;">
-                <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr" class="btn">View on GitHub</a>
-                <a href="#install" class="btn btn-outline">Installation</a>
-            </div>
-        </div>
-    </header>
+  <div class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="#top" aria-label="CaImagingAnalysisFr Home">
+        <span class="logo" aria-hidden="true"></span>
+        <span>CaImagingAnalysisFr</span>
+      </a>
+      <div class="nav-links" role="navigation" aria-label="Page navigation">
+        <a href="#install">Install</a>
+        <a href="#quickstart">Quick Start</a>
+        <a href="#features">Features</a>
+        <a href="#functions">Functions</a>
+        <a href="#citation">Cite</a>
+      </div>
+    </div>
+  </div>
 
-    <section class="install-section" id="install">
-        <div class="container">
-            <h2 style="text-align: center; margin-bottom: 1.5rem;">Installation</h2>
-            <pre><code># Install from GitHub
+  <header id="top">
+    <div class="container hero-grid">
+      <div>
+        <h1>CaImagingAnalysisFr</h1>
+        <p class="tagline">
+          R package for calcium imaging analysis with a Seurat-style object API, preprocessing, latent models, connectivity, and visualization.
+        </p>
+
+        <div class="badges" aria-label="Project highlights">
+          <span class="badge">Seurat-style object API</span>
+          <span class="badge">Reproducible command history</span>
+          <span class="badge">Preprocessing → models → plots</span>
+          <span class="badge">HMM / SLDS / TDA (where implemented)</span>
+        </div>
+
+        <div class="cta-row">
+          <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr" class="btn">View on GitHub</a>
+          <a href="#install" class="btn btn-outline">Installation</a>
+          <a href="#citation" class="btn btn-outline">Citation</a>
+        </div>
+
+        <p class="small" style="margin-top: 1rem;">
+          This page is intentionally conservative: it describes what the package aims to cover, but you should back claims with exported functions/vignettes in the repo.
+        </p>
+      </div>
+
+      <div class="hero-card">
+        <h3>What this is (and isn’t)</h3>
+        <p>
+          A single entry point for calcium imaging workflows. It’s built around a
+          <strong>CaExperiment</strong> container to standardize traces, metadata, results, and provenance.
+        </p>
+        <ul>
+          <li><strong>Inputs:</strong> traces (cells × time), frame rate, metadata</li>
+          <li><strong>Outputs:</strong> dF/F, spikes/events, latent embeddings, graphs, plots</li>
+          <li><strong>Goal:</strong> consistent pipelines + clean accessors</li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <section id="install">
+    <div class="container">
+      <h2 class="section-title">Installation</h2>
+      <p class="section-sub">Install directly from GitHub. If you rely on system libraries (e.g., for HMM/SLDS backends), document them in the repo README.</p>
+
+      <div class="code-wrap">
+        <button class="copy-btn" data-copy-target="install-code" aria-label="Copy installation code">Copy</button>
+        <pre id="install-code"><code># Install from GitHub
+install.packages("devtools")
 devtools::install_github("kevinj24fr/CaImagingAnalysisFr")</code></pre>
-        </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <section class="container">
-        <div class="features">
-            <div class="feature">
-                <h3>CaExperiment Object</h3>
-                <p>Unified Seurat-style container for all calcium imaging data, analysis results, and provenance tracking.</p>
-            </div>
-            <div class="feature">
-                <h3>Preprocessing</h3>
-                <p>Motion correction, neuropil subtraction, dF/F calculation, and spike inference (OASIS, threshold, Bayesian).</p>
-            </div>
-            <div class="feature">
-                <h3>Dimensionality Reduction</h3>
-                <p>PCA, GPFA, dPCA, tensor decomposition, and neural ODE fitting for latent dynamics.</p>
-            </div>
-            <div class="feature">
-                <h3>Network Analysis</h3>
-                <p>Functional connectivity, graph metrics, community detection, and causal discovery.</p>
-            </div>
-            <div class="feature">
-                <h3>State Space Models</h3>
-                <p>Hidden Markov Models (HMM), Switching Linear Dynamical Systems (SLDS), and changepoint detection.</p>
-            </div>
-            <div class="feature">
-                <h3>Advanced Methods</h3>
-                <p>Topological data analysis (TDA), recurrence quantification, optimal transport, and conformal prediction.</p>
-            </div>
-        </div>
-    </section>
+  <section id="quickstart">
+    <div class="container">
+      <h2 class="section-title">Quick Start</h2>
+      <p class="section-sub">
+        Minimal pipeline example. Keep this aligned with your exported API (don’t advertise functions that aren’t stable/exported).
+      </p>
 
-    <section class="quick-start container">
-        <h2>Quick Start</h2>
-        <pre><code>library(CaImagingAnalysisFr)
+      <div class="code-wrap">
+        <button class="copy-btn" data-copy-target="qs-code" aria-label="Copy quick start code">Copy</button>
+        <pre id="qs-code"><code>library(CaImagingAnalysisFr)
 
-# Create CaExperiment and run analysis pipeline
+# Create CaExperiment and run a typical pipeline
 ca <- CaExperiment(traces, frame_rate = 30) |>
   RunDFF(method = "rolling", window_size = 300) |>
   RunSpikes(method = "threshold", threshold_sd = 2.5) |>
   RunPCA(n_components = 15) |>
   RunConnectivity(method = "correlation") |>
-  RunGraphMetrics() |>
-  RunAssemblies(method = "pca", n_assemblies = 5) |>
-  RunTransients(threshold_sd = 2.0)
+  RunGraphMetrics()
 
 # Access results
 dff_traces <- GetTraces(ca, assay = "dff")
-spikes <- GetSpikes(ca)
-pca <- GetReduction(ca, "pca")
-conn <- GetGraph(ca, "connectivity_correlation")
+spikes     <- GetSpikes(ca)
+pca        <- GetReduction(ca, "pca")
+conn       <- GetGraph(ca, "connectivity_correlation")
 
-# Advanced analysis
-ca <- RunHMM(ca, n_states = 3)
-ca <- RunSLDS(ca, n_states = 2, latent_dim = 3)
-ca <- RunTDA(ca)
-ca <- RunNeuralODE(ca)</code></pre>
-    </section>
+# Optional advanced analysis (if available in your build)
+# ca <- RunHMM(ca, n_states = 3)
+# ca <- RunSLDS(ca, n_states = 2, latent_dim = 3)
+# ca <- RunTDA(ca)</code></pre>
+      </div>
+    </div>
+  </section>
 
-    <section class="container" style="padding: 3rem 0;">
-        <h2 style="color: #60a5fa; margin-bottom: 1rem;">Key Functions</h2>
-        <h4 style="color: var(--text-muted); margin: 1rem 0 0.5rem;">CaExperiment Methods</h4>
-        <div class="func-list">
+  <section id="features">
+    <div class="container">
+      <h2 class="section-title">Core Capabilities</h2>
+      <p class="section-sub">
+        The package is organized around a common object model and composable “Run*()” steps with explicit accessors.
+      </p>
+
+      <div class="features">
+        <div class="feature">
+          <h3>CaExperiment Object</h3>
+          <p>Unified Seurat-style container for traces, metadata, results, and command/provenance tracking.</p>
+        </div>
+        <div class="feature">
+          <h3>Preprocessing</h3>
+          <p>Typical steps: neuropil subtraction, dF/F, event/spike inference (method-dependent), QC, and normalization.</p>
+        </div>
+        <div class="feature">
+          <h3>Dimensionality Reduction</h3>
+          <p>Common reductions (e.g., PCA/GPFA-style embeddings) for population trajectories and state structure.</p>
+        </div>
+        <div class="feature">
+          <h3>Network Analysis</h3>
+          <p>Functional connectivity estimates, graph metrics, community detection, and network visualization.</p>
+        </div>
+        <div class="feature">
+          <h3>State Space Models</h3>
+          <p>State segmentation via HMM / switching models, plus changepoint-style methods (where implemented).</p>
+        </div>
+        <div class="feature">
+          <h3>Advanced Methods</h3>
+          <p>TDA / recurrence-style summaries / optimal transport-style comparisons (where implemented and documented).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="functions">
+    <div class="container">
+      <h2 class="section-title">Key Functions</h2>
+      <p class="section-sub">
+        If you want this to be bulletproof, auto-generate this list from your NAMESPACE exports during CI and paste it here.
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>CaExperiment “Run*()” methods</h3>
+          <div class="func-list" aria-label="Run methods">
             <span class="func">RunDFF()</span>
             <span class="func">RunSpikes()</span>
             <span class="func">RunPCA()</span>
@@ -210,14 +455,19 @@ ca <- RunNeuralODE(ca)</code></pre>
             <span class="func">RunHMM()</span>
             <span class="func">RunSLDS()</span>
             <span class="func">RunTDA()</span>
-            <span class="func">RunNeuralODE()</span>
             <span class="func">RunTensorDecomp()</span>
             <span class="func">RunChangepoints()</span>
             <span class="func">RunRQA()</span>
             <span class="func">RunCausalDiscovery()</span>
+          </div>
         </div>
-        <h4 style="color: var(--text-muted); margin: 1rem 0 0.5rem;">Accessors</h4>
-        <div class="func-list">
+
+        <div class="card">
+          <h3>Accessors + plotting</h3>
+          <p class="small">Prefer stable accessors over direct slot access. Keep plot functions explicit about inputs/units.</p>
+
+          <h4 style="margin-top: 0.9rem; color: var(--text-muted); font-size: 0.95rem;">Accessors</h4>
+          <div class="func-list" aria-label="Accessors">
             <span class="func">GetTraces()</span>
             <span class="func">GetSpikes()</span>
             <span class="func">GetReduction()</span>
@@ -226,9 +476,10 @@ ca <- RunNeuralODE(ca)</code></pre>
             <span class="func">GetTransients()</span>
             <span class="func">GetMetaData()</span>
             <span class="func">GetCommands()</span>
-        </div>
-        <h4 style="color: var(--text-muted); margin: 1rem 0 0.5rem;">Visualization</h4>
-        <div class="func-list">
+          </div>
+
+          <h4 style="margin-top: 0.9rem; color: var(--text-muted); font-size: 0.95rem;">Visualization</h4>
+          <div class="func-list" aria-label="Visualization">
             <span class="func">plot_neural_raster()</span>
             <span class="func">plot_correlation_matrix()</span>
             <span class="func">plot_assemblies()</span>
@@ -237,14 +488,82 @@ ca <- RunNeuralODE(ca)</code></pre>
             <span class="func">plot_circular_network()</span>
             <span class="func">plot_tuning_curve()</span>
             <span class="func">plot_dose_response()</span>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <footer>
-        <p>CaImagingAnalysisFr - MIT License</p>
-        <p style="margin-top: 0.5rem;">
-            <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr" style="color: #60a5fa;">GitHub</a>
+  <section id="citation">
+    <div class="container">
+      <h2 class="section-title">Citation</h2>
+      <p class="section-sub">
+        If you want people to cite this, add a real <code>CITATION.cff</code> file in the repo root. Until then, provide a minimal fallback.
+      </p>
+
+      <div class="card">
+        <h3>Recommended (add to repo)</h3>
+        <p class="small">
+          Create a <code>CITATION.cff</code> so GitHub renders a “Cite this repository” widget automatically.
         </p>
-    </footer>
+
+        <h3 style="margin-top: 1.1rem;">Fallback</h3>
+        <p class="small">
+          If you do not have a DOI yet, cite the GitHub repository + commit hash used for analysis.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:650; color: var(--text);">CaImagingAnalysisFr</div>
+          <div class="small">MIT License</div>
+        </div>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <a href="https://github.com/kevinj24fr/CaImagingAnalysisFr">GitHub</a>
+          <a href="#install">Install</a>
+          <a href="#quickstart">Quick Start</a>
+          <a href="#citation">Cite</a>
+        </div>
+      </div>
+      <div class="small" style="margin-top: 1rem;">
+        Tip: if you want this page to be defensible, auto-generate API + examples from vignettes and link them here.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Copy-to-clipboard for code blocks (no deps)
+    (function () {
+      const buttons = document.querySelectorAll(".copy-btn");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const targetId = btn.getAttribute("data-copy-target");
+          const pre = document.getElementById(targetId);
+          if (!pre) return;
+
+          const text = pre.innerText;
+          try {
+            await navigator.clipboard.writeText(text);
+            const old = btn.textContent;
+            btn.textContent = "Copied";
+            setTimeout(() => (btn.textContent = old), 900);
+          } catch (e) {
+            // Fallback: select text (older browsers)
+            const range = document.createRange();
+            range.selectNodeContents(pre);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            btn.textContent = "Select & copy";
+            setTimeout(() => (btn.textContent = "Copy"), 900);
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
